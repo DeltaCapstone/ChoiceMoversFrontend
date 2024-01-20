@@ -1,0 +1,6 @@
+.image-container {
+    margin: 15%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
