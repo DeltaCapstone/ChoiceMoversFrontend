@@ -1,7 +1,4 @@
-<app-navbar></app-navbar>
-
 <div class="image-container">
-  <img src="assets/cat-meme.png">
+  <h1>{{ response ? response : 'click the cat' }}</h1>
+  <img (click)="getRequest()" src="assets/cat-meme.png">
 </div>
-
-<router-outlet />
