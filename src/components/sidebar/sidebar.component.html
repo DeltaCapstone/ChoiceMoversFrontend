@@ -1,4 +1,4 @@
-<div class="w-40 h-full bg-white text-black fixed">
+<div class="w-40 h-full bg-neutral text-black fixed">
   <div>
     <img src="/assets/logo.png"/>
   </div>
@@ -9,10 +9,10 @@
   
   <div>
     <ul>
-      <li class="p-4 hover:bg-gray-700" *ngFor="let item of sidebarItems">
-        <div class="flex items-center">
-          <tui-svg src="tuiIconCalendarLarge"></tui-svg>
-          <p class="p-2">{{ item.name }}</p>
+      <li class="p-4 mb-5" [ngClass]="{'bg-secondary': i === selectedIndex}" *ngFor="let item of sidebarItems; index as i">
+        <div class="flex items-center" >
+          <tui-svg [src]="item.icon"></tui-svg>
+          <p [ngClass]="{'text-neutral': i === selectedIndex}"  class="ml-2 text-lg select-none">{{ item.name }}</p>
         </div>
       </li>
     </ul>
