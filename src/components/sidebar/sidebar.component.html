@@ -1,13 +1,15 @@
-<div>
+<div class="w-40 h-full bg-white text-black fixed">
   <div>
-    <img/>
+    <img src="/assets/logo.png"/>
   </div>
   
   <div>
     
   </div>
   
-  <ul>
-    <li *ngFor="let item of sidebarItems">{{ item.name }}</li>
-  </ul>
+  <div>
+    <ul>
+       <li class="p-4 hover:bg-gray-700" *ngFor="let item of sidebarItems">{{ item.name }}</li>
+    </ul>
+  </div>
 </div>
