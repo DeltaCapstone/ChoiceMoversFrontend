@@ -9,10 +9,10 @@
   
   <div>
     <ul>
-      <li class="mb-3" [ngClass]="{'bg-secondary': i === selIdx}" *ngFor="let item of items; index as i">
-        <a (click)="itemClick(i)" [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
+      <li class="mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
+        <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
           <tui-svg [src]="item.icon"></tui-svg>
-          <span [ngClass]="{'text-neutral': i === selIdx}"  class="ml-2 text-lg select-none">{{ item.name }}</span>
+          <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.name }}</span>
         </a>
       </li>
     </ul>
