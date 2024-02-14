@@ -10,8 +10,9 @@
   <div>
     <ul>
       <li class="p-4 hover:bg-gray-700" *ngFor="let item of sidebarItems">
-        <div>
-          <p>{{ item.name }}</p>
+        <div class="flex items-center">
+          <tui-svg src="tuiIconCalendarLarge"></tui-svg>
+          <p class="p-2">{{ item.name }}</p>
         </div>
       </li>
     </ul>
