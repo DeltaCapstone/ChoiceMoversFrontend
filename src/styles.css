@@ -1,1 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --neutral-light-color: rgba(239, 236, 236, 1);
+    --primary-color: rgba(24, 35, 50, 1);
+    --secondary-color: rgba(252, 103, 54, 1);
+}

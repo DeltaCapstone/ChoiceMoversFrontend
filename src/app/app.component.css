@@ -1,14 +1,1 @@
-.image-container {
-    margin: 25%;
-    width: 50%;
-    height: auto;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-}
 
-.image-container:hover {
-    margin: 15%;
-    width: 75%;
-    cursor: pointer;
-}
