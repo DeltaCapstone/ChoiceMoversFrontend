@@ -1,0 +1,3 @@
+li:not(.bg-secondary):hover {
+    background: rgba(198, 198, 198, 1);
+}
