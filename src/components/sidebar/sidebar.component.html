@@ -11,15 +11,16 @@
     <ul>
       <li class="mb-2 mt-2">
         <div class="flex">
-          <div class="flex items-center p-2 relative">
+          <div class="flex items-center p-2">
             <tui-marker-icon id="profileIcon" size="s" src="tuiIconUserLarge"></tui-marker-icon>
           </div>
-          <div>
-            <p class="text-lg">Adam Smith</p>
-            <span class="text-sm opacity-50">Supervisor</span>
+          <div class="flex flex-col justify-center">
+            <p class="text-xl">Adam Smith</p>
+            <span class="text-base opacity-50">Supervisor</span>
           </div>
         </div>
       </li>
+      
       <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
         <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
           <tui-svg [src]="item.icon"></tui-svg>
