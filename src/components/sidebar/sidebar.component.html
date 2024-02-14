@@ -9,11 +9,11 @@
   
   <div>
     <ul>
-      <li class="p-4 mb-5" [ngClass]="{'bg-secondary': i === selectedIndex}" *ngFor="let item of sidebarItems; index as i">
-        <div class="flex items-center" >
+      <li class="mb-3" [ngClass]="{'bg-secondary': i === selIdx}" *ngFor="let item of items; index as i">
+        <a (click)="itemClick(i)" [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
           <tui-svg [src]="item.icon"></tui-svg>
-          <p [ngClass]="{'text-neutral': i === selectedIndex}"  class="ml-2 text-lg select-none">{{ item.name }}</p>
-        </div>
+          <span [ngClass]="{'text-neutral': i === selIdx}"  class="ml-2 text-lg select-none">{{ item.name }}</span>
+        </a>
       </li>
     </ul>
   </div>
