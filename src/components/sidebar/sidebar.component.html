@@ -1,4 +1,4 @@
-<section class="w-40 h-full bg-neutral text-black font-bold">
+<section class="h-full bg-neutral text-black font-bold">
   <div>
     <img src="/assets/logo.png"/>
   </div>
@@ -9,7 +9,18 @@
   
   <div>
     <ul>
-      <li class="mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
+      <li class="mb-2 mt-2">
+        <div class="flex">
+          <div class="flex items-center p-2 relative">
+            <tui-marker-icon id="profileIcon" size="s" src="tuiIconUserLarge"></tui-marker-icon>
+          </div>
+          <div>
+            <p class="text-lg">Adam Smith</p>
+            <span class="text-sm opacity-50">Supervisor</span>
+          </div>
+        </div>
+      </li>
+      <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
         <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
           <tui-svg [src]="item.icon"></tui-svg>
           <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.name }}</span>

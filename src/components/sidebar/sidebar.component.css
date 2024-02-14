@@ -1,3 +1,8 @@
-li:not(.bg-secondary):hover {
+.sidebar-item:not(.bg-secondary):hover {
     background: rgba(198, 198, 198, 1);
+}
+
+#profileIcon {
+    color: var(--tui-base-01);
+    background-color: var(--primary-color);
 }

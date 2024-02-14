@@ -2,6 +2,7 @@ import { NgFor, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { TuiSvgModule } from '@taiga-ui/core';
 import { RouterLink, RouterLinkActive  } from '@angular/router';
+import { TuiMarkerIconModule } from '@taiga-ui/kit';
 
 type SidebarItem = {
     readonly name: string
@@ -12,14 +13,14 @@ type SidebarItem = {
 @Component({
     selector: 'app-sidebar',
     standalone: true,
-    imports: [NgFor, TuiSvgModule, NgClass, RouterLink, RouterLinkActive],
+    imports: [NgFor, TuiSvgModule, NgClass, RouterLink, RouterLinkActive, TuiMarkerIconModule],
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {    
+export class SidebarComponent {
     items: SidebarItem[] = [
         { name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" },
-        { name: "Employees", icon: "tuiIconUserLarge", route: "employees" },
+        { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },
         { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" },
         { name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" }
     ];
