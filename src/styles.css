@@ -6,4 +6,6 @@
     --neutral-light-color: rgba(239, 236, 236, 1);
     --primary-color: rgba(24, 35, 50, 1);
     --secondary-color: rgba(252, 103, 54, 1);
+    --tui-avatar-color: var(--neutral-light-color);
+    --tui-avatar-background: var(--primary-color);
 }
