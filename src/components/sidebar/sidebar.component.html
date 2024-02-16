@@ -10,15 +10,15 @@
   <div>
     <ul>
       <li class="mb-2 mt-2">
-        <div class="flex">
+        <button style="background: var(--neutral-light-color); box-shadow: 0 0;" class="flex w-full hover:drop-shadow-sm" tuiSurface="elevated">
           <div class="flex items-center p-2">
             <tui-avatar id="profileIcon" text="Adam Smith"></tui-avatar>
           </div>
           <div class="flex flex-col justify-center">
             <p class="text-xl">Adam Smith</p>
-            <span class="text-base opacity-50">Supervisor</span>
+            <span class="text-base text-left opacity-50">Supervisor</span>
           </div>
-        </div>
+        </button>
       </li>
       
       <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
