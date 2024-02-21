@@ -1,19 +1,17 @@
 import { NgDompurifySanitizer } from "@tinkoff/ng-dompurify";
-import { TuiRootModule, TuiDialogModule, TuiAlertModule, TUI_SANITIZER } from "@taiga-ui/core";
+import { TuiRootModule, TUI_SANITIZER } from "@taiga-ui/core";
 import { Component } from '@angular/core';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { BrowserModule } from '@angular/platform-browser';
-import { SidebarComponent } from '../components/sidebar/sidebar.component';
-import { RouterOutlet } from "@angular/router";
+import { LayoutComponent } from "./shared/components/layout/layout.component";
+import { SidebarComponent } from "./shared/components/sidebar/sidebar.component";
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [SidebarComponent, TuiRootModule, TuiDialogModule,
-              TuiAlertModule, RouterOutlet],
+    imports: [SidebarComponent, TuiRootModule, LayoutComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    providers: [{provide: TUI_SANITIZER, useClass: NgDompurifySanitizer}]
+    providers: [{ provide: TUI_SANITIZER, useClass: NgDompurifySanitizer }]
 })
 export class AppComponent {
 }
+
