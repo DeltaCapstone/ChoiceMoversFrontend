@@ -1,15 +1,9 @@
-<section class="h-full bg-neutral text-black font-bold">
-    <div>
-        <img src="/assets/logo.png" />
-    </div>
-
-    <div>
-        <ul>
-            <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
-                <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
-                    <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.title }}</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</section>
+<div>
+    <app-customer-nav-bar></app-customer-nav-bar>
+    <section>
+      <div>
+        <router-outlet></router-outlet>
+      </div>
+    </section>
+  </div>
+  

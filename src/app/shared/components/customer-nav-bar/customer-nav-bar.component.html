@@ -1,0 +1,9 @@
+<img src="/assets/logo.png" alt="Logo" width="150px" height="150px"/>
+    <ul class="flex">
+        <li routerLinkActive="bg-secondary" *ngFor="let item of items">
+            <a [routerLink]="item.route" style="color:white">
+                <span routerLinkActive="text-neutral">{{ item.title }}</span>
+            </a>
+      </li>
+    </ul>
+
