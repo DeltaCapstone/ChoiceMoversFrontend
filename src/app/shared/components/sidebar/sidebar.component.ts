@@ -3,7 +3,8 @@ import { Component } from '@angular/core';
 import { TuiSvgModule } from '@taiga-ui/core';
 import { RouterLink, RouterLinkActive  } from '@angular/router';
 import {TuiAvatarModule} from '@taiga-ui/kit';
-import { TuiCardModule, TuiSurfaceModule } from '@taiga-ui/experimental';
+import { TuiSurfaceModule } from '@taiga-ui/experimental';
+import { BaseComponent } from '../base-component';
 
 type SidebarItem = {
     readonly name: string
@@ -18,7 +19,7 @@ type SidebarItem = {
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
+export class SidebarComponent extends BaseComponent {
     items: SidebarItem[] = [
         { name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" },
         { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },

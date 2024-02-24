@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { PageService } from '../../../shared/services/page.service';
+import { PageComponent } from '../../../shared/components/page-component';
 
 @Component({
   selector: 'app-statistics',
@@ -7,6 +9,12 @@ import { Component } from '@angular/core';
   templateUrl: './statistics.component.html',
   styleUrl: './statistics.component.css'
 })
-export class StatisticsComponent {
-
+export class StatisticsComponent extends PageComponent {
+    ngOnInit(){
+        this.setTitle("Statistics");
+    }
+    
+    constructor(pageService: PageService){
+        super(pageService);
+    }
 }

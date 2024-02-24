@@ -1,9 +1,12 @@
-import { NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
-import {TuiTableModule} from '@taiga-ui/addon-table';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
-import { TuiTagModule } from '@taiga-ui/kit';
-import {TuiButtonModule} from '@taiga-ui/core';
+import { TuiInputModule, TuiTagModule } from '@taiga-ui/kit';
+import { TuiButtonModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
+import { PageComponent } from '../../../shared/components/page-component';
+import { PageService } from '../../../shared/services/page.service';
+import { FormGroup, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 interface User {
     readonly email: string;
@@ -15,12 +18,26 @@ interface User {
 @Component({
     selector: 'app-employees',
     standalone: true,
-    imports: [TuiTableModule, TuiTagModule, NgIf, NgFor, TuiLetModule, TuiButtonModule],
+    imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
+              TuiInputModule, TuiTableFiltersModule, 
+              TuiLetModule, TuiButtonModule, 
+              ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
     templateUrl: './employees.component.html',
-    styleUrl: './employees.component.css'
+    styleUrl: './employees.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EmployeesComponent {
-    readonly columns = ['name', 'email', 'status', 'tags'];
+export class EmployeesComponent extends PageComponent {
+    ngOnInit(){
+        this.setTitle("Employees");
+    }
+
+    constructor(pageService: PageService) {
+        super(pageService);
+    }
+
+    readonly form = new FormGroup({
+        input: new FormControl(""),
+    });
 
     users: readonly User[] = [
         {
@@ -60,4 +77,8 @@ export class EmployeesComponent {
             tags: ['Funny', 'King Arthur'],
         },
     ];
+
+    readonly filter = (item: string, value: string): boolean => item.includes(value);
+
+    readonly columns = Object.keys(this.users[0]);
 }
