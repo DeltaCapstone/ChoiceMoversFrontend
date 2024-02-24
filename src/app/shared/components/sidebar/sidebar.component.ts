@@ -1,8 +1,8 @@
 import { NgFor, NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { TuiSvgModule } from '@taiga-ui/core';
-import { RouterLink, RouterLinkActive  } from '@angular/router';
-import {TuiAvatarModule} from '@taiga-ui/kit';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
 import { BaseComponent } from '../base-component';
 

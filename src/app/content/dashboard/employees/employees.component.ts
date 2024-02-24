@@ -3,10 +3,10 @@ import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
 import { TuiInputModule, TuiTagModule } from '@taiga-ui/kit';
-import { TuiButtonModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
+import { TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
-import { FormGroup, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 interface User {
     readonly email: string;
@@ -20,7 +20,7 @@ interface User {
     standalone: true,
     imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
               TuiInputModule, TuiTableFiltersModule, 
-              TuiLetModule, TuiButtonModule, 
+              TuiLetModule, TuiButtonModule, TuiSvgModule,
               ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
     templateUrl: './employees.component.html',
     styleUrl: './employees.component.css',
