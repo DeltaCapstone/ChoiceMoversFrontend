@@ -1,0 +1,78 @@
+<div>
+  <div class="flex">
+    <div class="flex items-center p-2">
+      <tui-avatar [rounded]="true" size="xl" [text]="user.name"></tui-avatar>
+    </div>
+    <div class="flex flex-col text-left justify-center">
+      <p class="text-4xl">{{ user.name }}</p>
+      <span class="text-2xl opacity-50">Employee</span>
+    </div>
+  </div>
+
+  <div class="tui-container w-full mt-5">
+    <form [formGroup]="form">
+      <div class="tui-row tui-row_sme">
+        <div class="tui-col_8 w-5/6 m-auto mt-8">
+          <div class="tui-form__row">
+            <tui-input formControlName="name">
+              Name
+              <input tuiTextfield />
+              <span class="tui-required"></span>
+            </tui-input>
+            <tui-error formControlName="name"></tui-error>
+          </div>
+
+          <div class="tui-form__row tui-form__row_multi-fields">
+            <div class="tui-form__multi-field">
+              <tui-input formControlName="zip">
+                Zip
+              </tui-input>
+              <tui-error formControlName="zip" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
+            <div class="tui-form__multi-field">
+              <tui-input-phone formControlName="phone">Phone</tui-input-phone>
+              <tui-error formControlName="phone" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
+          </div>
+
+          <div class="tui-form__row tui-form__row_multi-fields">
+            <div class="tui-form__multi-field">
+              <tui-input formControlName="city">
+                City
+              </tui-input>
+              <tui-error formControlName="city" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
+            <div class="tui-form__multi-field">
+              <tui-input formControlName="state">
+                State
+              </tui-input>
+              <tui-error formControlName="state" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
+          </div>
+
+          <div class="tui-form__row">
+            <tui-input formControlName="address">
+              Name
+              <input tuiTextfield />
+            </tui-input>
+            <tui-error formControlName="address"></tui-error>
+          </div>
+
+          <div class="tui-form__row">
+            <tui-textarea [rows]="5" formControlName="notes" [expandable]="true">
+              Notes
+            </tui-textarea>
+          </div>
+          <div class="tui-form__buttons">
+            <button tuiButton type="submit" style="background: var(--secondary-color)" class="p-3 rounded-md text-lg tui-form__button">
+              Submit
+            </button>
+            <button tuiButton type="button" class="text-lg tui-form__button">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
