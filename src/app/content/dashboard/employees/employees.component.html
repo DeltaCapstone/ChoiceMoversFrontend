@@ -1,18 +1,16 @@
 <section style="border: 1px solid rgb(27, 31, 59, .2);" class="bg-[white] h-full p-[20px]" tuiTableFilters>
   <form class="w-full" [formGroup]="form">
-    <div class="flex m-3 ml-0 items-center">
+    <div class="flex mb-[1.5em] ml-0 items-center">
           <tui-input class="w-2/5" tuiTextfieldSize="s" formControlName="input" tuiTableFilter="name"
             [tuiGenericFilter]="filter">
             Name
             <input tuiTextfield />
           </tui-input>
-          <div class="p-1 hover:bg-[black] hover:rounded-lg hover:bg-opacity-10 ml-auto flex items-center cursor-pointer">
-            <tui-svg src="tuiIconFilterLarge"></tui-svg>
-            <span class="ml-1">Filter</span>
+          <div class="px-[0.65em] py-[0.4em] bg-primary rounded-[3.25px] text-[white] ml-auto flex items-center cursor-pointer">
+            <tui-svg src="tuiIconFilter"></tui-svg>
           </div>
-          <div class="p-1 hover:bg-[black] hover:rounded-lg hover:bg-opacity-10 ml-4 flex items-center cursor-pointer">
-            <tui-svg src="tuiIconPlusCircleLarge"></tui-svg>
-            <span class="ml-1">Add</span>
+          <div class="px-[0.65em] py-[0.4em] bg-primary ml-[0.75em] text-[white] rounded-[3.25px] flex items-center cursor-pointer">
+            <tui-svg src="tuiIconPlusCircle"></tui-svg>
           </div>          
     </div>
 
