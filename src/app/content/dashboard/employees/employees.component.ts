@@ -29,7 +29,7 @@ export class EmployeesComponent extends PageComponent {
     constructor(pageService: PageService) {
         super(pageService);
 
-        this.currentUser = null;
+        this.openedUser = null;
     }
 
     readonly form = new FormGroup({
@@ -38,10 +38,10 @@ export class EmployeesComponent extends PageComponent {
     });
 
     openUser(i: number){
-        this.currentUser = this.users[i];
+        this.openedUser = this.users[i];
     }
 
-    currentUser: User | null;
+    openedUser: User | null;
 
     users: readonly User[] = [
         {

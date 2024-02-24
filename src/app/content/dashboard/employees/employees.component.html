@@ -1,4 +1,4 @@
-<app-profile [user]="currentUser" *ngIf="currentUser; else tableView"></app-profile>
+<app-profile [user]="openedUser" *ngIf="openedUser; else tableView"></app-profile>
 
 <ng-template #tableView>
   <div style="border: 1px solid rgb(27, 31, 59, .2);" class="bg-[white] h-full p-[20px]" tuiTableFilters>
