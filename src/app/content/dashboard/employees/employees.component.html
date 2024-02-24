@@ -1,4 +1,4 @@
-<app-profile *ngIf="currentUser; else tableView"></app-profile>
+<app-profile [user]="currentUser" *ngIf="currentUser; else tableView"></app-profile>
 
 <ng-template #tableView>
   <div style="border: 1px solid rgb(27, 31, 59, .2);" class="bg-[white] h-full p-[20px]" tuiTableFilters>
@@ -36,8 +36,8 @@
           </tr>
         </thead>
         <tbody *tuiLet="users | tuiTableSort as sortedUsers" tuiTbody [data]="sortedUsers">
-          <tr *ngFor="let item of sortedUsers | tuiTableFilters | async" tuiTr>
-            <td *tuiCell="'name'" tuiTd>
+          <tr *ngFor="let item of sortedUsers | tuiTableFilters | async; let i = index" tuiTr>
+            <td (click)="openUser(i)" class="cursor-pointer" *tuiCell="'name'" tuiTd>
               {{ item.name }}
             </td>
             <td *tuiCell="'email'" tuiTd>

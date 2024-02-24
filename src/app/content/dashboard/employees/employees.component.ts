@@ -3,18 +3,12 @@ import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
 import { TuiInputModule, TuiTagModule } from '@taiga-ui/kit';
-import { TuiButtonModule, TuiPrimitiveTextfieldDirective, TuiSvgModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
+import { TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
-
-interface User {
-    readonly email: string;
-    readonly name: string;
-    readonly status: 'alive' | 'deceased';
-    readonly tags: readonly string[];
-}
+import { User } from '../../../models/user';
 
 @Component({
     selector: 'app-employees',
@@ -35,7 +29,7 @@ export class EmployeesComponent extends PageComponent {
     constructor(pageService: PageService) {
         super(pageService);
 
-        this.currentUser = true;
+        this.currentUser = null;
     }
 
     readonly form = new FormGroup({
@@ -43,7 +37,11 @@ export class EmployeesComponent extends PageComponent {
         filters: new FormControl([])
     });
 
-    currentUser: User | boolean;
+    openUser(i: number){
+        this.currentUser = this.users[i];
+    }
+
+    currentUser: User | null;
 
     users: readonly User[] = [
         {
