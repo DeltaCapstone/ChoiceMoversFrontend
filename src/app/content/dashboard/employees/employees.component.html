@@ -2,16 +2,16 @@
   <form class="w-full" [formGroup]="form">
     <div class="flex mb-[1.5em] ml-0 items-center">
           <tui-input class="w-2/5" tuiTextfieldSize="s" formControlName="input" tuiTableFilter="name"
-            [tuiGenericFilter]="filter">
+            [tuiGenericFilter]="nameFilter">
             Name
             <input tuiTextfield />
           </tui-input>
-          <div class="px-[0.65em] py-[0.4em] bg-primary rounded-[3.25px] text-[white] ml-auto flex items-center cursor-pointer">
-            <tui-svg src="tuiIconFilter"></tui-svg>
-          </div>
-          <div class="px-[0.65em] py-[0.4em] bg-primary ml-[0.75em] text-[white] rounded-[3.25px] flex items-center cursor-pointer">
+          <!-- <div class="px-[0.65em] py-[0.4em] bg-primary rounded-[3.25px] text-[white] ml-auto flex items-center cursor-pointer"> -->
+          <!--   <tui-svg src="tuiIconFilter"></tui-svg> -->
+          <!-- </div> -->
+          <div class="px-[0.65em] py-[0.4em] bg-primary ml-auto text-[white] rounded-[3.25px] flex items-center cursor-pointer">
             <tui-svg src="tuiIconPlusCircle"></tui-svg>
-          </div>          
+          </div>      
     </div>
 
     <table class="w-full" tuiTable [columns]="columns">

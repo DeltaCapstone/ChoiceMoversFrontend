@@ -37,6 +37,7 @@ export class EmployeesComponent extends PageComponent {
 
     readonly form = new FormGroup({
         input: new FormControl(""),
+        filters: new FormControl([])
     });
 
     users: readonly User[] = [
@@ -78,7 +79,7 @@ export class EmployeesComponent extends PageComponent {
         },
     ];
 
-    readonly filter = (item: string, value: string): boolean => item.includes(value);
+    readonly nameFilter = (item: string, value: string): boolean => item.includes(value);
 
     readonly columns = Object.keys(this.users[0]);
 }
