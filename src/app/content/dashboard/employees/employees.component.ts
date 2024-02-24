@@ -3,10 +3,11 @@ import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
 import { TuiInputModule, TuiTagModule } from '@taiga-ui/kit';
-import { TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
+import { TuiButtonModule, TuiPrimitiveTextfieldDirective, TuiSvgModule, TuiTextfieldControllerModule, } from '@taiga-ui/core';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 
 interface User {
     readonly email: string;
@@ -19,8 +20,8 @@ interface User {
     selector: 'app-employees',
     standalone: true,
     imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
-              TuiInputModule, TuiTableFiltersModule, 
-              TuiLetModule, TuiButtonModule, TuiSvgModule,
+              TuiInputModule, TuiTableFiltersModule, TuiButtonModule,
+              TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent,
               ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
     templateUrl: './employees.component.html',
     styleUrl: './employees.component.css',
@@ -33,12 +34,16 @@ export class EmployeesComponent extends PageComponent {
 
     constructor(pageService: PageService) {
         super(pageService);
+
+        this.currentUser = true;
     }
 
     readonly form = new FormGroup({
         input: new FormControl(""),
         filters: new FormControl([])
     });
+
+    currentUser: User | boolean;
 
     users: readonly User[] = [
         {
