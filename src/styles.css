@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+    /* main color variables */
     --neutral-light-color: rgba(239, 236, 236, 1);
     --primary-color: rgba(24, 35, 50, 1);
     --secondary-color: rgba(252, 103, 54, 1);
@@ -14,4 +15,8 @@
     /* full calendar */
     --fc-button-bg-color: var(--primary-color);
     --fc-today-bg-color: rgba(252, 103, 54, .15);
+}
+
+body, html {
+    background-color: var(--primary-color);
 }

@@ -82,7 +82,7 @@ export class EmployeesComponent extends PageComponent {
         },
     ];
 
-    readonly nameFilter = (item: string, value: string): boolean => item.includes(value);
+    readonly nameFilter = (item: string, value: string): boolean => item.toLowerCase().includes(value.toLowerCase());
 
     readonly columns = Object.keys(this.users[0]);
 }
