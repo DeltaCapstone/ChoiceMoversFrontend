@@ -1,0 +1,15 @@
+nav {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+    font-size: xx-large;
+}
+
+.active {
+    background-color: #ffb0b0;
+}
+
+li {
+    font-size: 25px;
+}
