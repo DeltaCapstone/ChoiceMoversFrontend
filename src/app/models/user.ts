@@ -1,6 +1,9 @@
 export interface User {
-    readonly email: string;
-    readonly name: string;
-    readonly status: 'alive' | 'deceased';
-    readonly tags: readonly string[];
+    customerId: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phonePrimary: string;
+    phoneOther: string | null;
+    userName: string;
 }

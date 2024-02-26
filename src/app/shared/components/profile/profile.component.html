@@ -1,10 +1,10 @@
 <div>
   <div class="flex">
     <div class="flex items-center p-2">
-      <tui-avatar [rounded]="true" size="xl" [text]="user.name"></tui-avatar>
+      <tui-avatar [rounded]="true" size="xl" [text]="user.firstName + ' ' +  user.lastName"></tui-avatar>
     </div>
     <div class="flex flex-col text-left justify-center">
-      <p class="text-4xl">{{ user.name }}</p>
+      <p class="text-4xl">{{ user.firstName + ' ' +  user.lastName }}</p>
       <span class="text-2xl opacity-50">Employee</span>
     </div>
   </div>
