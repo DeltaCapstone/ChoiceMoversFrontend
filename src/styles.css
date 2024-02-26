@@ -15,3 +15,8 @@
     --fc-button-bg-color: var(--primary-color);
     --fc-today-bg-color: rgba(252, 103, 54, .15);
 }
+
+body,
+html {
+    background-color: rgba(24, 35, 50, 1);
+}
