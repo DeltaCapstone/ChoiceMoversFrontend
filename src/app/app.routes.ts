@@ -15,7 +15,7 @@ import { StorageComponent } from './content/home/storage/storage/storage.compone
 
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'home', pathMatch: 'full' },
+    { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'dashboard', redirectTo: 'dashboard/schedule', pathMatch: 'full' },
 
     {
