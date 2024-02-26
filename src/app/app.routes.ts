@@ -13,6 +13,7 @@ import { PackingComponent } from './content/home/packing/packing/packing.compone
 import { QuoteComponent } from './content/home/quote/quote/quote.component';
 import { StorageComponent } from './content/home/storage/storage/storage.component';
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
+import { MovePlannerBlowoutComponent } from './content/home/move-planner-blowout/move-planner-blowout.component';
 
 
 export const routes: Routes = [
@@ -25,7 +26,11 @@ export const routes: Routes = [
             { path: 'clean-out', component: CleanOutComponent },
             { path: 'contact', component: ContactComponent },
             { path: 'moving', component: MovingComponent },
-            { path: 'move-planner', component: MovePlannerComponent },
+            {
+                path: 'move-planner', component: MovePlannerComponent, children: [
+                    { path: 'move-planner-blowout/:id', component: MovePlannerBlowoutComponent }
+                ]
+            },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
             { path: 'storage', component: StorageComponent }
