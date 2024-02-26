@@ -12,6 +12,7 @@ import { ContactComponent } from './content/home/contact/contact/contact.compone
 import { PackingComponent } from './content/home/packing/packing/packing.component';
 import { QuoteComponent } from './content/home/quote/quote/quote.component';
 import { StorageComponent } from './content/home/storage/storage/storage.component';
+import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
 
 
 export const routes: Routes = [
@@ -24,6 +25,7 @@ export const routes: Routes = [
             { path: 'clean-out', component: CleanOutComponent },
             { path: 'contact', component: ContactComponent },
             { path: 'moving', component: MovingComponent },
+            { path: 'move-planner', component: MovePlannerComponent },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
             { path: 'storage', component: StorageComponent }
