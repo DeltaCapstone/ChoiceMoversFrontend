@@ -23,7 +23,8 @@ export class ProfileComponent extends BaseComponent {
         this._user = user;
         if (user){
             this.form.patchValue({
-                name: this._user.firstName + this._user.lastName,
+                name: `${this._user.firstName} ${this._user.lastName}`,
+                phone: this._user.phonePrimary,
             });   
         }
     }
