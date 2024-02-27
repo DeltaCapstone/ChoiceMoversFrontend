@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-move-planner-blowout',
@@ -8,5 +9,6 @@ import { Component } from '@angular/core';
   styleUrl: './move-planner-blowout.component.css'
 })
 export class MovePlannerBlowoutComponent {
+  selectedOption: string;
 
 }
