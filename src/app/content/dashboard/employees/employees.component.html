@@ -1,7 +1,7 @@
 <app-profile [user]="openedEmployee" *ngIf="openedEmployee; else tableView"></app-profile>
 
 <ng-template #tableView>
-  <div style="border: 1px solid rgb(27, 31, 59, .2);" class="bg-[white] h-full p-[20px]" tuiTableFilters>
+  <div class="bg-[white] h-full p-[20px]" tuiTableFilters>
     <form class="w-full">
       <div class="flex mb-[1.5em] ml-0 items-center">
         <tui-input class="w-2/5" tuiTextfieldSize="s" [formControl]="searchInput">
