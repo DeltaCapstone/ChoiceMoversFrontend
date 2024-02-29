@@ -1,8 +1,16 @@
-<!--<button iconRight="tuiIconChevronDown" tuiButton type="button" [tuiDropdown]="dropdownContent"
-    [tuiDropdownManual]="open" (click)="onClick()" (tuiActiveZoneChange)="onActiveZone($event)"
-    (tuiObscured)="onObscured($event)">
-    Choose Room
+<button
+    iconRight="tuiIconChevronDown"
+    tuiButton
+    type="button"
+    [tuiDropdown]="dropdownContent"
+    [tuiDropdownManual]="open"
+    (click)="onClick()"
+    (tuiActiveZoneChange)="onActiveZone(open)"
+    (tuiObscured)="onObscured(open)"
+    class = "bg-secondary text-primary"
+>
+    Rooms
     <ng-template #dropdownContent>
-        <div class="dropdown">But there is nothing to choose</div>
+        <div *ngFor="let item of items" class="bg-secondary dropdown">{{item.room}}</div>
     </ng-template>
-</button>-->
+</button>
