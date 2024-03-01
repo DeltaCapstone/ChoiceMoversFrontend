@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { TuiErrorModule } from '@taiga-ui/core';
 import { User } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
@@ -26,8 +26,12 @@ export class ProfileComponent extends BaseComponent {
         }
     }
 
-    constructor(private route: ActivatedRoute, private usersService: UsersService) {
+    constructor(private location: Location, private route: ActivatedRoute, private usersService: UsersService) {
         super();
+    }
+
+    back(){
+        this.location.back();
     }
     
     readonly form = new FormGroup({
