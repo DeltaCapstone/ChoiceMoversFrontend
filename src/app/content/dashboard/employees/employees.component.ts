@@ -12,13 +12,14 @@ import { User } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
+import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'app-employees',
     standalone: true,
     imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
         TuiInputModule, TuiTableFiltersModule, TuiButtonModule,
-        TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent,
+        TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent, RouterOutlet,
         ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
     templateUrl: './employees.component.html',
     styleUrl: './employees.component.css',
@@ -27,7 +28,6 @@ import { map, startWith, debounceTime } from 'rxjs/operators';
 export class EmployeesComponent extends PageComponent {
     employees$ = new BehaviorSubject<User[]>([]);
     filteredEmployees$ = new Observable<User[]>;
-    openedEmployee: User | null = null;
     
     ngOnInit() {
         this.setTitle("Employees");
@@ -43,14 +43,14 @@ export class EmployeesComponent extends PageComponent {
         );
     }
 
-    constructor(pageService: PageService, private usersService: UsersService) {
+    constructor(pageService: PageService, private usersService: UsersService, private router: Router) {
         super(pageService);
     }
 
     openEmployee(i: number){
         this.employees$.pipe(
             map(employees => employees[i])
-        ).subscribe(employee => this.openedEmployee = employee);
+        ).subscribe(employee => this.router.navigate(["/dashboard/employees/profile", employee.userName]));
     }
 
     searchInput = new FormControl('');

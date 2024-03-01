@@ -5,6 +5,9 @@ import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TuiErrorModule } from '@taiga-ui/core';
 import { User } from '../../../models/user';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { UsersService } from '../../services/users.service';
 
 @Component({
     selector: 'app-profile',
@@ -15,18 +18,16 @@ import { User } from '../../../models/user';
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent extends BaseComponent {
-    private _user: User;
-    
-    @Input()
-    get user(): User { return this._user; }
-    set user(user: User) {
-        this._user = user;
-        if (user){
-            this.form.patchValue({
-                name: `${this._user.firstName} ${this._user.lastName}`,
-                phone: this._user.phonePrimary,
-            });   
+    user$: Observable<User>;
+    ngOnInit() {
+        const userName: string | null = this.route.snapshot.paramMap.get('userName');
+        if (userName){
+            this.user$ = this.usersService.getEmployee(userName);   
         }
+    }
+
+    constructor(private route: ActivatedRoute, private usersService: UsersService) {
+        super();
     }
     
     readonly form = new FormGroup({

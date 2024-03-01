@@ -1,7 +1,7 @@
 import { NgFor, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
 import { BaseComponent } from '../base-component';
@@ -15,7 +15,8 @@ type SidebarItem = {
 @Component({
     selector: 'app-sidebar',
     standalone: true,
-    imports: [NgFor, TuiSvgModule, NgClass, RouterLink, RouterLinkActive, TuiAvatarModule, TuiSurfaceModule, TuiHostedDropdownModule, TuiDataListModule],
+    imports: [NgFor, TuiSvgModule, NgClass, RouterModule, TuiAvatarModule,
+              TuiSurfaceModule, TuiHostedDropdownModule, TuiDataListModule],
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush

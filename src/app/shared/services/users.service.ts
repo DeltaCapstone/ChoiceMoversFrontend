@@ -11,11 +11,17 @@ import { FeatureService } from './feature.service';
   providedIn: 'root'
 })
 export class UsersService {
-    constructor(private http: HttpClient, private feature: FeatureService) { }
+    apiUrl: string = "";
+    
+    constructor(private http: HttpClient, private feature: FeatureService) {
+        this.apiUrl = this.feature.getFeatureValue("api").url;
+    }
+
+    getEmployee(userName: string): Observable<User> {
+        return this.http.get<User>(`${this.apiUrl}/employee/${userName}`, { observe: 'body' });
+    }
     
     getEmployees(): Observable<Array<User>> {
-        const apiUrl: string = this.feature.getFeatureValue("api").url;
-        
-        return this.http.get<Array<User>>(`${apiUrl}/employee`, { observe: 'body' });
+        return this.http.get<Array<User>>(`${this.apiUrl}/manager/employee`, { observe: 'body' });
     }
 }
