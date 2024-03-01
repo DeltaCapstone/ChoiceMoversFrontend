@@ -10,8 +10,7 @@ import { MoveBlowoutDropdownComponent } from '../../../../shared/components/move
   templateUrl: './move-planner.component.html',
   styleUrl: './move-planner.component.css'
 })
+
 export class MovePlannerComponent {
-  dropdownOptions: string[] = ['Bedroom', 'Bathroom', 'Garage', 'Utility Room', 'Patio/Deck', 'Study', 'Kitchen', 'Living Room'];
-  selectedOption: string;
 
 }

@@ -6,10 +6,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 
+
 type DropDownItem = {
   readonly room: string
   readonly route: string
 }
+
 @Component({
   selector: 'app-move-blowout-dropdown',
   standalone: true,
@@ -19,20 +21,20 @@ type DropDownItem = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MoveBlowoutDropdownComponent {
-  
+
   items: DropDownItem[] = [
-    {room: 'Bedroom', route: 'bedroom'},
-    {room: 'Bathroom', route: 'bathroom'},
-    {room: 'Garage', route: 'garage'},
-    {room: 'Utility Room', route: 'utility-room'},
-    {room: 'Patio/Deck', route: 'patio'},
-    {room: 'Study', route: 'study'},
-    {room: 'Kitchen', route: 'kitchen'},
-    {room: 'Living Room', route: 'living-room'}     
+    { room: 'Bedroom', route: 'move-planner-blowout' },
+    { room: 'Bathroom', route: 'move-planner-blowout' },
+    { room: 'Garage', route: 'move-planner-blowout' },
+    { room: 'Utility Room', route: 'move-planner-blowout' },
+    { room: 'Patio/Deck', route: 'move-planner-blowout' },
+    { room: 'Study', route: 'move-planner-blowout' },
+    { room: 'Kitchen', route: 'move-planner-blowout' },
+    { room: 'Living Room', route: 'move-planner-blowout' }
   ];
 
-  selectedOption: string;
-
+  selectedOption: DropDownItem;
+  blowoutIsOpen: boolean = false;
   open: boolean = false;
 
   onClick(): void {
@@ -46,8 +48,13 @@ export class MoveBlowoutDropdownComponent {
   }
 
   onActiveZone(active: boolean): void {
-    if(active) {
+    if (active) {
       this.open = true;
     }
+  }
+
+  onSelect(item: DropDownItem): void {
+    this.selectedOption = item;
+    this.blowoutIsOpen = true;
   }
 }
