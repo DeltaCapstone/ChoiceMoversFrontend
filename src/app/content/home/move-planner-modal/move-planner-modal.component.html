@@ -1,4 +1,6 @@
-<h1 mat-dialog-title>{{ data.room }}</h1>
-<div mat-dialog-content>
-    <!-- Your modal content here -->
+<h1 class="text-2xl text-center font-bold" mat-dialog-title>{{ data.room }}</h1>
+<div class="background-neutral" mat-dialog-content>
+    <div *ngFor="let item of data.roomItems">
+        {{item}}
+    </div>
 </div>

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { MoveBlowoutDropdownComponent } from '../../../../shared/components/move-blowout-dropdown/move-blowout-dropdown.component';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MovePlannerModalComponent } from '../../move-planner-modal/move-planner-modal.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon'
 type DropDownItem = {
   readonly room: string;
   readonly route: string;
+  readonly roomItems: string[];
 }
 
 @Component({
@@ -22,23 +23,59 @@ type DropDownItem = {
 })
 
 export class MovePlannerComponent {
+
+  isMenuOpen: boolean = false;
+
   items: DropDownItem[] = [
-    { room: 'Bedroom', route: 'move-planner-modal' },
-    { room: 'Bathroom', route: 'move-planner-modal' },
-    { room: 'Garage', route: 'move-planner-modal' },
-    { room: 'Utility Room', route: 'move-planner-modal' },
-    { room: 'Patio/Deck', route: 'move-planner-modal' },
-    { room: 'Study', route: 'move-planner-modal' },
-    { room: 'Kitchen', route: 'move-planner-modal' },
-    { room: 'Living Room', route: 'move-planner-modal' }
+    {
+      room: 'Bedroom', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Bathroom', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Garage', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Utility Room', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Patio/Deck', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Study', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Kitchen', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    },
+    {
+      room: 'Living Room', route: 'move-planner-modal', roomItems: [
+        'Bed Frame', 'Mattress', 'Paintings', 'Chairs', 'T.V.', 'Nightstand', 'Dresser', 'Lighting'
+      ]
+    }
   ]
 
   constructor(public dialog: MatDialog) { }
 
-  openRoomModal(room: string): void {
+  openRoomModal(room: string, roomItems: string[]): void {
     const dialogRef = this.dialog.open(MovePlannerModalComponent, {
-      width: '250px',
-      data: { room }
+      width: '800px',
+      height: '600px',
+      data: { room, roomItems }
     });
   }
 }
