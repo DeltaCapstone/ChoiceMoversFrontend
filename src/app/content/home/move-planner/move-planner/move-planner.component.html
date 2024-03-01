@@ -1,11 +1,20 @@
 <div class="flex felx-col justify-center max-w-80 pt-4 mx-auto">
-    <div class="border-4 border-solid border-secondary h-80 w-50">
+    <div class="border-4 border-solid border-secondary rounded-lg h-80 w-50">
         <h1 class="flex justify-center items-center text-center text-neutral text-2xl font-bold p-4 m-4">Let's Get
             Started Planning
             Your
             Move!</h1>
         <div class="flex justify-center items-center">
-            <app-move-blowout-dropdown></app-move-blowout-dropdown>
+            <div class="flex justify-center border-4 border-secondary text-2xl text-neutral p-4 rounded-lg dropdown">
+                <button mat-button [matMenuTriggerFor]="roomMenu">Rooms<mat-icon aria-hidden="false"
+                        aria-label="keyboard_arrow_down"
+                        fontIcon="keyboard_arrow_down">keyboard_arrow_down</mat-icon></button>
+                <mat-menu #roomMenu="matMenu">
+                    <button mat-menu-item *ngFor="let item of items" (click)="openRoomModal(item.room)">
+                        {{ item.room }}
+                    </button>
+                </mat-menu>
+            </div>
         </div>
     </div>
 </div>

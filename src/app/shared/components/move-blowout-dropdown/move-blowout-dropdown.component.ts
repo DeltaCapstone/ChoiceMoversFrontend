@@ -7,6 +7,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 
 
 
+
 type DropDownItem = {
   readonly room: string
   readonly route: string
@@ -23,14 +24,14 @@ type DropDownItem = {
 export class MoveBlowoutDropdownComponent {
 
   items: DropDownItem[] = [
-    { room: 'Bedroom', route: 'move-planner-blowout' },
-    { room: 'Bathroom', route: 'move-planner-blowout' },
-    { room: 'Garage', route: 'move-planner-blowout' },
-    { room: 'Utility Room', route: 'move-planner-blowout' },
-    { room: 'Patio/Deck', route: 'move-planner-blowout' },
-    { room: 'Study', route: 'move-planner-blowout' },
-    { room: 'Kitchen', route: 'move-planner-blowout' },
-    { room: 'Living Room', route: 'move-planner-blowout' }
+    { room: 'Bedroom', route: 'move-planner-modal' },
+    { room: 'Bathroom', route: 'move-planner-modal' },
+    { room: 'Garage', route: 'move-planner-modal' },
+    { room: 'Utility Room', route: 'move-planner-modal' },
+    { room: 'Patio/Deck', route: 'move-planner-modal' },
+    { room: 'Study', route: 'move-planner-modal' },
+    { room: 'Kitchen', route: 'move-planner-modal' },
+    { room: 'Living Room', route: 'move-planner-modal' }
   ];
 
   selectedOption: DropDownItem;
