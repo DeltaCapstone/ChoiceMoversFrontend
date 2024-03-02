@@ -1,12 +1,22 @@
 <div class="modal-content border-8 border-solid border-secondary h-full">
-    <h1 class=" text-2xl text-center font-bold" mat-dialog-title><mat-icon>{{data.iconName}}</mat-icon> {{ data.room }}
-    </h1>
+    <div class="flex justify-center items-center">
+        <h1 class="flex justify-center items-center border-solid border-4 border-secondary rounded-lg text-2xl text-center font-bold m-2 p-2"
+            mat-dialog-title>
+            <mat-icon>{{data.iconName}}</mat-icon> {{ data.room }}
+        </h1>
+    </div>
     <div class="flex flex-row justify-between w-full background-neutral" mat-dialog-content>
-        <div class="w-1/2 pr-4">
-            <mat-list>
-                <mat-list-item *ngFor="let item of data.roomItems ">
-                    <mat-icon mat-list-icon>{{item.icon}}</mat-icon>
-                    <p mat-line>{{item.itemName}}</p>
+        <div class="w-1/2">
+            <mat-list class="text-sm">
+                <mat-list-item *ngFor="let item of data.roomItems"
+                    class="flex border-2 border-solid border-secondary rounded m-1 p-8">
+                    <div class="flex items-center justify-between w-full">
+                        <mat-icon class="flex-none" mat-list-icon>{{item.icon}}</mat-icon>
+                        <p class="flex-1 m-0 ml-2" mat-line>{{item.itemName}}</p>
+                        <div class="p-4">
+                            <app-move-planner-modal-count-input class="flex-none"></app-move-planner-modal-count-input>
+                        </div>
+                    </div>
                 </mat-list-item>
             </mat-list>
         </div>
@@ -14,6 +24,9 @@
             <mat-form-field appearance="outline" class="w-full">
                 <textarea matInput placeholder="Special items/requests" class="h-32 w-full border"></textarea>
             </mat-form-field>
+            <div class="flex justify-center">
+                <button class="border-2 border-solid border-secondary rounded m-2 p-6">Submit</button>
+            </div>
         </div>
     </div>
 </div>
