@@ -1,12 +1,10 @@
 import { NgFor, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
 import { BaseComponent } from '../base-component';
-import { Subscription, pipe } from 'rxjs';
-import { reduce } from 'rxjs/operators';
 
 type SidebarItem = {
     readonly name: string
@@ -26,8 +24,6 @@ type SidebarItem = {
 export class SidebarComponent extends BaseComponent {
     @ViewChild(TuiHostedDropdownComponent)
     component?: TuiHostedDropdownComponent;
-
-    private routeSub: Subscription;
     
     dropdownOpen = false;
 
@@ -46,10 +42,4 @@ export class SidebarComponent extends BaseComponent {
         { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" },
         { name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" }
     ];
-
-    ngOnDestroy() {
-        if (this.routeSub) {
-            this.routeSub.unsubscribe();
-        }
-    }
 }
