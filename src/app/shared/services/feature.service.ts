@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../environments/environment';
 
 /**
  * A service that streamlines checking whether certain features are enabled to control application behavior.

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { MoveBlowoutDropdownComponent } from '../../../../shared/components/move-blowout-dropdown/move-blowout-dropdown.component';
@@ -15,9 +16,11 @@ type DropDownItem = {
   readonly icon: string;
 }
 
+
 @Component({
   selector: 'app-move-planner',
   standalone: true,
+
   imports: [CommonModule, NgFor, MoveBlowoutDropdownComponent, MatMenuModule, MatDialogModule, MatIconModule],
   templateUrl: './move-planner.component.html',
   styleUrl: './move-planner.component.css'
@@ -97,5 +100,4 @@ export class MovePlannerComponent {
     });
   }
 }
-
 

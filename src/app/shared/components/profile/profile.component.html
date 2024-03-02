@@ -1,10 +1,10 @@
 <div>
   <div class="flex">
     <div class="flex items-center p-2">
-      <tui-avatar [rounded]="true" size="xl" [text]="user.name"></tui-avatar>
+      <tui-avatar [rounded]="true" size="xl" [text]="user.firstName + ' ' +  user.lastName"></tui-avatar>
     </div>
     <div class="flex flex-col text-left justify-center">
-      <p class="text-4xl">{{ user.name }}</p>
+      <p class="text-4xl">{{ user.firstName + ' ' +  user.lastName }}</p>
       <span class="text-2xl opacity-50">Employee</span>
     </div>
   </div>
@@ -30,7 +30,7 @@
               <tui-error formControlName="zip" [error]="[] | tuiFieldError | async"></tui-error>
             </div>
             <div class="tui-form__multi-field">
-              <tui-input-phone formControlName="phone">Phone</tui-input-phone>
+              <tui-input-phone countryCode="+1" formControlName="phone">Phone</tui-input-phone>
               <tui-error formControlName="phone" [error]="[] | tuiFieldError | async"></tui-error>
             </div>
           </div>
@@ -52,7 +52,7 @@
 
           <div class="tui-form__row">
             <tui-input formControlName="address">
-              Name
+              Address
               <input tuiTextfield />
             </tui-input>
             <tui-error formControlName="address"></tui-error>
@@ -64,7 +64,7 @@
             </tui-textarea>
           </div>
           <div class="tui-form__buttons">
-            <button tuiButton type="submit" style="background: var(--secondary-color)" class="p-3 rounded-md text-lg tui-form__button">
+            <button tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Submit
             </button>
             <button tuiButton type="button" class="text-lg tui-form__button">
