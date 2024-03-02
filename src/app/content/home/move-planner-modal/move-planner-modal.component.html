@@ -1,6 +1,19 @@
-<h1 class="text-2xl text-center font-bold" mat-dialog-title>{{ data.room }}</h1>
-<div class="background-neutral" mat-dialog-content>
-    <div *ngFor="let item of data.roomItems">
-        {{item}}
+<div class="modal-content border-8 border-solid border-secondary h-full">
+    <h1 class=" text-2xl text-center font-bold" mat-dialog-title><mat-icon>{{data.iconName}}</mat-icon> {{ data.room }}
+    </h1>
+    <div class="flex flex-row justify-between w-full background-neutral" mat-dialog-content>
+        <div class="w-1/2 pr-4">
+            <mat-list>
+                <mat-list-item *ngFor="let item of data.roomItems ">
+                    <mat-icon mat-list-icon>{{item.icon}}</mat-icon>
+                    <p mat-line>{{item.itemName}}</p>
+                </mat-list-item>
+            </mat-list>
+        </div>
+        <div class="w-1/2">
+            <mat-form-field appearance="outline" class="w-full">
+                <textarea matInput placeholder="Special items/requests" class="h-32 w-full border"></textarea>
+            </mat-form-field>
+        </div>
     </div>
 </div>
