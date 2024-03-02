@@ -12,14 +12,14 @@ import { User } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-employees',
     standalone: true,
     imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
         TuiInputModule, TuiTableFiltersModule, TuiButtonModule,
-        TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent, RouterOutlet,
+        TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent,
         ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
     templateUrl: './employees.component.html',
     styleUrl: './employees.component.css',

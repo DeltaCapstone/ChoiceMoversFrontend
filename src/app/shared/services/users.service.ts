@@ -17,6 +17,10 @@ export class UsersService {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
+    putEmployee(updatedUser: User): Observable<User> {
+        return this.http.put<User>(`${this.apiUrl}/employee/`, updatedUser);
+    }
+    
     getEmployee(userName: string): Observable<User> {
         return this.http.get<User>(`${this.apiUrl}/employee/${userName}`, { observe: 'body' });
     }
