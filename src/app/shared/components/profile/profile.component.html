@@ -4,7 +4,7 @@
       <tui-avatar [rounded]="true" size="xl" [text]="user.firstName + ' ' +  user.lastName"></tui-avatar>
     </div>
     <div class="flex flex-col text-left justify-center">
-      <p class="text-4xl">{{ user.firstName + ' ' +  user.lastName }}</p>
+      <p class="text-4xl">{{ user.firstName + ' ' + user.lastName }}</p>
       <span class="text-2xl opacity-50">Employee</span>
     </div>
   </div>
@@ -14,57 +14,58 @@
       <div class="tui-row tui-row_sme">
         <div class="tui-col_8 w-5/6 m-auto mt-8">
           <div class="tui-form__row">
-            <tui-input formControlName="name">
-              Name
+            <tui-input formControlName="userName">
+              Username
               <input tuiTextfield />
               <span class="tui-required"></span>
             </tui-input>
-            <tui-error formControlName="name"></tui-error>
+            <tui-error formControlName="userName"></tui-error>
           </div>
 
           <div class="tui-form__row tui-form__row_multi-fields">
             <div class="tui-form__multi-field">
-              <tui-input formControlName="zip">
-                Zip
+              <tui-input formControlName="firstName">
+                First name
               </tui-input>
-              <tui-error formControlName="zip" [error]="[] | tuiFieldError | async"></tui-error>
+              <tui-error formControlName="firstName" [error]="[] | tuiFieldError | async"></tui-error>
             </div>
+
             <div class="tui-form__multi-field">
-              <tui-input-phone countryCode="+1" formControlName="phone">Phone</tui-input-phone>
-              <tui-error formControlName="phone" [error]="[] | tuiFieldError | async"></tui-error>
+              <tui-input formControlName="lastName">
+                Last name
+              </tui-input>
+              <tui-error formControlName="lastName" [error]="[] | tuiFieldError | async"></tui-error>
             </div>
           </div>
-
-          <div class="tui-form__row tui-form__row_multi-fields">
-            <div class="tui-form__multi-field">
-              <tui-input formControlName="city">
-                City
-              </tui-input>
-              <tui-error formControlName="city" [error]="[] | tuiFieldError | async"></tui-error>
-            </div>
-            <div class="tui-form__multi-field">
-              <tui-input formControlName="state">
-                State
-              </tui-input>
-              <tui-error formControlName="state" [error]="[] | tuiFieldError | async"></tui-error>
-            </div>
-          </div>
-
           <div class="tui-form__row">
-            <tui-input formControlName="address">
-              Address
+            <tui-input formControlName="email">
+              Email
               <input tuiTextfield />
             </tui-input>
-            <tui-error formControlName="address"></tui-error>
-          </div>
-
-          <div class="tui-form__row">
-            <tui-textarea [rows]="5" formControlName="notes" [expandable]="true">
-              Notes
-            </tui-textarea>
+            <tui-error formControlName="email"></tui-error>
+            </div>
+            <div class="tui-form__row">
+              <tui-select tuiTextfieldSize="s" formControlName="employeeType">
+                Employee type
+                <input placeholder="Choose your hero" tuiTextfield />
+                <tui-data-list-wrapper *tuiDataList [items]="employeeTypes"></tui-data-list-wrapper>
+              </tui-select>
+              <tui-error formControlName="employeeType"></tui-error>
+            </div>
+          
+          <div class="tui-form__row tui-form__row_multi-fields">
+            <div class="tui-form__multi-field">
+              <tui-input-phone phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phonePrimary">Phone primary</tui-input-phone>
+              <tui-error formControlName="phonePrimary" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
+            <div class="tui-form__multi-field">
+              <tui-input-phone phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phoneOther">Phone other</tui-input-phone>
+              <tui-error formControlName="phoneOther" [error]="[] | tuiFieldError | async"></tui-error>
+            </div>
           </div>
           <div class="tui-form__buttons">
-            <button (click)="save()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+            <button (click)="save()" tuiButton type="submit"
+              class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Submit
             </button>
             <button (click)="back()" tuiButton type="button" class="text-lg tui-form__button">

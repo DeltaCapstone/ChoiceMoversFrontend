@@ -8,10 +8,10 @@ import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
-import { User } from '../../../models/user';
+import { Employee } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, startWith, debounceTime } from 'rxjs/operators';
+import { map, startWith, debounceTime, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
@@ -26,13 +26,13 @@ import { Router } from '@angular/router';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent extends PageComponent {
-    employees$ = new BehaviorSubject<User[]>([]);
-    filteredEmployees$ = new Observable<User[]>;
+    employees$ = new BehaviorSubject<Employee[]>([]);
+    filteredEmployees$ = new Observable<Employee[]>;
     
     ngOnInit() {
         this.setTitle("Employees");
         // Fetch all employees once
-        this.usersService.getEmployees().subscribe(employees => this.employees$.next(employees));
+        this.usersService.getEmployees().subscribe(employees => {this.employees$.next(employees)});
         
         this.filteredEmployees$ = combineLatest([this.employees$, this.searchInput.valueChanges.pipe(startWith(''))]).pipe(
             debounceTime(100),
@@ -55,5 +55,5 @@ export class EmployeesComponent extends PageComponent {
 
     searchInput = new FormControl('');
 
-    readonly columns = ["name", "email"];
+    readonly columns = ["name", "email", "employeeType"];
 }

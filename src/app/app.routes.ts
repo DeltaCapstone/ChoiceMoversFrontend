@@ -35,10 +35,12 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: DashboardComponent, children: [
             { path: 'schedule', component: ScheduleComponent },
+            { path: 'schedule/profile/:userName', component: ProfileComponent },
             { path: 'employees', component: EmployeesComponent },
             { path: 'employees/profile/:userName', component: ProfileComponent },
             { path: 'statistics', component: StatisticsComponent },
             { path: 'settings', component: SettingsComponent },
+            { path: 'profile/:userName', component: ProfileComponent },
         ]
     },
 ];

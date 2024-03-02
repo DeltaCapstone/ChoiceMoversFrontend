@@ -17,11 +17,14 @@
     <table class="w-full" tuiTable [columns]="columns">
       <thead>
         <tr tuiThGroup>
+          <th *tuiHead="'email'" tuiTh>
+            E-mail
+          </th>
           <th *tuiHead="'name'" tuiTh>
             Name
           </th>
-          <th *tuiHead="'email'" tuiTh>
-            E-mail
+          <th *tuiHead="'employeeType'" tuiTh>
+            Employee Type
           </th>
         </tr>
       </thead>
@@ -36,6 +39,9 @@
                 {{ item.email }}
               </a>
             </td>
+            <td *tuiCell="'employeeType'" tuiTd>
+              {{ item.employeeType }}
+            </td>            
           </tr>
         </tbody>
       </ng-container>

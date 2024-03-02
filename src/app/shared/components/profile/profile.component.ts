@@ -1,43 +1,48 @@
 import { Component, } from '@angular/core';
 import { BaseComponent } from '../base-component';
-import { TuiAvatarModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiTextareaModule } from '@taiga-ui/kit';
+import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { TuiErrorModule } from '@taiga-ui/core';
-import { User } from '../../../models/user';
+import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
+import { Employee, EmployeeType, getEmployeeTypes } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, map, take } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule,
+    imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
         CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent extends BaseComponent {
+    employeeTypes: String[] = getEmployeeTypes();
+    
     readonly form = new FormGroup({
-        name: new FormControl(""),
-        phone: new FormControl(""),
-        zip: new FormControl(""),
-        city: new FormControl(""),
-        state: new FormControl(""),
-        address: new FormControl(""),
-        notes: new FormControl(""),
+        userName: new FormControl(""),
+        firstName: new FormControl(""),
+        lastName: new FormControl(""),
+        email: new FormControl(""),
+        employeeType: new FormControl(""),
+        phoneOther: new FormControl(""),
+        phonePrimary: new FormControl(""),
     });
-    user$: Observable<User>;
+    user$: Observable<Employee>;
 
     ngOnInit() {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) {
-            console.log(userName);
             this.user$ = this.usersService.getEmployee(userName);
             this.user$.subscribe(user => {
                 this.form.patchValue({
-                    name: `${user.firstName} ${user.lastName}`,
-                    phone: user.phonePrimary
+                    lastName: user.firstName,
+                    firstName: user.lastName,
+                    userName: user.userName,
+                    phonePrimary: user.phonePrimary,
+                    phoneOther: user.phoneOther,
+                    employeeType: user.employeeType,
                 });
             });
         }
@@ -52,21 +57,24 @@ export class ProfileComponent extends BaseComponent {
     save() {
         const formValues = this.form.value;
         this.user$.pipe(
-            take(1),
             map(user => ({
                 ...user,
-                firstName: formValues.name?.split(" ")[0] ?? user.firstName,
-                lastName: formValues.name?.split(" ")[1] ?? user.lastName,
-                phonePrimary: formValues.phone ?? user.phonePrimary,
+                firstName: formValues.firstName ?? user.firstName,
+                lastName: formValues.lastName ?? user.lastName,
+                userName: formValues.userName ?? user.userName,
+                phonePrimary: formValues.phonePrimary ?? user.phonePrimary,
+                phoneOther: formValues.phoneOther ?? user.phoneOther,
+                employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
             }))
         ).subscribe(updatedUser => {
-            console.log(updatedUser);
-            this.usersService.putEmployee(updatedUser).subscribe({
+            this.usersService.updateEmployee(updatedUser).subscribe({
                 next: (response) => {
                     console.log('User updated successfully', response);
+                    this.back();
                 },
                 error: (error) => {
                     console.error('Error updating user', error);
+                    this.back();
                 }
             });
         });

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User } from '../../models/user';
+import { Employee } from '../../models/user';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -17,15 +17,15 @@ export class UsersService {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
-    putEmployee(updatedUser: User): Observable<User> {
-        return this.http.put<User>(`${this.apiUrl}/employee/`, updatedUser);
+    updateEmployee(updatedEmployee: Employee): Observable<Employee> {
+        return this.http.put<Employee>(`${this.apiUrl}/employee/`, updatedEmployee);
     }
     
-    getEmployee(userName: string): Observable<User> {
-        return this.http.get<User>(`${this.apiUrl}/employee/${userName}`, { observe: 'body' });
+    getEmployee(userName: string): Observable<Employee> {
+        return this.http.get<Employee>(`${this.apiUrl}/employee/${userName}`, { observe: 'body' });
     }
     
-    getEmployees(): Observable<Array<User>> {
-        return this.http.get<Array<User>>(`${this.apiUrl}/manager/employee`, { observe: 'body' });
+    getEmployees(): Observable<Array<Employee>> {
+        return this.http.get<Array<Employee>>(`${this.apiUrl}/manager/employee`, { observe: 'body' });
     }
 }
