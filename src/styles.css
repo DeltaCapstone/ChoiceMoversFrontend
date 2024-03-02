@@ -17,6 +17,11 @@
     --fc-today-bg-color: rgba(252, 103, 54, .15);
 }
 
-body, html {
-    background-color: var(--primary-color);
+
+body,
+html {
+    background-color: rgba(24, 35, 50, 1);
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+

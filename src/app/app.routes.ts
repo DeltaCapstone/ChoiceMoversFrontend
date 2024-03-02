@@ -17,6 +17,7 @@ import { MovePlannerComponent } from './content/home/move-planner/move-planner/m
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
+    { path: 'home', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'dashboard', redirectTo: 'dashboard/schedule', pathMatch: 'full' },
 
     {
