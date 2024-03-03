@@ -10,9 +10,10 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 import { Employee } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, startWith, debounceTime, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
+import { map, startWith, debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
+
 
 @Component({
     selector: 'app-employees',
@@ -27,7 +28,7 @@ import { Router } from '@angular/router';
 })
 export class EmployeesComponent extends PageComponent {
     employees$ = new BehaviorSubject<Employee[]>([]);
-    filteredEmployees$ = new Observable<Employee[]>;
+    filteredEmployees$: Observable<Employee[]> = new Observable<Employee[]>;
     
     ngOnInit() {
         this.setTitle("Employees");
@@ -47,15 +48,10 @@ export class EmployeesComponent extends PageComponent {
         super(pageService);
     }
 
-    openEmployee(i?: number){
-        if (i){
-            this.employees$.pipe(
-                map(employees => employees[i])
-            ).subscribe(employee => this.router.navigate(["/dashboard/employees/profile", employee.userName]));   
-        }
-        else {
-            this.router.navigate(["/dashboard/employees/profile"]);
-        }
+    openEmployee(userName?: string){
+        this.employees$.pipe(
+            map(employees => employees.find(employee => employee.userName == userName))
+        ).subscribe(employee => this.router.navigate(["/dashboard/employees/profile", employee?.userName ?? ""]));
     }
 
     searchInput = new FormControl('');
