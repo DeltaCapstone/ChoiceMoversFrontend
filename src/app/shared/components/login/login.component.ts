@@ -13,5 +13,6 @@ import { TuiInputModule, TuiInputPasswordModule } from '@taiga-ui/kit';
 export class LoginComponent extends BaseComponent {
     readonly form = new FormGroup({
         userName: new FormControl(""),
+        passwordPlain: new FormControl(""),
     });
 }
