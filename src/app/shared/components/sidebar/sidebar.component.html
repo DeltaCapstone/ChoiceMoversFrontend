@@ -12,7 +12,7 @@
       <li class="mb-2 mt-2">
         <tui-hosted-dropdown class="w-full" tuiDropdownAlign="right" [content]="dropdown" [sided]="true" [(open)]="dropdownOpen">
           <button
-            [ngClass]="{'elevated': dropdownOpen}"
+            [ngClass]="{'elevated': dropdownOpen || profileOpen}"
             class="bg-neutral flex w-full transition-transform transition-all duration-100 ease-in hover:drop-shadow">
             <div class="flex items-center p-2">
               <tui-avatar text="Adam Smith"></tui-avatar>
@@ -27,7 +27,7 @@
         <ng-template #dropdown>
           <tui-data-list class="bg-neutral">
             <tui-opt-group>
-              <button (click)="openProfile()" tuiOption >Edit</button>
+              <button *ngIf="!profileOpen" (click)="openProfile()" tuiOption >Edit</button>
               <button tuiOption >Sign out</button>
             </tui-opt-group>
           </tui-data-list>

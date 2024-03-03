@@ -73,7 +73,6 @@ export class ProfileComponent extends BaseComponent {
                 employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
             }))
         ).subscribe(newUser => {
-            console.log(newUser);
             if (this.isNew){
                 const createEmployeeRequest: CreateEmployeeRequest = {
                     ...newUser,
