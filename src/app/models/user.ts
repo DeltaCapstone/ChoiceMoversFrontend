@@ -1,10 +1,11 @@
 // -------------------
 // EMPLOYEE
 // -------------------
-export type EmployeeType = "Full-time" | "Part-time" | "Manager" | "Admin";
-
-export function getEmployeeTypes(): EmployeeType[] {
-    return ["Full-time", "Part-time", "Manager", "Admin"];
+export enum EmployeeType {
+    FullTime = "Full-time",
+    PartTime = "Part-time",
+    Manager = "Manager",
+    Admin= "Admin"
 }
 
 export interface IEmployee {
@@ -28,5 +29,5 @@ export class Employee implements IEmployee {
     phonePrimary: string = "";
     phoneOther: string | null = null;
     userName: string = "";
-    employeeType: EmployeeType = "Full-time";
+    employeeType: EmployeeType = EmployeeType.FullTime;
 }

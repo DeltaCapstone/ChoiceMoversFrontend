@@ -4,7 +4,7 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { CreateEmployeeRequest, Employee, EmployeeType, getEmployeeTypes } from '../../../models/user';
+import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
 import { UsersService } from '../../services/users.service';
@@ -19,7 +19,7 @@ import { UsersService } from '../../services/users.service';
 })
 export class ProfileComponent extends BaseComponent {
     subscriptions: Subscription[] = [];
-    employeeTypes: String[] = getEmployeeTypes();
+    employeeTypes: String[] = Object.values(EmployeeType);
     isNew = false;
     
     readonly form = new FormGroup({
@@ -50,6 +50,10 @@ export class ProfileComponent extends BaseComponent {
             this.subscriptions.push(userSub);
         }
         else {
+            // set default values
+            this.form.patchValue({
+                employeeType: EmployeeType.FullTime
+            });
             this.user$ = of(new Employee);
             this.isNew = true;
         }
@@ -75,7 +79,7 @@ export class ProfileComponent extends BaseComponent {
                 employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
             }))
         ).subscribe(newUser => {
-            if (this.isNew){
+            if (this.isNew){ // CREATE NEW USER
                 const createEmployeeRequest: CreateEmployeeRequest = {
                     ...newUser,
                     phoneOther: null,
@@ -94,7 +98,7 @@ export class ProfileComponent extends BaseComponent {
                 });                
                 this.isNew = false;
             }
-            else {
+            else { // UPDATE EXISTING USER
                 this.usersService.updateEmployee(newUser).subscribe({
                     next: (response) => {
                         console.log('User updated successfully', response);
