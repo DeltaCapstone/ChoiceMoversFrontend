@@ -13,6 +13,7 @@ import { PackingComponent } from './content/home/packing/packing/packing.compone
 import { QuoteComponent } from './content/home/quote/quote/quote.component';
 import { StorageComponent } from './content/home/storage/storage/storage.component';
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
+import { ProfileComponent } from './shared/components/profile/profile.component';
 
 
 export const routes: Routes = [
@@ -35,9 +36,13 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: DashboardComponent, children: [
             { path: 'schedule', component: ScheduleComponent },
+            { path: 'schedule/profile/:userName', component: ProfileComponent },
             { path: 'employees', component: EmployeesComponent },
+            { path: 'employees/profile/:userName', component: ProfileComponent },
+            { path: 'employees/profile', component: ProfileComponent },
             { path: 'statistics', component: StatisticsComponent },
             { path: 'settings', component: SettingsComponent },
+            { path: 'profile/:userName', component: ProfileComponent },
         ]
     },
 ];

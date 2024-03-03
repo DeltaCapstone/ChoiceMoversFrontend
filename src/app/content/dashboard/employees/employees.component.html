@@ -1,48 +1,52 @@
-<app-profile [user]="openedEmployee" *ngIf="openedEmployee; else tableView"></app-profile>
-
-<ng-template #tableView>
-  <div class="bg-[white] h-full p-[20px]" tuiTableFilters>
-    <form class="w-full">
-      <div class="flex mb-[1.5em] ml-0 items-center">
-        <tui-input class="w-2/5" tuiTextfieldSize="s" [formControl]="searchInput">
-          Search
-          <input tuiTextfield />
-        </tui-input>
-        <!-- <div class="px-[0.65em] py-[0.4em] bg-primary rounded-[3.25px] text-[white] ml-auto flex items-center cursor-pointer"> -->
-        <!--   <tui-svg src="tuiIconFilter"></tui-svg> -->
-        <!-- </div> -->
-        <div
-          class="px-[0.65em] py-[0.4em] bg-primary ml-auto text-[white] rounded-[3.25px] flex items-center cursor-pointer">
-          <tui-svg src="tuiIconPlusCircle"></tui-svg>
-        </div>
+<div class="bg-[white] h-full p-[20px]" tuiTableFilters>
+  <form class="w-full">
+    <div class="flex mb-[1.5em] ml-0 items-center">
+      <tui-input class="w-2/5" tuiTextfieldSize="s" [formControl]="searchInput">
+        Search
+        <input tuiTextfield />
+      </tui-input>
+      <!-- <div class="px-[0.65em] py-[0.4em] bg-primary rounded-[3.25px] text-[white] ml-auto flex items-center cursor-pointer"> -->
+      <!--   <tui-svg src="tuiIconFilter"></tui-svg> -->
+      <!-- </div> -->
+      <div
+        (click)="openEmployee()"
+        class="px-[0.65em] py-[0.4em] bg-primary ml-auto text-[white] rounded-[3.25px] flex items-center cursor-pointer">
+        <tui-svg src="tuiIconPlusCircle"></tui-svg>
       </div>
+    </div>
 
-      <table class="w-full" tuiTable [columns]="columns">
-        <thead>
-          <tr tuiThGroup>
-            <th *tuiHead="'name'" tuiTh>
-              Name
-            </th>
-            <th *tuiHead="'email'" tuiTh>
-              E-mail
-            </th>
+    <table class="w-full" tuiTable [columns]="columns">
+      <thead>
+        <tr tuiThGroup>
+          <th *tuiHead="'email'" tuiTh>
+            E-mail
+          </th>
+          <th *tuiHead="'name'" tuiTh>
+            Name
+          </th>
+          <th *tuiHead="'employeeType'" tuiTh>
+            Employee Type
+          </th>
+        </tr>
+      </thead>
+      <ng-container *ngIf="filteredEmployees$ | async as employees">
+        <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
+          <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
+            <td (click)="openEmployee(item.userName)" class="cursor-pointer" *tuiCell="'name'" tuiTd>
+              {{ item.firstName + ' ' + item.lastName }}
+            </td>
+            <td *tuiCell="'email'" tuiTd>
+              <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
+                {{ item.email }}
+              </a>
+            </td>
+            <td *tuiCell="'employeeType'" tuiTd>
+              {{ item.employeeType }}
+            </td>            
           </tr>
-        </thead>
-        <ng-container *ngIf="filteredEmployees$ | async as employees">
-          <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
-            <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
-              <td (click)="openEmployee(i)" class="cursor-pointer" *tuiCell="'name'" tuiTd>
-                {{ item.firstName + ' ' + item.lastName }}
-              </td>
-              <td *tuiCell="'email'" tuiTd>
-                <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
-                  {{ item.email }}
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </ng-container>
-        </table>
-    </form>
-  </div>
-</ng-template>
+        </tbody>
+      </ng-container>
+    </table>
+  </form>
+</div>
+
