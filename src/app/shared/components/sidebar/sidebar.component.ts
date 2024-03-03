@@ -49,9 +49,9 @@ export class SidebarComponent extends BaseComponent {
         super();
     }
 
-    openProfile() {
+    openProfile(userName: string) {
         this.dropdownOpen = false;
-        this.router.navigate([`dashboard/profile/`, "emp_linda_k"]);
+        this.router.navigate([`dashboard/profile/`, userName]);
     }
     
     items: SidebarItem[] = [

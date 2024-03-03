@@ -26,8 +26,8 @@
         
         <ng-template #dropdown>
           <tui-data-list class="bg-neutral">
-            <tui-opt-group>
-              <button *ngIf="!profileOpen" (click)="openProfile()" tuiOption >Edit</button>
+            <tui-opt-group *ngIf="user$ | async as user">
+              <button *ngIf="!profileOpen" (click)="openProfile(user.userName)" tuiOption >Edit</button>
               <button tuiOption >Sign out</button>
             </tui-opt-group>
           </tui-data-list>
