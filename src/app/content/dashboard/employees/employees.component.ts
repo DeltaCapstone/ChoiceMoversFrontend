@@ -27,14 +27,13 @@ import { Router } from '@angular/router';
 })
 export class EmployeesComponent extends PageComponent {
     subscriptions: Subscription[] = [];
-    employees$ = new BehaviorSubject<Employee[]>([]);
+    employees$: Observable<Employee[]>;
     filteredEmployees$: Observable<Employee[]> = new Observable<Employee[]>;
 
     ngOnInit() {
         this.setTitle("Employees");
         // Fetch all employees once
-        const usersSub = this.usersService.getEmployees().subscribe(employees => this.employees$.next(employees) );
-        this.subscriptions.push(usersSub);
+        this.employees$ = this.usersService.getEmployees();
 
         this.filteredEmployees$ = combineLatest([this.employees$, this.searchInput.valueChanges.pipe(startWith(''))]).pipe(
             debounceTime(100),

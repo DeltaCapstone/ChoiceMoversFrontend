@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CreateEmployeeRequest, Employee } from '../../models/user';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 
