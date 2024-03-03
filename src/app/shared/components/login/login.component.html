@@ -1,0 +1,35 @@
+<section class="w-full h-full flex items-center place-content-center">
+  <div class="w-3/6 3xl:h-[1000px] lg:h-[750px] md:h-[600px] bg-neutral p-10 ">
+    <form [formGroup]="form">
+      <div class="tui-row tui-row_sme">
+        <div class="tui-col_8 w-5/6 m-auto mt-8">
+          <div class="tui-form__row">
+            <tui-input formControlName="userName">
+              Username
+              <input tuiTextfield />
+              <span class="tui-required"></span>
+            </tui-input>
+            <tui-error formControlName="userName"></tui-error>
+          </div>
+
+          <div class="tui-form__row">
+            <tui-input-password formControlName="testValue" tuiTextfieldSize="s">
+              Password
+              <input tuiTextfield />
+              <span class="tui-required"></span>
+            </tui-input-password>
+            <tui-error formControlName="userName"></tui-error>
+          </div>
+          
+          <div class="tui-form__buttons">
+            <button Button type="submit"
+              class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    
+  </div>
+</section>

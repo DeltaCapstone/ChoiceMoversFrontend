@@ -14,6 +14,7 @@ import { QuoteComponent } from './content/home/quote/quote/quote.component';
 import { StorageComponent } from './content/home/storage/storage/storage.component';
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
+import { LoginComponent } from './shared/components/login/login.component';
 
 
 export const routes: Routes = [
@@ -45,4 +46,5 @@ export const routes: Routes = [
             { path: 'profile/:userName', component: ProfileComponent },
         ]
     },
+    { path: 'login', pathMatch: 'full', component: LoginComponent },
 ];

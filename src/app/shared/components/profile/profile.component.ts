@@ -39,6 +39,7 @@ export class ProfileComponent extends BaseComponent {
             this.user$ = this.usersService.getEmployee(userName);
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
+                    email: user.email,
                     lastName: user.lastName,
                     firstName: user.firstName,
                     userName: user.userName,
