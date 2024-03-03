@@ -6,7 +6,7 @@ import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
 import { CreateEmployeeRequest, Employee, EmployeeType, getEmployeeTypes } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, map, of } from 'rxjs';
+import { Observable, Subscription, map, of } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -18,6 +18,7 @@ import { UsersService } from '../../services/users.service';
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent extends BaseComponent {
+    subscriptions: Subscription[] = [];
     employeeTypes: String[] = getEmployeeTypes();
     isNew = false;
     
@@ -36,16 +37,17 @@ export class ProfileComponent extends BaseComponent {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) {
             this.user$ = this.usersService.getEmployee(userName);
-            this.user$.subscribe(user => {
+            const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
-                    lastName: user.firstName,
-                    firstName: user.lastName,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
                     userName: user.userName,
                     phonePrimary: user.phonePrimary,
                     phoneOther: user.phoneOther,
                     employeeType: user.employeeType,
                 });
             });
+            this.subscriptions.push(userSub);
         }
         else {
             this.user$ = of(new Employee);
@@ -61,7 +63,7 @@ export class ProfileComponent extends BaseComponent {
 
     save() {
         const formValues = this.form.value;
-        this.user$.pipe(
+        const saveSub = this.user$.pipe(
             map(user => ({
                 ...user,
                 email:  formValues.email ?? user.email,
@@ -105,9 +107,14 @@ export class ProfileComponent extends BaseComponent {
                 });
             }
         });
+        this.subscriptions.push(saveSub);
     }
 
     back() {
         this.location.back();
+    }
+
+    ngOnDestroy(){
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }
