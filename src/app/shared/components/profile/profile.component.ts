@@ -35,7 +35,7 @@ export class ProfileComponent extends BaseComponent {
 
     ngOnInit() {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
-        if (userName) {
+        if (userName) { // get this employee and set the form values
             this.user$ = this.usersService.getEmployee(userName);
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
@@ -49,8 +49,7 @@ export class ProfileComponent extends BaseComponent {
             });
             this.subscriptions.push(userSub);
         }
-        else {
-            // set default values
+        else { // no user, fill in default values
             this.form.patchValue({
                 employeeType: EmployeeType.FullTime
             });
@@ -79,7 +78,7 @@ export class ProfileComponent extends BaseComponent {
                 employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
             }))
         ).subscribe(newUser => {
-            if (this.isNew){ // CREATE NEW USER
+            if (this.isNew){ // CREATE NEW EMPLOYEE
                 const createEmployeeRequest: CreateEmployeeRequest = {
                     ...newUser,
                     phoneOther: null,
@@ -98,7 +97,7 @@ export class ProfileComponent extends BaseComponent {
                 });                
                 this.isNew = false;
             }
-            else { // UPDATE EXISTING USER
+            else { // UPDATE EXISTING EMPLOYEE
                 this.usersService.updateEmployee(newUser).subscribe({
                     next: (response) => {
                         console.log('User updated successfully', response);

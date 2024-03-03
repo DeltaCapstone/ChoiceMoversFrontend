@@ -10,7 +10,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 import { Employee } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
-import { BehaviorSubject, Observable, Subscription, combineLatest, of } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
