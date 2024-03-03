@@ -110,6 +110,23 @@ export class ProfileComponent extends BaseComponent {
         this.subscriptions.push(saveSub);
     }
 
+    delete() {
+        const userName: string | null = this.route.snapshot.paramMap.get('userName');
+        if (!userName)
+            return;
+        
+        this.usersService.deleteEmployee(userName).subscribe({
+            next: (response) => {
+                console.log('User deleted successfully', response);
+                this.back();
+            },
+            error: (error) => {
+                console.error('Error deleting user', error);
+                this.back();
+            }
+        });                
+    }
+
     back() {
         this.location.back();
     }

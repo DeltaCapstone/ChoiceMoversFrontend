@@ -20,16 +20,20 @@ export class UsersService {
     createEmployee(newEmployee: CreateEmployeeRequest): Observable<CreateEmployeeRequest> {
         return this.http.post<CreateEmployeeRequest>(`${this.apiUrl}/manager/employee`, newEmployee);        
     }
-    
-    updateEmployee(updatedEmployee: Employee): Observable<Employee> {
-        return this.http.put<Employee>(`${this.apiUrl}/employee/`, updatedEmployee);
-    }
-    
+
     getEmployee(userName: string): Observable<Employee> {
         return this.http.get<Employee>(`${this.apiUrl}/employee/${userName}`, { observe: 'body' });
     }
     
     getEmployees(): Observable<Array<Employee>> {
         return this.http.get<Array<Employee>>(`${this.apiUrl}/manager/employee`, { observe: 'body' });
+    }
+    
+    updateEmployee(updatedEmployee: Employee): Observable<Employee> {
+        return this.http.put<Employee>(`${this.apiUrl}/employee/`, updatedEmployee);
+    }
+
+    deleteEmployee(userName: string) {
+        return this.http.delete<Employee>(`${this.apiUrl}/manager/employee/${userName}`);        
     }
 }

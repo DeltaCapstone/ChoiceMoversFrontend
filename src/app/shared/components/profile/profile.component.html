@@ -47,7 +47,7 @@
             <div class="tui-form__row">
               <tui-select tuiTextfieldSize="s" formControlName="employeeType">
                 Employee type
-                <input placeholder="Choose your hero" tuiTextfield />
+                <input tuiTextfield />
                 <tui-data-list-wrapper *tuiDataList [items]="employeeTypes"></tui-data-list-wrapper>
               </tui-select>
               <tui-error formControlName="employeeType"></tui-error>
@@ -64,9 +64,11 @@
             </div>
           </div>
           <div class="tui-form__buttons">
-            <button (click)="save()" tuiButton type="submit"
-              class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+            <button (click)="save()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Submit
+            </button>
+            <button *ngIf="!isNew" (click)="delete()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+              Delete
             </button>
             <button (click)="back()" tuiButton type="button" class="text-lg tui-form__button">
               Cancel
