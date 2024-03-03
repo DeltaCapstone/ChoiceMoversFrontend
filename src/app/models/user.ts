@@ -1,17 +1,32 @@
+// -------------------
+// EMPLOYEE
+// -------------------
 export type EmployeeType = "Full-time" | "Part-time" | "Manager" | "Admin";
 
 export function getEmployeeTypes(): EmployeeType[] {
     return ["Full-time", "Part-time", "Manager", "Admin"];
 }
 
-export interface Employee {
-    employeeId: string,
+export interface IEmployee {
     email: string;
-    firstName: string;
+    firstName: string
     lastName: string;
     phonePrimary: string;
     phoneOther: string | null;
     userName: string;
     employeeType: EmployeeType;
-    passwordHash: string;
+}
+
+export interface CreateEmployeeRequest extends IEmployee {
+    passwordPlain: string;
+}
+
+export class Employee implements IEmployee {
+    email: string = "";
+    firstName: string = "";
+    lastName: string = "";
+    phonePrimary: string = "";
+    phoneOther: string | null = null;
+    userName: string = "";
+    employeeType: EmployeeType = "Full-time";
 }

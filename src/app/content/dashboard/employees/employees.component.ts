@@ -47,10 +47,15 @@ export class EmployeesComponent extends PageComponent {
         super(pageService);
     }
 
-    openEmployee(i: number){
-        this.employees$.pipe(
-            map(employees => employees[i])
-        ).subscribe(employee => this.router.navigate(["/dashboard/employees/profile", employee.userName]));
+    openEmployee(i?: number){
+        if (i){
+            this.employees$.pipe(
+                map(employees => employees[i])
+            ).subscribe(employee => this.router.navigate(["/dashboard/employees/profile", employee.userName]));   
+        }
+        else {
+            this.router.navigate(["/dashboard/employees/profile"]);
+        }
     }
 
     searchInput = new FormControl('');

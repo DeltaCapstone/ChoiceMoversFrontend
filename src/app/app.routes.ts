@@ -38,6 +38,7 @@ export const routes: Routes = [
             { path: 'schedule/profile/:userName', component: ProfileComponent },
             { path: 'employees', component: EmployeesComponent },
             { path: 'employees/profile/:userName', component: ProfileComponent },
+            { path: 'employees/profile', component: ProfileComponent },
             { path: 'statistics', component: StatisticsComponent },
             { path: 'settings', component: SettingsComponent },
             { path: 'profile/:userName', component: ProfileComponent },

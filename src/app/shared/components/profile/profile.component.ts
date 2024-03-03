@@ -4,9 +4,9 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { Employee, EmployeeType, getEmployeeTypes } from '../../../models/user';
+import { CreateEmployeeRequest, Employee, EmployeeType, getEmployeeTypes } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -19,6 +19,7 @@ import { UsersService } from '../../services/users.service';
 })
 export class ProfileComponent extends BaseComponent {
     employeeTypes: String[] = getEmployeeTypes();
+    isNew = false;
     
     readonly form = new FormGroup({
         userName: new FormControl(""),
@@ -46,6 +47,10 @@ export class ProfileComponent extends BaseComponent {
                 });
             });
         }
+        else {
+            this.user$ = of(new Employee);
+            this.isNew = true;
+        }
     }
 
     constructor(private location: Location,
@@ -59,6 +64,7 @@ export class ProfileComponent extends BaseComponent {
         this.user$.pipe(
             map(user => ({
                 ...user,
+                email:  formValues.email ?? user.email,
                 firstName: formValues.firstName ?? user.firstName,
                 lastName: formValues.lastName ?? user.lastName,
                 userName: formValues.userName ?? user.userName,
@@ -66,17 +72,39 @@ export class ProfileComponent extends BaseComponent {
                 phoneOther: formValues.phoneOther ?? user.phoneOther,
                 employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
             }))
-        ).subscribe(updatedUser => {
-            this.usersService.updateEmployee(updatedUser).subscribe({
-                next: (response) => {
-                    console.log('User updated successfully', response);
-                    this.back();
-                },
-                error: (error) => {
-                    console.error('Error updating user', error);
-                    this.back();
-                }
-            });
+        ).subscribe(newUser => {
+            console.log(newUser);
+            if (this.isNew){
+                const createEmployeeRequest: CreateEmployeeRequest = {
+                    ...newUser,
+                    phoneOther: null,
+                    passwordPlain: "test1234"
+                };
+                
+                this.usersService.createEmployee(createEmployeeRequest).subscribe({
+                    next: (response) => {
+                        console.log('User created successfully', response);
+                        this.back();
+                    },
+                    error: (error) => {
+                        console.error('Error creating user', error);
+                        this.back();
+                    }
+                });                
+                this.isNew = false;
+            }
+            else {
+                this.usersService.updateEmployee(newUser).subscribe({
+                    next: (response) => {
+                        console.log('User updated successfully', response);
+                        this.back();
+                    },
+                    error: (error) => {
+                        console.error('Error updating user', error);
+                        this.back();
+                    }
+                });
+            }
         });
     }
 
