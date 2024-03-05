@@ -18,7 +18,7 @@ export class UsersService {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
-    login(userName: string, passwordPlain: string){
+    requestLogin(userName: string, passwordPlain: string){
         const loginRequest: LoginRequest = {
             userName: userName,
             passwordPlain: passwordPlain

@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
         importProvidersFrom(HttpClientModule, TuiRootModule,
             JwtModule.forRoot({
                 config: {
-                    tokenGetter: () => sessionStorage.getItem("token"),
+                    tokenGetter: () => sessionStorage.getItem("accessToken"),
                     allowedDomains: ["localhost:8080"],
                 },
             },
