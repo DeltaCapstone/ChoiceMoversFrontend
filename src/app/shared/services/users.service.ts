@@ -3,6 +3,7 @@ import { CreateEmployeeRequest, Employee, LoginRequest } from '../../models/user
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
+import { SessionService } from './session.service';
 
 /**
  * Service type that provides an interface for users stored in the database.
@@ -13,7 +14,7 @@ import { FeatureService } from './feature.service';
 export class UsersService {
     apiUrl: string = "";
     
-    constructor(private http: HttpClient, private feature: FeatureService) {
+    constructor(private http: HttpClient, private feature: FeatureService,) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
