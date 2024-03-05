@@ -53,6 +53,11 @@ export class SidebarComponent extends BaseComponent {
         this.dropdownOpen = false;
         this.router.navigate([`dashboard/profile/`, userName]);
     }
+
+    logout(){
+        this.session.logout();
+        this.router.navigate([`/login`]);
+    }
     
     items: SidebarItem[] = [
         { name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" },

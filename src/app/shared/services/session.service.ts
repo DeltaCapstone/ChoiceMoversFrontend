@@ -7,7 +7,7 @@ import { Observable, map, of } from 'rxjs';
   providedIn: 'root'
 })
 export class SessionService {
-    user$: Observable<Employee | undefined> = of(undefined);
+    user$: Observable<Employee | undefined>;
     
     constructor(private usersService: UsersService) {
         // check if there is a stored token
@@ -15,6 +15,9 @@ export class SessionService {
         const userName = sessionStorage.getItem("userName");
         if (token && userName) {
             this.user$ = this.usersService.getEmployee(userName);
+        }
+        else {
+            this.user$ = of(undefined);
         }
     }
 
@@ -31,6 +34,10 @@ export class SessionService {
                 sessionStorage.setItem("userName", userName);
                 return !!res["token"];
             }));
+    }
+
+    logout() {
+        this.user$ = of(undefined);
     }
 
     getUser(): Observable<Employee | undefined> {
