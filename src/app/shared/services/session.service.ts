@@ -9,12 +9,10 @@ import { Observable, of } from 'rxjs';
 export class SessionService {
     user$: Observable<Employee | undefined> = of(undefined);
     
-    constructor(private usersService: UsersService) {
-        this.user$ = this.usersService.getEmployee("mgr_sarah_m");
-    }
+    constructor(private usersService: UsersService) {}
     
-    setUser(user: Observable<Employee | undefined>) {
-        this.user$ = user;
+    setUser(userName: string) {
+        this.user$ = this.usersService.getEmployee(userName);
     }
 
     getUser(): Observable<Employee | undefined> {
