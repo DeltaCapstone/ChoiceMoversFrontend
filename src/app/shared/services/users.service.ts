@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CreateEmployeeRequest, Employee } from '../../models/user';
+import { CreateEmployeeRequest, Employee, LoginRequest } from '../../models/user';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -17,8 +17,16 @@ export class UsersService {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
+    login(userName: string, passwordPlain: string){
+        const loginRequest: LoginRequest = {
+            userName: userName,
+            passwordPlain: passwordPlain
+        };
+        return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest);
+    }
+
     createEmployee(newEmployee: CreateEmployeeRequest): Observable<CreateEmployeeRequest> {
-        return this.http.post<CreateEmployeeRequest>(`${this.apiUrl}/manager/employee`, newEmployee);        
+        return this.http.post<CreateEmployeeRequest>(`${this.apiUrl}/manager/employee`, newEmployee);
     }
 
     getEmployee(userName: string): Observable<Employee> {

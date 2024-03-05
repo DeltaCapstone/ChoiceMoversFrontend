@@ -18,12 +18,17 @@ export class LoginComponent extends BaseComponent {
     }
     
     readonly form = new FormGroup({
-        userName: new FormControl(""),
-        passwordPlain: new FormControl(""),
+        userName: new FormControl("emp_alex_j"),
+        passwordPlain: new FormControl("uvwxy"),
     });
 
     login(){
-        this.session.setUser("emp_linda_k");
-        this.router.navigate(["/dashboard"]);
+        const userName = this.form.value.userName ?? "";
+        const password = this.form.value.passwordPlain ?? "";
+        this.session.login(userName, password).subscribe(success => {
+            if (success){
+                this.router.navigate(["/dashboard"]);
+            }
+        });
     }
 }

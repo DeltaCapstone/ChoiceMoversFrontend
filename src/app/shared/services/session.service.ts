@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Employee } from '../../models/user';
 import { UsersService } from './users.service';
-import { Observable, of } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +11,12 @@ export class SessionService {
     
     constructor(private usersService: UsersService) {}
     
-    setUser(userName: string) {
-        this.user$ = this.usersService.getEmployee(userName);
+    login(userName: string, passwordPlain: string): Observable<boolean> {
+        return this.usersService.login(userName, passwordPlain).pipe(
+            map((res: any) => {
+                this.user$ = this.usersService.getEmployee(userName);
+                return !!res["token"];
+            }));
     }
 
     getUser(): Observable<Employee | undefined> {
