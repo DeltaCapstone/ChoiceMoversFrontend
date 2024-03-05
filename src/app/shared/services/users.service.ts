@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CreateEmployeeRequest, Employee } from '../../models/user';
-import { Observable } from 'rxjs';
+import { CreateEmployeeRequest, Employee, LoginRequest } from '../../models/user';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
+import { SessionService } from './session.service';
 
 /**
  * Service type that provides an interface for users stored in the database.
@@ -13,12 +14,20 @@ import { FeatureService } from './feature.service';
 export class UsersService {
     apiUrl: string = "";
     
-    constructor(private http: HttpClient, private feature: FeatureService) {
+    constructor(private http: HttpClient, private feature: FeatureService,) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
     }
 
+    requestLogin(userName: string, passwordPlain: string){
+        const loginRequest: LoginRequest = {
+            userName: userName,
+            passwordPlain: passwordPlain
+        };
+        return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest);
+    }
+
     createEmployee(newEmployee: CreateEmployeeRequest): Observable<CreateEmployeeRequest> {
-        return this.http.post<CreateEmployeeRequest>(`${this.apiUrl}/manager/employee`, newEmployee);        
+        return this.http.post<CreateEmployeeRequest>(`${this.apiUrl}/manager/employee`, newEmployee);
     }
 
     getEmployee(userName: string): Observable<Employee> {
