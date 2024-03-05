@@ -9,12 +9,26 @@ import { Observable, map, of } from 'rxjs';
 export class SessionService {
     user$: Observable<Employee | undefined> = of(undefined);
     
-    constructor(private usersService: UsersService) {}
+    constructor(private usersService: UsersService) {
+        // check if there is a stored token
+        const token = this.getToken();
+        const userName = sessionStorage.getItem("userName");
+        if (token && userName) {
+            this.user$ = this.usersService.getEmployee(userName);
+        }
+    }
+
+    getToken(): string | null {
+        return sessionStorage.getItem("token");
+    }
     
     login(userName: string, passwordPlain: string): Observable<boolean> {
         return this.usersService.login(userName, passwordPlain).pipe(
             map((res: any) => {
                 this.user$ = this.usersService.getEmployee(userName);
+                sessionStorage.setItem("token", res["token"]);
+                // TODO: encode in token and pull from that?
+                sessionStorage.setItem("userName", userName);
                 return !!res["token"];
             }));
     }

@@ -5,7 +5,7 @@ import { first, map } from 'rxjs';
 
 export const dashboardGuard: CanActivateFn = (route, state) => {
     const router = inject(Router);
-    const session = inject(SessionService)
+    const session = inject(SessionService);
     return session.getUser().pipe(
         first(),
         map(user => {
