@@ -15,7 +15,7 @@ import { StorageComponent } from './content/home/storage/storage/storage.compone
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 import { LoginComponent } from './shared/components/login/login.component';
-
+import { dashboardGuard } from './shared/guards/dashboard.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -35,7 +35,7 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'dashboard', component: DashboardComponent, children: [
+        path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
             { path: 'schedule', component: ScheduleComponent },
             { path: 'schedule/profile/:userName', component: ProfileComponent },
             { path: 'employees', component: EmployeesComponent },
