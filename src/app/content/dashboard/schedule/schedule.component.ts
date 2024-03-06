@@ -1,40 +1,44 @@
 import { Component } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
+import { Observable, of } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-schedule',
-  standalone: true,
-    imports: [FullCalendarModule],
-  templateUrl: './schedule.component.html',
-  styleUrl: './schedule.component.css'
+    selector: 'app-schedule',
+    standalone: true,
+    imports: [FullCalendarModule, CommonModule],
+    templateUrl: './schedule.component.html',
+    styleUrl: './schedule.component.css'
 })
 export class ScheduleComponent extends PageComponent {
-    ngOnInit(){
+    ngOnInit() {
         this.setTitle("Schedule");
     }
-    
-    constructor(pageService: PageService){
+
+    events: Observable<EventInput[]> = of([
+        {
+            title: "te",
+            start: "2024-03-06",
+            end: "2024-03-08"
+        }
+
+    ]);
+
+    constructor(pageService: PageService) {
         super(pageService);
     }
-    
+
     calendarOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         plugins: [dayGridPlugin],
-        eventClick: this.eventClick,
-        events: [
-            {
-                title: "test",
-                start: "2024-03-06",
-                end: "2024-03-08"
-            }
-        ]
+        eventClick: this.eventClick
     }
 
-    eventClick(info: EventClickArg){
+    eventClick(info: EventClickArg) {
         console.log(info.event.title);
     }
 }

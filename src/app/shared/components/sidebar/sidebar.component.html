@@ -9,15 +9,15 @@
 
   <div>
     <ul>
-      <li class="mb-2 mt-2">
+      <li *ngIf="user$ | async as user" class="mb-2 mt-2">
         <tui-hosted-dropdown class="w-full" tuiDropdownAlign="right" [content]="dropdown" [sided]="true" [(open)]="dropdownOpen">
           <button
             [ngClass]="{'elevated': dropdownOpen || profileOpen}"
             class="bg-neutral flex w-full transition-transform transition-all duration-100 ease-in hover:drop-shadow">
             <div class="flex items-center p-2">
-              <tui-avatar text="Adam Smith"></tui-avatar>
+              <tui-avatar [text]="user.firstName + ' ' + user.lastName"></tui-avatar>
             </div>
-            <div *ngIf="user$ | async as user" class="flex flex-col text-left justify-center">
+            <div class="flex flex-col text-left justify-center">
               <p class="text-xl">{{ user.firstName + ' ' + user.lastName }}</p>
               <span class="text-base opacity-50">{{ user.employeeType }}</span>
             </div>
