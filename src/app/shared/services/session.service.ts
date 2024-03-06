@@ -14,8 +14,10 @@ export class SessionService {
         // check if there is a stored token
         const token = sessionStorage.getItem("accessToken");
         const userName = sessionStorage.getItem("userName");
+        
+        // TODO: need to check for expiration
         if (token && userName) {
-            this.user$ = this.usersService.getEmployee(userName);
+            this.user$ = this.usersService.getProfile();
         }
         else {
             this.user$ = of(undefined);
@@ -25,15 +27,15 @@ export class SessionService {
     login(userName: string, passwordPlain: string): Observable<boolean> {
         return this.usersService.requestLogin(userName, passwordPlain).pipe(
             map((res: any) => {
-                const accessToken = res["access_token"];
-                const refreshToken = res["refresh_token"];
-                if (accessToken && refreshToken){
-                    this.user$ = this.usersService.getEmployee(userName);
+                const accessToken = res["accessToken"];
+                // const refreshToken = res["refreshToken"];
+                if (accessToken){
+                    this.user$ = this.usersService.getProfile();
                     sessionStorage.setItem("accessToken", accessToken);
-                    localStorage.setItem("refreshToken", refreshToken);
+                    // localStorage.setItem("refreshToken", refreshToken);
                     // TODO: encode in token and pull from that?
                     sessionStorage.setItem("userName", userName);
-                    return res["access_token"];   
+                    return res["accessToken"];   
                 }
                 return false;
             }));
@@ -41,7 +43,7 @@ export class SessionService {
 
     logout() {
         sessionStorage.setItem("accessToken", "");
-        localStorage.setItem("refreshToken", "");
+        // localStorage.setItem("refreshToken", "");
         sessionStorage.setItem("userName", "");         
         this.user$ = of(undefined);
     }

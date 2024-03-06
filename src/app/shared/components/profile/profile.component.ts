@@ -1,4 +1,4 @@
-import { Component, } from '@angular/core';
+import { Component, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
@@ -18,6 +18,7 @@ import { UsersService } from '../../services/users.service';
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent extends BaseComponent {
+    @Input() isSignedInUser!: boolean;
     subscriptions: Subscription[] = [];
     employeeTypes: String[] = Object.values(EmployeeType);
     isNew = false;
@@ -36,7 +37,10 @@ export class ProfileComponent extends BaseComponent {
     ngOnInit() {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
-            this.user$ = this.usersService.getEmployee(userName);
+            this.user$ = this.isSignedInUser ?
+                this.usersService.getProfile() :
+                this.usersService.getEmployee(userName);
+            
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
                     email: user.email,
@@ -99,7 +103,11 @@ export class ProfileComponent extends BaseComponent {
                 this.isNew = false;
             }
             else { // UPDATE EXISTING EMPLOYEE
-                this.usersService.updateEmployee(newUser).subscribe({
+                const update = this.isSignedInUser ?
+                    this.usersService.updateProfile.bind(this.usersService) :
+                    this.usersService.updateEmployee.bind(this.usersService);
+                
+                update(newUser).subscribe({
                     next: (response) => {
                         console.log('User updated successfully', response);
                         this.back();
