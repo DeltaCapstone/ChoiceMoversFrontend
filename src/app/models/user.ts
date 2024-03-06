@@ -18,8 +18,14 @@ export interface IEmployee {
     employeeType: EmployeeType;
 }
 
+// should the password generated on the backend?
 export interface CreateEmployeeRequest extends IEmployee {
     passwordPlain: string;
+}
+
+export interface LoginRequest {
+    userName: string;    
+    passwordPlain: string;    
 }
 
 export class Employee implements IEmployee {
