@@ -54,7 +54,7 @@ export class EmployeesComponent extends PageComponent {
 
     /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
     openEmployee(userName: string = "") {
-        this.router.navigate(["/dashboard/employees/profile", userName])
+        this.router.navigate(["/dashboard/employees/employee", userName])
     }
 
     searchInput = new FormControl('');

@@ -1,11 +1,11 @@
 <div *ngIf="(user$ | async) as user">
   <div class="flex">
-    <div class="flex items-center p-2">
+    <div *ngIf="!isNew" class="flex items-center p-2">
       <tui-avatar [rounded]="true" size="xl" [text]="user.firstName + ' ' +  user.lastName"></tui-avatar>
     </div>
     <div class="flex flex-col text-left justify-center">
-      <p class="text-4xl">{{ user.firstName + ' ' + user.lastName }}</p>
-      <span class="text-2xl opacity-50">{{ user.employeeType }}</span>
+      <p class="text-4xl">{{ isNew ? "New Employee" : user.firstName + ' ' + user.lastName }}</p>
+      <span class="text-2xl opacity-50">{{ isNew ? "" : user.employeeType }}</span>
     </div>
   </div>
 
@@ -64,8 +64,11 @@
             </div>
           </div>
           <div class="tui-form__buttons">
-            <button (click)="update()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+            <button (click)="save()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Submit
+            </button>
+            <button *ngIf="!isNew" (click)="delete()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+              Delete
             </button>
             <button (click)="back()" tuiButton type="button" class="text-lg tui-form__button">
               Cancel
@@ -76,3 +79,4 @@
     </form>
   </div>
 </div>
+

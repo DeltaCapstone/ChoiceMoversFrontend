@@ -47,7 +47,8 @@ export class UsersService {
     }
     
     updateEmployee(updatedEmployee: Employee): Observable<Employee> {
-        return this.http.put<Employee>(`${this.apiUrl}/employee/`, updatedEmployee);
+        // TODO: route needs implemented
+        return this.http.put<Employee>(`${this.apiUrl}/manager/employee`, updatedEmployee);
     }
 
     deleteEmployee(userName: string) {
