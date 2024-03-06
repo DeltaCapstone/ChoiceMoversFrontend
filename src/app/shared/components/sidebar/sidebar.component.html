@@ -26,15 +26,15 @@
         
         <ng-template #dropdown>
           <tui-data-list class="bg-neutral">
-            <tui-opt-group *ngIf="user$ | async as user">
-              <button *ngIf="!profileOpen" (click)="openProfile(user.userName)" tuiOption >Edit</button>
+            <tui-opt-group>
+              <button *ngIf="!profileOpen" (click)="openProfile()" tuiOption >Edit</button>
               <button (click)="logout()" tuiOption >Log out</button>
             </tui-opt-group>
           </tui-data-list>
         </ng-template>
       </li>
 
-      <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of items">
+      <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of sidebarItems$ | async">
         <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
           <tui-svg [src]="item.icon"></tui-svg>
           <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.name }}</span>

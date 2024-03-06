@@ -26,7 +26,6 @@ export class LoginComponent extends BaseComponent {
         const userName = this.form.value.userName ?? "";
         const password = this.form.value.passwordPlain ?? "";
         this.session.login(userName, password).subscribe(success => {
-            console.log(success);
             if (success){
                 this.router.navigate(["dashboard"]);
             }
