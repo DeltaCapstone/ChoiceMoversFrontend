@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
@@ -23,6 +23,18 @@ export class ScheduleComponent extends PageComponent {
     
     calendarOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
-        plugins: [dayGridPlugin]
+        plugins: [dayGridPlugin],
+        eventClick: this.eventClick,
+        events: [
+            {
+                title: "test",
+                start: "2024-03-06",
+                end: "2024-03-08"
+            }
+        ]
+    }
+
+    eventClick(info: EventClickArg){
+        console.log(info.event.title);
     }
 }
