@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { TuiSvgModule } from '@taiga-ui/core';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [],
+  imports: [TuiSvgModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.css'
 })
