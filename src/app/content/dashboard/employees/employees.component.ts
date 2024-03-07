@@ -11,7 +11,7 @@ import { ProfileComponent } from '../../../shared/components/profile/profile.com
 import { Employee } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
 import { BehaviorSubject, Observable, Subscription, combineLatest } from 'rxjs';
-import { map, startWith, debounceTime } from 'rxjs/operators';
+import { map, startWith, debounceTime, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({

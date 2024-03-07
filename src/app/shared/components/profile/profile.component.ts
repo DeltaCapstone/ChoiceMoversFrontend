@@ -6,7 +6,7 @@ import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
 import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, map, of } from 'rxjs';
+import { Observable, Subscription, map, of, finalize, pipe } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -58,6 +58,7 @@ export class ProfileComponent extends BaseComponent {
     update() {
         const formValues = this.form.value;
         const saveSub = this.user$.pipe(
+            finalize(() => this.back()),
             map(user => ({
                 ...user,
                 email: formValues.email ?? user.email,
@@ -72,11 +73,9 @@ export class ProfileComponent extends BaseComponent {
             this.usersService.updateProfile(newUser).subscribe({
                 next: (response) => {
                     console.log('User updated successfully', response);
-                    this.back();
                 },
                 error: (error) => {
                     console.error('Error updating user', error);
-                    this.back();
                 }
             });
         });

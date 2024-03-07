@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Employee } from '../../models/user';
 import { UsersService } from './users.service';
-import { Observable, map, of } from 'rxjs';
+import { Observable, ReplaySubject, catchError, map, of, switchMap, tap } from 'rxjs';
 import { HttpRequest, HttpEvent, HttpHandler } from '@angular/common/http';
 
 @Injectable({
@@ -19,28 +19,39 @@ export class SessionService {
         if (token && userName) {
             this.user$ = this.usersService.getProfile();
         }
-        else {
-            this.user$ = of(undefined);
-        }
     }
     
     login(userName: string, passwordPlain: string): Observable<boolean> {
         return this.usersService.requestLogin(userName, passwordPlain).pipe(
-            map((res: any) => {
+            switchMap((res: any) => {
                 const accessToken = res["accessToken"];
-                // const refreshToken = res["refreshToken"];
-                if (accessToken){
-                    this.user$ = this.usersService.getProfile();
+                if (accessToken) {
                     sessionStorage.setItem("accessToken", accessToken);
-                    // localStorage.setItem("refreshToken", refreshToken);
-                    // TODO: encode in token and pull from that?
                     sessionStorage.setItem("userName", userName);
-                    return res["accessToken"];   
+                    // If refreshToken is needed, uncomment the next line
+                    // localStorage.setItem("refreshToken", res["refreshToken"]); 
+                    return this.usersService.getProfile().pipe(
+                        tap(profile => {
+                            this.user$ = of(profile);
+                        }),
+                        map(() => true),
+                        catchError(() => {
+                            sessionStorage.setItem("accessToken", "");
+                            // localStorage.setItem("refreshToken", "");
+                            sessionStorage.setItem("userName", ""); 
+                            return of(false)
+                        }) 
+                    );
                 }
-                return false;
-            }));
+                else {
+                    // If no accessToken, immediately return false
+                    return of(false);
+                }
+            }),
+            // Catch any error that occurs during the requestLogin or if switchMap fails
+            catchError(() => of(false))
+        );
     }
-
     logout() {
         sessionStorage.setItem("accessToken", "");
         // localStorage.setItem("refreshToken", "");
