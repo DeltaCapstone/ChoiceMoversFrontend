@@ -1,75 +1,74 @@
-/**
- * Class that defines a Job object and its properties and methods
- */
 import { Room } from "./room.model";
-export class Job {
-    id: number;
-    customerID: number;
-    loadAddr: number; //string?
-    unloadAddr: number; //string?
+/**
+ * Interface that describes the Job type
+ */
+export interface IJobRequest {
+    username: string;
+    loadAddr: string;
+    unloadAddr: string;
     startTime: Date;
-    hoursLabor: number;
-    finalized: boolean;
     rooms: Room[];
     pack: boolean;
     unpack: boolean;
     load: boolean;
     unload: boolean;
     clean: boolean;
-    mileage: number;
-    cost: number;
+    notes: string;
+}
 
-    constructor(id: number, customerID: number, loadAddr: number, unloadAddr: number, startTime: Date, hoursLabor: number, finalized: boolean, rooms: Room[], pack: boolean, unpack: boolean, load: boolean, unload: boolean, clean: boolean, mileage: number, cost: number) {
-        this.id = id;
-        this.customerID = customerID;
+/**
+ * Class that defines a Job object and its properties and methods
+ */
+export class JobRequest {
+    username: string;
+    loadAddr: string = "";
+    unloadAddr: string = "";
+    startTime: Date = new Date();
+    rooms: Room[] = [];
+    pack: boolean = false;
+    unpack: boolean = false;
+    load: boolean = false;
+    unload: boolean = false;
+    clean: boolean = false;
+    notes: string = "";
+
+    constructor(username: string, loadAddr: string, unloadAddr: string, startTime: Date, rooms: Room[], pack: boolean, unpack: boolean, load: boolean, unload: boolean, clean: boolean, notes: string) {
+        this.username = username;
         this.loadAddr = loadAddr;
         this.unloadAddr = unloadAddr;
         this.startTime = startTime;
-        this.hoursLabor = hoursLabor;
-        this.finalized = finalized;
         this.rooms = rooms;
         this.pack = pack;
         this.unpack = unpack;
         this.load = load;
         this.unload = unload;
         this.clean = clean;
-        this.mileage = mileage;
-        this.cost = cost;
+        this.notes = notes;
     }
 
     //Getters and setters
 
-    getId(): number {
-        return this.id;
+    getUsername(): string {
+        return this.username;
     }
 
-    setId(id: number): void {
-        this.id = id;
+    setUsername(username: string): void {
+        this.username = username;
     }
 
-
-    getCustomerID(): number {
-        return this.customerID;
-    }
-
-    setCustomerID(customerID: number): void {
-        this.customerID = customerID;
-    }
-
-
-    getLoadAddr(): number {
+    getLoadAddr(): string {
         return this.loadAddr;
     }
 
-    setLoadAddr(loadAddr: number): void {
+    setLoadAddr(loadAddr: string): void {
         this.loadAddr = loadAddr;
     }
 
-    getUnloadAddr(): number {
+    getUnloadAddr(): string {
         return this.unloadAddr;
     }
 
-    setUnloadAddr(unloadAddr: number): void {
+    setUnloadAddr(unloadAddr: string): void {
         this.unloadAddr = unloadAddr;
     }
 
@@ -80,24 +79,6 @@ export class Job {
     setStartTime(startTime: Date): void {
         this.startTime = startTime;
     }
-
-    getHoursLabor(): number {
-        return this.hoursLabor;
-    }
-
-    setHoursLabor(hoursLabor: number): void {
-        this.hoursLabor = hoursLabor;
-    }
-
-    getFinalized(): boolean {
-        return this.finalized;
-    }
-
-    setFinalized(finalized: boolean): void {
-        this.finalized = finalized;
-    }
-
-    //maybe rework this set of getters and setters (Rooms is an array of objects)
 
     getPack(): boolean {
         return this.pack;
@@ -137,22 +118,6 @@ export class Job {
 
     setClean(clean: boolean): void {
         this.clean = clean;
-    }
-
-    getMileage(): number {
-        return this.mileage;
-    }
-
-    setMileage(mileage: number): void {
-        this.mileage = mileage;
-    }
-
-    getCost(): number {
-        return this.cost;
-    }
-
-    setCost(cost: number): void {
-        this.cost = cost;
     }
 }
 
