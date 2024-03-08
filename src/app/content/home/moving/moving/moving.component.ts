@@ -4,7 +4,7 @@ import { StartMoveButtonComponent } from '../../../../shared/components/start-mo
 import { GoogleMapsModule } from '@angular/google-maps';
 import { NgFor, NgIf, CommonModule } from '@angular/common';
 import { GoogleMapsComponentComponent } from '../../../../shared/components/google-maps-component/google-maps-component.component';
-
+import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 @Component({
   selector: 'app-moving',
   standalone: true,
@@ -14,5 +14,20 @@ import { GoogleMapsComponentComponent } from '../../../../shared/components/goog
 })
 
 export class MovingComponent {
+  googleReviews: any[];
 
+  constructor(private googleMapsLoaderService: GoogleMapsLoaderService) { }
+
+  ngOnInit() {
+    this.getReviews();
+  }
+
+  getReviews() {
+    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
+
+    this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
+      this.googleReviews = response;
+      console.log(this.googleReviews);
+    });
+  }
 }
