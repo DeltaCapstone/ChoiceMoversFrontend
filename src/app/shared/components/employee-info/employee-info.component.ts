@@ -7,7 +7,7 @@ import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
 import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
-import { UsersService } from '../../services/users.service';
+import { EmployeesService } from '../../services/employees.service';
 
 @Component({
     selector: 'app-employee-info',
@@ -30,23 +30,25 @@ export class EmployeeInfoComponent extends BaseComponent {
         employeeType: new FormControl(""),
         phoneOther: new FormControl(""),
         phonePrimary: new FormControl(""),
+        employeePriority: new FormControl(0),
     });
-    user$: Observable<Employee>;
+    user$: Observable<Employee | undefined>;
 
     ngOnInit() {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
-            this.user$ = this.usersService.getEmployee(userName);
+            this.user$ = this.employeesService.getEmployee(userName);
             
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
-                    email: user.email,
-                    lastName: user.lastName,
-                    firstName: user.firstName,
-                    userName: user.userName,
-                    phonePrimary: user.phonePrimary,
-                    phoneOther: user.phoneOther,
-                    employeeType: user.employeeType,
+                    email: user?.email ?? "",
+                    lastName: user?.lastName ?? "",
+                    firstName: user?.firstName ?? "",
+                    userName: user?.userName ?? "",
+                    phonePrimary: user?.phonePrimary ?? "",
+                    phoneOther: user?.phoneOther ?? "",
+                    employeeType: user?.employeeType ?? "",
+                    employeePriority: user?.employeePriority ?? 0,
                 });
             });
             this.subscriptions.push(userSub);
@@ -62,7 +64,7 @@ export class EmployeeInfoComponent extends BaseComponent {
 
     constructor(private location: Location,
                 private route: ActivatedRoute,
-                private usersService: UsersService) {
+                private employeesService: EmployeesService) {
         super();
     }
 
@@ -71,23 +73,25 @@ export class EmployeeInfoComponent extends BaseComponent {
         const saveSub = this.user$.pipe(
             map(user => ({
                 ...user,
-                email:  formValues.email ?? user.email,
-                firstName: formValues.firstName ?? user.firstName,
-                lastName: formValues.lastName ?? user.lastName,
-                userName: formValues.userName ?? user.userName,
-                phonePrimary: formValues.phonePrimary ?? user.phonePrimary,
-                phoneOther: formValues.phoneOther ?? user.phoneOther,
-                employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
+                email:  formValues.email ?? user?.email ?? "",
+                firstName: formValues.firstName ?? user?.firstName ?? "",
+                lastName: formValues.lastName ?? user?.lastName ?? "",
+                userName: formValues.userName ?? user?.userName ?? "",
+                phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
+                phoneOther: formValues.phoneOther ?? user?.phoneOther ?? "",
+                employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
+                employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 0,
             }))
         ).subscribe(newUser => {
             if (this.isNew){ // CREATE NEW EMPLOYEE
                 const createEmployeeRequest: CreateEmployeeRequest = {
                     ...newUser,
                     phoneOther: null,
+                    employeePriority: 0,
                     passwordPlain: "test1234"
                 };
                 
-                this.usersService.createEmployee(createEmployeeRequest).subscribe({
+                this.employeesService.createEmployee(createEmployeeRequest).subscribe({
                     next: (response) => {
                         console.log('User created successfully', response);
                         this.back();
@@ -101,7 +105,7 @@ export class EmployeeInfoComponent extends BaseComponent {
             }
             else { // UPDATE EXISTING EMPLOYEE
                 console.log(newUser);
-                this.usersService.updateEmployee(newUser).subscribe({
+                this.employeesService.updateEmployee(newUser).subscribe({
                     next: (response) => {
                         console.log('User updated successfully', response);
                         this.back();
@@ -121,7 +125,7 @@ export class EmployeeInfoComponent extends BaseComponent {
         if (!userName)
             return;
         
-        this.usersService.deleteEmployee(userName).subscribe({
+        this.employeesService.deleteEmployee(userName).subscribe({
             next: (response) => {
                 console.log('User deleted successfully', response);
                 this.back();

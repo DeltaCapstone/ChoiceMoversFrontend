@@ -16,6 +16,7 @@ export interface IEmployee {
     phoneOther: string | null;
     userName: string;
     employeeType: EmployeeType;
+    employeePriority: number;
 }
 
 // should the password generated on the backend?
@@ -36,4 +37,5 @@ export class Employee implements IEmployee {
     phoneOther: string | null = null;
     userName: string = "";
     employeeType: EmployeeType = EmployeeType.FullTime;
+    employeePriority: number = 0;
 }

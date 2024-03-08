@@ -7,7 +7,7 @@ import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
 import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of, finalize, pipe } from 'rxjs';
-import { UsersService } from '../../services/users.service';
+import { EmployeesService } from '../../services/employees.service';
 
 @Component({
     selector: 'app-profile',
@@ -29,29 +29,32 @@ export class ProfileComponent extends BaseComponent {
         employeeType: new FormControl(""),
         phoneOther: new FormControl(""),
         phonePrimary: new FormControl(""),
+        employeePriority: new FormControl(0),
     });
-    user$: Observable<Employee>;
+    user$: Observable<Employee | undefined>;
 
     ngOnInit() {
-        this.user$ = this.usersService.getProfile();
+        this.user$ = this.employeesService.getProfile();
 
         const userSub = this.user$.subscribe(user => {
-            this.form.patchValue({
-                email: user.email,
-                lastName: user.lastName,
-                firstName: user.firstName,
-                userName: user.userName,
-                phonePrimary: user.phonePrimary,
-                phoneOther: user.phoneOther,
-                employeeType: user.employeeType,
-            });
+            if (user) {
+                this.form.patchValue({
+                    email: user.email,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    userName: user.userName,
+                    phonePrimary: user.phonePrimary,
+                    phoneOther: user.phoneOther,
+                    employeeType: user.employeeType,
+                    employeePriority: user.employeePriority,
+                });
+            }
         });
         this.subscriptions.push(userSub);
     }
 
     constructor(private location: Location,
-        private route: ActivatedRoute,
-        private usersService: UsersService) {
+        private employeesService: EmployeesService) {
         super();
     }
 
@@ -61,16 +64,17 @@ export class ProfileComponent extends BaseComponent {
             finalize(() => this.back()),
             map(user => ({
                 ...user,
-                email: formValues.email ?? user.email,
-                firstName: formValues.firstName ?? user.firstName,
-                lastName: formValues.lastName ?? user.lastName,
-                userName: formValues.userName ?? user.userName,
-                phonePrimary: formValues.phonePrimary ?? user.phonePrimary,
-                phoneOther: formValues.phoneOther ?? user.phoneOther,
-                employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
+                email: formValues.email ?? user?.email ?? "",
+                firstName: formValues.firstName ?? user?.firstName ?? "",
+                lastName: formValues.lastName ?? user?.lastName ?? "",
+                userName: formValues.userName ?? user?.userName ?? "",
+                phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
+                phoneOther: formValues.phoneOther ?? user?.phoneOther ?? "",
+                employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 0,
+                employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
             }))
         ).subscribe(newUser => {
-            this.usersService.updateProfile(newUser).subscribe({
+            this.employeesService.updateProfile(newUser).subscribe({
                 next: (response) => {
                     console.log('User updated successfully', response);
                 },

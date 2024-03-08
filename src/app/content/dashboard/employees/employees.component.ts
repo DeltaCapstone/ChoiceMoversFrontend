@@ -9,8 +9,8 @@ import { PageService } from '../../../shared/services/page.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 import { Employee } from '../../../models/user';
-import { UsersService } from '../../../shared/services/users.service';
-import { BehaviorSubject, Observable, Subscription, combineLatest } from 'rxjs';
+import { EmployeesService } from '../../../shared/services/employees.service';
+import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -33,7 +33,7 @@ export class EmployeesComponent extends PageComponent {
     ngOnInit() {
         this.setTitle("Employees");
         // Fetch all employees once
-        this.employees$ = this.usersService.getEmployees();
+        this.employees$ = this.employeesService.getEmployees();
 
         this.filteredEmployees$ = combineLatest([this.employees$, this.searchInput.valueChanges.pipe(startWith(''))]).pipe(
             debounceTime(100),
@@ -48,7 +48,7 @@ export class EmployeesComponent extends PageComponent {
         );
     }
 
-    constructor(pageService: PageService, private usersService: UsersService, private router: Router) {
+    constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router) {
         super(pageService);
     }
 
