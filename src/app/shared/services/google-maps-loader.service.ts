@@ -1,13 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { GoogleReviewsResponse } from '../../models/google-reviews-response';
+import { FeatureService } from './feature.service';
 
+/**
+ * Service type that provides an interface for loading GoogleMaps related content
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleMapsLoaderService {
 
-  constructor(private http: HttpClient) { }
+  apiUrl: string = "";
+
+  constructor(private http: HttpClient, private feature: FeatureService) {
+    this.apiUrl = this.feature.getFeatureValue("api").url;
+  }
 
   map: google.maps.Map;
 
@@ -29,7 +38,7 @@ export class GoogleMapsLoaderService {
     );
   }
 
-  getGoogleReviews(url: string): Observable<any> {
-    return this.http.get(url);
+  getGoogleReviews(url: string): Observable<GoogleReviewsResponse> {
+    return this.http.get<GoogleReviewsResponse>(url, { observe: 'body' });
   }
 }
