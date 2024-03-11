@@ -16,11 +16,16 @@
     "@angular/compiler": "^17.1.0",
     "@angular/core": "^17.1.0",
     "@angular/forms": "^17.1.0",
+
     "@angular/google-maps": "^17.2.1",
-    "@angular/material": "^17.2.0",
+   
+
+    "@angular/material": "^17.2.1",
+
     "@angular/platform-browser": "^17.1.0",
     "@angular/platform-browser-dynamic": "^17.1.0",
     "@angular/router": "^17.1.0",
+    "@auth0/angular-jwt": "^5.2.0",
     "@fullcalendar/angular": "^6.1.10",
     "@fullcalendar/core": "^6.1.10",
     "@fullcalendar/daygrid": "^6.1.10",

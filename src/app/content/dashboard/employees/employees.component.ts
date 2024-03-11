@@ -10,7 +10,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 import { Employee } from '../../../models/user';
 import { UsersService } from '../../../shared/services/users.service';
-import { BehaviorSubject, Observable, Subscription, combineLatest, of } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -27,14 +27,13 @@ import { Router } from '@angular/router';
 })
 export class EmployeesComponent extends PageComponent {
     subscriptions: Subscription[] = [];
-    employees$ = new BehaviorSubject<Employee[]>([]);
+    employees$: Observable<Employee[]>;
     filteredEmployees$: Observable<Employee[]> = new Observable<Employee[]>;
 
     ngOnInit() {
         this.setTitle("Employees");
         // Fetch all employees once
-        const usersSub = this.usersService.getEmployees().subscribe(employees => this.employees$.next(employees) );
-        this.subscriptions.push(usersSub);
+        this.employees$ = this.usersService.getEmployees();
 
         this.filteredEmployees$ = combineLatest([this.employees$, this.searchInput.valueChanges.pipe(startWith(''))]).pipe(
             debounceTime(100),
@@ -52,9 +51,10 @@ export class EmployeesComponent extends PageComponent {
     constructor(pageService: PageService, private usersService: UsersService, private router: Router) {
         super(pageService);
     }
-    
-    openEmployee(userName?: string) {
-        this.router.navigate(["/dashboard/employees/profile", userName ?? ""])
+
+    /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
+    openEmployee(userName: string = "") {
+        this.router.navigate(["/dashboard/employees/employee", userName])
     }
 
     searchInput = new FormControl('');

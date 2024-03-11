@@ -1,12 +1,14 @@
-import { NgFor, NgClass, NgIf } from '@angular/common';
+import { NgFor, NgClass, NgIf, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
 import { BaseComponent } from '../base-component';
-import { filter } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { Observable, Subscription, combineLatest, of } from 'rxjs';
+import { SessionService } from '../../services/session.service';
+import { Employee, EmployeeType } from '../../../models/user';
 
 type SidebarItem = {
     readonly name: string
@@ -17,7 +19,7 @@ type SidebarItem = {
 @Component({
     selector: 'app-sidebar',
     standalone: true,
-    imports: [NgFor, TuiSvgModule, NgClass, RouterModule, TuiAvatarModule, NgIf,
+    imports: [NgFor, TuiSvgModule, NgClass, RouterModule, TuiAvatarModule, NgIf, CommonModule,
         TuiSurfaceModule, TuiHostedDropdownModule, TuiDataListModule],
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css',
@@ -26,34 +28,54 @@ type SidebarItem = {
 export class SidebarComponent extends BaseComponent {
     @ViewChild(TuiHostedDropdownComponent)
     component?: TuiHostedDropdownComponent;
-
-    routerEventSub: Subscription;
     
+    user$: Observable<Employee | undefined> = of(undefined);
+    sidebarItems$: Observable<SidebarItem[]> = of([]);
+    subscriptions: Subscription[] = [];
+
     dropdownOpen: boolean = false;
     profileOpen: boolean = false;
 
-    constructor(private router: Router) {
-        super();
-        this.routerEventSub = this.router.events.pipe(
+    ngOnInit() {
+        this.user$ = this.session.getUser();
+
+        const routerEventSub = this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(_ => {
             this.profileOpen = this.router.url.includes("/dashboard/profile");
         });
+        this.subscriptions.push(routerEventSub);
+
+        this.sidebarItems$ = this.user$.pipe(
+            map(user => {
+                let sidebarItems = [];
+                sidebarItems.push({ name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" });
+                if (user?.employeeType == EmployeeType.Manager){
+                    sidebarItems = sidebarItems.concat([
+                        { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },
+                        { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" }
+                    ]);   
+                }
+                sidebarItems.push({ name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" });
+                return sidebarItems;
+            }));
+    }
+
+    constructor(private router: Router, private session: SessionService) {
+        super();
     }
 
     openProfile() {
         this.dropdownOpen = false;
-        this.router.navigate([`dashboard/profile/`, "emp_linda_k"]);
+        this.router.navigate([`dashboard/profile/`]);
     }
-    
-    items: SidebarItem[] = [
-        { name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" },
-        { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },
-        { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" },
-        { name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" }
-    ];
+
+    logout(){
+        this.session.logout();
+        this.router.navigate([`/login`]);
+    }
 
     ngOnDestroy(){
-        this.routerEventSub.unsubscribe();
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }
