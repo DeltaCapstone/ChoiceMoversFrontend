@@ -27,32 +27,40 @@ export class SessionService {
         }
     }
 
-    setSessionValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, userName?: string){
+    setSessionValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string){
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";
+        refreshTokenExpiresAt = refreshTokenExpiresAt ?? sessionStorage.getItem("refreshTokenExpiresAt") ?? "";
         userName = userName ?? sessionStorage.getItem("userName") ?? "";
         
         sessionStorage.setItem("accessToken", accessToken);
         sessionStorage.setItem("userName", userName);
         sessionStorage.setItem("accessTokenExpiresAt", accessTokenExpiresAt)
         localStorage.setItem("refreshToken", refreshToken); 
+        sessionStorage.setItem("refreshTokenExpiresAt", refreshTokenExpiresAt)
     }
 
     isActive(): boolean {
-        const expirationDateString = sessionStorage.getItem("accessTokenExpiresAt");
-        const expirationDate = expirationDateString ? new Date(expirationDateString) : new Date(0);
-        return expirationDate && expirationDate >= new Date();
+        const accessTokenExpiresAt = sessionStorage.getItem("accessTokenExpiresAt");
+        const accessTokenExpirationDate = accessTokenExpiresAt ? new Date(accessTokenExpiresAt) : new Date(0);
+        return accessTokenExpirationDate && accessTokenExpirationDate >= new Date();
     }
 
     refresh(): Observable<boolean> {
         const refreshToken = sessionStorage.getItem("refreshToken");
+        const refreshTokenExpiresAt = sessionStorage.getItem("refreshTokenExpiresAt");
+        const refreshTokenExpirationDate = refreshTokenExpiresAt ? new Date(refreshTokenExpiresAt) : new Date(0);
+        if (refreshTokenExpirationDate < new Date()){
+            this.logout();
+            return of(false);
+        }
         return this.http.post(`${this.apiUrl}/renewAccess`, {"refreshToken": refreshToken}).pipe(
             tap((res: any) => this.setSessionValues(res["accessToken"], res["accessTokenExpiresAt"])),
             map(_ => true),
             catchError(err => {
                 console.error(err);
-                this.setSessionValues("", "", "", "");
+                this.logout();
                 return of(false);
             })
         )
@@ -66,7 +74,7 @@ export class SessionService {
         return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
             switchMap((res: any) => {
                 const accessToken = res["accessToken"];
-                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], userName);
+                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
                 if (accessToken) {
                     return this.employeesService.getProfile().pipe(
                         tap(profile => {
@@ -75,7 +83,7 @@ export class SessionService {
                         map(_ => true),
                         catchError(err => {
                             console.error(err);
-                            this.setSessionValues("", "", "", "");
+                            this.logout();
                             return of(false)
                         }) 
                     );
@@ -91,7 +99,7 @@ export class SessionService {
     }
 
     logout() {
-        this.setSessionValues("", "", "", "");
+        this.setSessionValues("", "", "", "", "");
         this.user$ = of(undefined);
     }
 
