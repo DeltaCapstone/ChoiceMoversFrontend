@@ -4,7 +4,7 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
@@ -28,7 +28,7 @@ export class EmployeeInfoComponent extends BaseComponent {
         lastName: new FormControl(""),
         email: new FormControl(""),
         employeeType: new FormControl(""),
-        phoneOther: new FormControl(""),
+        // phoneOther: new FormControl([]),
         phonePrimary: new FormControl(""),
         employeePriority: new FormControl(0),
     });
@@ -46,7 +46,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                     firstName: user?.firstName ?? "",
                     userName: user?.userName ?? "",
                     phonePrimary: user?.phonePrimary ?? "",
-                    phoneOther: user?.phoneOther ?? "",
+                    // phoneOther: user?.phoneOther ?? [],
                     employeeType: user?.employeeType ?? "",
                     employeePriority: user?.employeePriority ?? 0,
                 });
@@ -78,15 +78,15 @@ export class EmployeeInfoComponent extends BaseComponent {
                 lastName: formValues.lastName ?? user?.lastName ?? "",
                 userName: formValues.userName ?? user?.userName ?? "",
                 phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
-                phoneOther: formValues.phoneOther ?? user?.phoneOther ?? "",
+                phoneOther: [],
                 employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
                 employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 0,
             }))
         ).subscribe(newUser => {
             if (this.isNew){ // CREATE NEW EMPLOYEE
-                const createEmployeeRequest: CreateEmployeeRequest = {
+                const createEmployeeRequest: EmployeeCreateRequest = {
                     ...newUser,
-                    phoneOther: null,
+                    phoneOther: [],
                     employeePriority: 0,
                     passwordPlain: "test1234"
                 };
@@ -104,7 +104,6 @@ export class EmployeeInfoComponent extends BaseComponent {
                 this.isNew = false;
             }
             else { // UPDATE EXISTING EMPLOYEE
-                console.log(newUser);
                 this.employeesService.updateEmployee(newUser).subscribe({
                     next: (response) => {
                         console.log('User updated successfully', response);

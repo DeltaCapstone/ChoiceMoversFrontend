@@ -4,7 +4,7 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of, finalize, pipe } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
@@ -13,7 +13,7 @@ import { EmployeesService } from '../../services/employees.service';
     selector: 'app-profile',
     standalone: true,
     imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
-        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
+              CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -27,9 +27,8 @@ export class ProfileComponent extends BaseComponent {
         lastName: new FormControl(""),
         email: new FormControl(""),
         employeeType: new FormControl(""),
-        phoneOther: new FormControl(""),
-        phonePrimary: new FormControl(""),
-        employeePriority: new FormControl(0),
+        // phoneOther: new FormControl([]),
+        phonePrimary: new FormControl("")
     });
     user$: Observable<Employee | undefined>;
 
@@ -44,9 +43,8 @@ export class ProfileComponent extends BaseComponent {
                     firstName: user.firstName,
                     userName: user.userName,
                     phonePrimary: user.phonePrimary,
-                    phoneOther: user.phoneOther,
-                    employeeType: user.employeeType,
-                    employeePriority: user.employeePriority,
+                    // phoneOther: user.phoneOther,
+                    employeeType: user.employeeType
                 });
             }
         });
@@ -63,16 +61,14 @@ export class ProfileComponent extends BaseComponent {
         const saveSub = this.user$.pipe(
             finalize(() => this.back()),
             map(user => ({
-                ...user,
                 email: formValues.email ?? user?.email ?? "",
                 firstName: formValues.firstName ?? user?.firstName ?? "",
                 lastName: formValues.lastName ?? user?.lastName ?? "",
                 userName: formValues.userName ?? user?.userName ?? "",
                 phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
-                phoneOther: formValues.phoneOther ?? user?.phoneOther ?? "",
-                employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 0,
+                phoneOther: [],
                 employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
-            }))
+            } as EmployeeProfileUpdateRequest))
         ).subscribe(newUser => {
             this.employeesService.updateProfile(newUser).subscribe({
                 next: (response) => {
