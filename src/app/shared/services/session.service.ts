@@ -14,13 +14,16 @@ export class SessionService {
     
     constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
-        // check if there is a stored token
-        const token = sessionStorage.getItem("accessToken");
-        const userName = sessionStorage.getItem("userName");
-        
-        // TODO: need to check for expiration
-        if (token && userName) {
+
+        if (this.isActive()){
             this.user$ = this.employeesService.getProfile();
+        }
+        else {
+            this.refresh().subscribe(success => {
+                if (success){
+                    this.user$ = this.employeesService.getProfile();
+                }
+            })
         }
     }
 
@@ -36,15 +39,10 @@ export class SessionService {
         localStorage.setItem("refreshToken", refreshToken); 
     }
 
-    isExpired(): boolean {
+    isActive(): boolean {
         const expirationDateString = sessionStorage.getItem("accessTokenExpiresAt");
-        if (expirationDateString){
-            const expirationDate = new Date(expirationDateString);
-            return expirationDate < new Date();
-        }
-        else {
-            return true;
-        }
+        const expirationDate = expirationDateString ? new Date(expirationDateString) : new Date(0);
+        return expirationDate && expirationDate >= new Date();
     }
 
     refresh(): Observable<boolean> {
@@ -67,13 +65,12 @@ export class SessionService {
         };
         return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
             switchMap((res: any) => {
-                console.log(res);
                 const accessToken = res["accessToken"];
+                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], userName);
                 if (accessToken) {
                     return this.employeesService.getProfile().pipe(
                         tap(profile => {
                             this.user$ = of(profile);
-                            this.setSessionValues(accessToken, userName, res["accessTokenExpiresAt"], res["refreshToken"]);
                         }),
                         map(_ => true),
                         catchError(err => {
