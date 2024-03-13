@@ -13,6 +13,7 @@ import { EmployeesService } from '../../../shared/services/employees.service';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { SessionService } from '../../../shared/services/session.service';
 
 @Component({
     selector: 'app-employees',
@@ -48,13 +49,13 @@ export class EmployeesComponent extends PageComponent {
         );
     }
 
-    constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router) {
+    constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router, private session: SessionService) {
         super(pageService);
     }
 
     /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
     openEmployee(userName: string = "") {
-        this.router.navigate(["/dashboard/employees/employee", userName])
+        this.session.guardWithAuth(() => this.router.navigate(["/dashboard/employees/employee", userName]));
     }
 
     searchInput = new FormControl('');
