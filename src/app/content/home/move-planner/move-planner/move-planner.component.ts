@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { MoveBlowoutDropdownComponent } from '../../../../shared/components/move-blowout-dropdown/move-blowout-dropdown.component';
@@ -8,6 +7,16 @@ import { MovePlannerModalComponent } from '../../move-planner-modal/move-planner
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon'
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { PageService } from '../../../../shared/services/page.service';
+import { PageComponent } from '../../../../shared/components/page-component';
+
 
 type DropDownItem = {
   readonly room: string;
@@ -16,19 +25,36 @@ type DropDownItem = {
   readonly icon: string;
 }
 
-
 @Component({
   selector: 'app-move-planner',
   standalone: true,
 
-  imports: [CommonModule, NgFor, MoveBlowoutDropdownComponent, MatMenuModule, MatDialogModule, MatIconModule],
+  imports: [CommonModule, NgFor, MoveBlowoutDropdownComponent, MatMenuModule, MatDialogModule, MatIconModule, MatButtonModule, MatStepperModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatCardModule],
   templateUrl: './move-planner.component.html',
   styleUrl: './move-planner.component.css'
 })
 
-export class MovePlannerComponent {
+export class MovePlannerComponent extends PageComponent {
+
+  firstFormGroup: FormGroup;
+
+  secondFormGroup: FormGroup;
 
   isMenuOpen: boolean = false;
+
+  isLinear: boolean = true;
+
+  moveService: boolean = false;
+
+  cleanOutService: boolean = false;
+
+  storageService: boolean = false;
+
+  packingService: boolean = false;
+
+  labelPosition: 'before' | 'after' = 'after';
+
+  disabled: boolean = false;
 
   items: DropDownItem[] = [
     {
@@ -73,7 +99,25 @@ export class MovePlannerComponent {
     }
   ]
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog, private formBuilder: FormBuilder, pageService: PageService) {
+    super(pageService);
+  }
+
+  override ngOnInit(): void {
+    this.setTitle("Move Planner");
+    this.firstFormGroup = this.formBuilder.group({
+      firstCtrl: ['', Validators.required],
+      moveService: [false],
+      cleanOutService: [false],
+      packingService: [false],
+      storageService: [false]
+    });
+
+    this.secondFormGroup = this.formBuilder.group({
+      secondCtrl: ['', Validators.required]
+    });
+  }
+
 
   getIconName(itemName: string): string {
     const item = this.items.find(item => item.room === itemName);

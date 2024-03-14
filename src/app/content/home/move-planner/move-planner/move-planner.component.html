@@ -1,21 +1,37 @@
-<div class="flex justify-center max-w-80 pt-4 mx-auto">
-    <div class="border-4 border-solid border-secondary rounded-lg h-80 w-50">
-        <h1 class="flex justify-center items-center text-center text-neutral text-2xl font-bold p-4 m-4">Let's Get
-            Started Planning
-            Your
-            Move!</h1>
-        <div class="flex justify-center items-center">
-            <div class="flex justify-center border-4 border-secondary text-2xl text-neutral p-4 rounded-lg dropdown">
-                <button mat-button [matMenuTriggerFor]="roomMenu" (menuOpened)="isMenuOpen = true"
-                    (menuClosed)="isMenuOpen = false">Rooms<mat-icon>{{isMenuOpen ?
-                        'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon></button>
-                <mat-menu #roomMenu="matMenu">
-                    <button mat-menu-item *ngFor="let item of items" (click)="openRoomModal(item.room, item.roomItems)">
-                        {{ item.room }}
-                    </button>
-                </mat-menu>
+<mat-stepper [linear]="isLinear" #stepper>
+    <mat-step [stepControl]="firstFormGroup">
+        <form [formGroup]="firstFormGroup">
+            <ng-template matStepLabel>What Services Will You Be Using?</ng-template>
+            <mat-label>Service</mat-label>
+            <section class="example-section">
+                <mat-checkbox formControlName="moveService">Moving</mat-checkbox>
+                <mat-checkbox formControlName="cleanOutService">Clean Out</mat-checkbox>
+                <mat-checkbox formControlName="packingService">Packing</mat-checkbox>
+                <mat-checkbox formControlName="storageService">Storage</mat-checkbox>
+            </section>
+            <div>
+                <button mat-button matStepperNext>Next</button>
             </div>
+        </form>
+    </mat-step>
+    <mat-step [stepControl]="secondFormGroup" label="Fill out your address">
+        <form [formGroup]="secondFormGroup">
+            <mat-form-field>
+                <mat-label>Address</mat-label>
+                <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY" required>
+            </mat-form-field>
+            <div>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button matStepperNext>Next</button>
+            </div>
+        </form>
+    </mat-step>
+    <mat-step>
+        <ng-template matStepLabel>Done</ng-template>
+        <p>You are now done.</p>
+        <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
         </div>
-    </div>
-</div>
-
+    </mat-step>
+</mat-stepper>
