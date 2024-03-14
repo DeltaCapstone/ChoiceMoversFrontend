@@ -4,9 +4,8 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/user';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, map, of, finalize, pipe } from 'rxjs';
+import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/user';
+import { Observable, Subscription, map, finalize, take } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
 
@@ -60,7 +59,7 @@ export class ProfileComponent extends BaseComponent {
     update() {
         this.session.guardWithAuth(() => {
             const formValues = this.form.value;
-            const saveSub = this.user$.pipe(
+            this.user$.pipe(
                 finalize(() => this.back()),
                 map(user => ({
                     email: formValues.email ?? user?.email ?? "",
@@ -74,15 +73,14 @@ export class ProfileComponent extends BaseComponent {
             ).subscribe(newUser => {
                 this.employeesService.updateProfile(newUser).subscribe({
                     next: (response) => {
-                        console.log('User updated successfully', response);
+                        console.log('Profile updated successfully', response);
                     },
                     error: (error) => {
-                        console.error('Error updating user', error);
+                        console.error('Error updating profile', error);
                     }
                 });
             });
-            this.subscriptions.push(saveSub);
-        });
+        }).pipe((take(1))).subscribe();
     }
 
     back() {
