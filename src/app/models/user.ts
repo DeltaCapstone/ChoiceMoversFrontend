@@ -13,13 +13,14 @@ export interface IEmployee {
     firstName: string
     lastName: string;
     phonePrimary: string;
-    phoneOther: string | null;
+    phoneOther: string[];
     userName: string;
     employeeType: EmployeeType;
+    employeePriority: number;
 }
 
 // should the password generated on the backend?
-export interface CreateEmployeeRequest extends IEmployee {
+export interface EmployeeCreateRequest extends IEmployee {
     passwordPlain: string;
 }
 
@@ -28,12 +29,23 @@ export interface LoginRequest {
     passwordPlain: string;    
 }
 
+export interface EmployeeProfileUpdateRequest {
+    email: string;
+    firstName: string
+    lastName: string;
+    phonePrimary: string;
+    phoneOther: string[];
+    userName: string;
+    employeeType: EmployeeType;
+}
+
 export class Employee implements IEmployee {
     email: string = "";
     firstName: string = "";
     lastName: string = "";
     phonePrimary: string = "";
-    phoneOther: string | null = null;
+    phoneOther: string[] = [];
     userName: string = "";
     employeeType: EmployeeType = EmployeeType.FullTime;
+    employeePriority: number = 0;
 }

@@ -4,10 +4,11 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { CreateEmployeeRequest, Employee, EmployeeType } from '../../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeType } from '../../../models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
-import { UsersService } from '../../services/users.service';
+import { EmployeesService } from '../../services/employees.service';
+import { SessionService } from '../../services/session.service';
 
 @Component({
     selector: 'app-employee-info',
@@ -28,25 +29,27 @@ export class EmployeeInfoComponent extends BaseComponent {
         lastName: new FormControl(""),
         email: new FormControl(""),
         employeeType: new FormControl(""),
-        phoneOther: new FormControl(""),
+        // phoneOther: new FormControl([]),
         phonePrimary: new FormControl(""),
+        employeePriority: new FormControl(0),
     });
-    user$: Observable<Employee>;
+    user$: Observable<Employee | undefined>;
 
     ngOnInit() {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
-            this.user$ = this.usersService.getEmployee(userName);
+            this.user$ = this.employeesService.getEmployee(userName);
             
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
-                    email: user.email,
-                    lastName: user.lastName,
-                    firstName: user.firstName,
-                    userName: user.userName,
-                    phonePrimary: user.phonePrimary,
-                    phoneOther: user.phoneOther,
-                    employeeType: user.employeeType,
+                    email: user?.email ?? "",
+                    lastName: user?.lastName ?? "",
+                    firstName: user?.firstName ?? "",
+                    userName: user?.userName ?? "",
+                    phonePrimary: user?.phonePrimary ?? "",
+                    // phoneOther: user?.phoneOther ?? [],
+                    employeeType: user?.employeeType ?? "",
+                    employeePriority: user?.employeePriority ?? 0,
                 });
             });
             this.subscriptions.push(userSub);
@@ -62,75 +65,81 @@ export class EmployeeInfoComponent extends BaseComponent {
 
     constructor(private location: Location,
                 private route: ActivatedRoute,
-                private usersService: UsersService) {
+                private session: SessionService,
+                private employeesService: EmployeesService) {
         super();
     }
 
     save() {
-        const formValues = this.form.value;
-        const saveSub = this.user$.pipe(
-            map(user => ({
-                ...user,
-                email:  formValues.email ?? user.email,
-                firstName: formValues.firstName ?? user.firstName,
-                lastName: formValues.lastName ?? user.lastName,
-                userName: formValues.userName ?? user.userName,
-                phonePrimary: formValues.phonePrimary ?? user.phonePrimary,
-                phoneOther: formValues.phoneOther ?? user.phoneOther,
-                employeeType: (formValues.employeeType ?? user.employeeType) as EmployeeType,
-            }))
-        ).subscribe(newUser => {
-            if (this.isNew){ // CREATE NEW EMPLOYEE
-                const createEmployeeRequest: CreateEmployeeRequest = {
-                    ...newUser,
-                    phoneOther: null,
-                    passwordPlain: "test1234"
-                };
+        this.session.guardWithAuth(() => {
+            const formValues = this.form.value;
+            const saveSub = this.user$.pipe(
+                map(user => ({
+                    ...user,
+                    email:  formValues.email ?? user?.email ?? "",
+                    firstName: formValues.firstName ?? user?.firstName ?? "",
+                    lastName: formValues.lastName ?? user?.lastName ?? "",
+                    userName: formValues.userName ?? user?.userName ?? "",
+                    phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
+                    phoneOther: [],
+                    employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
+                    employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 0,
+                }))
+            ).subscribe(newUser => {
+                if (this.isNew){ // CREATE NEW EMPLOYEE
+                    const createEmployeeRequest: EmployeeCreateRequest = {
+                        ...newUser,
+                        phoneOther: [],
+                        employeePriority: 0,
+                        passwordPlain: "test1234"
+                    };
                 
-                this.usersService.createEmployee(createEmployeeRequest).subscribe({
-                    next: (response) => {
-                        console.log('User created successfully', response);
-                        this.back();
-                    },
-                    error: (error) => {
-                        console.error('Error creating user', error);
-                        this.back();
-                    }
-                });                
-                this.isNew = false;
-            }
-            else { // UPDATE EXISTING EMPLOYEE
-                console.log(newUser);
-                this.usersService.updateEmployee(newUser).subscribe({
-                    next: (response) => {
-                        console.log('User updated successfully', response);
-                        this.back();
-                    },
-                    error: (error) => {
-                        console.error('Error updating user', error);
-                        this.back();
-                    }
-                });
-            }
-        });
-        this.subscriptions.push(saveSub);
+                    this.employeesService.createEmployee(createEmployeeRequest).subscribe({
+                        next: (response) => {
+                            console.log('User created successfully', response);
+                            this.back();
+                        },
+                        error: (error) => {
+                            console.error('Error creating user', error);
+                            this.back();
+                        }
+                    });                
+                    this.isNew = false;
+                }
+                else { // UPDATE EXISTING EMPLOYEE
+                    this.employeesService.updateEmployee(newUser).subscribe({
+                        next: (response) => {
+                            console.log('User updated successfully', response);
+                            this.back();
+                        },
+                        error: (error) => {
+                            console.error('Error updating user', error);
+                            this.back();
+                        }
+                    });
+                }
+            });
+            this.subscriptions.push(saveSub);
+        }).subscribe();
     }
 
     delete() {
-        const userName: string | null = this.route.snapshot.paramMap.get('userName');
-        if (!userName)
-            return;
+        this.session.guardWithAuth(() => {
+            const userName: string | null = this.route.snapshot.paramMap.get('userName');
+            if (!userName)
+                return;
         
-        this.usersService.deleteEmployee(userName).subscribe({
-            next: (response) => {
-                console.log('User deleted successfully', response);
-                this.back();
-            },
-            error: (error) => {
-                console.error('Error deleting user', error);
-                this.back();
-            }
-        });                
+            this.employeesService.deleteEmployee(userName).subscribe({
+                next: (response) => {
+                    console.log('User deleted successfully', response);
+                    this.back();
+                },
+                error: (error) => {
+                    console.error('Error deleting user', error);
+                    this.back();
+                }
+            });                
+        }).subscribe();
     }
 
     back() {

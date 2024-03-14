@@ -58,10 +58,10 @@
               <tui-input-phone phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phonePrimary">Phone primary</tui-input-phone>
               <tui-error formControlName="phonePrimary" [error]="[] | tuiFieldError | async"></tui-error>
             </div>
-            <div class="tui-form__multi-field">
-              <tui-input-phone phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phoneOther">Phone other</tui-input-phone>
-              <tui-error formControlName="phoneOther" [error]="[] | tuiFieldError | async"></tui-error>
-            </div>
+            <!-- <div class="tui-form__multi-field"> -->
+            <!--   <tui-input-phone phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phoneOther">Phone other</tui-input-phone> -->
+            <!--   <tui-error formControlName="phoneOther" [error]="[] | tuiFieldError | async"></tui-error> -->
+            <!-- </div> -->
           </div>
           <div class="tui-form__buttons">
             <button (click)="save()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
