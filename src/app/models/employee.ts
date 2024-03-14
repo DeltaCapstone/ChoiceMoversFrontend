@@ -36,7 +36,12 @@ export interface EmployeeProfileUpdateRequest {
     phonePrimary: string;
     phoneOther: string[];
     userName: string;
+}
+
+export interface EmployeeTypePriorityRequest {
+    userName: string;
     employeeType: EmployeeType;
+    employeePriority: number;
 }
 
 export class Employee implements IEmployee {
@@ -47,5 +52,5 @@ export class Employee implements IEmployee {
     phoneOther: string[] = [];
     userName: string = "";
     employeeType: EmployeeType = EmployeeType.FullTime;
-    employeePriority: number = 0;
+    employeePriority: number = 3;
 }

@@ -42,7 +42,7 @@ export const routes: Routes = [
             { path: 'employees/employee/:userName', component: EmployeeInfoComponent },
             { path: 'statistics', component: StatisticsComponent },
             { path: 'settings', component: SettingsComponent },
-            { path: 'profile', component: ProfileComponent },
+            { path: 'profile', component: ProfileComponent},
         ]
     },
     { path: 'login', pathMatch: 'full', component: LoginComponent },

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest } from '../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeTypePriorityRequest } from '../../models/employee';
 import { Observable, switchMap, tap, of, take, map, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -30,7 +30,7 @@ export class EmployeesService {
             take(1),
             switchMap(cache => {
                 const userName = sessionStorage.getItem("userName") ?? "";
-                if (cache.size > 1) {
+                if (cache.size > 2) {
                     return of(cache.get(userName));
                 } else {
                     return this.http.get<Employee>(`${this.apiUrl}/employee/profile`, { observe: 'body' }).pipe(
@@ -60,7 +60,7 @@ export class EmployeesService {
         return this.cache$.pipe(
             take(1),
             switchMap(cache => {
-                if (cache.size > 1){
+                if (cache.size > 2){
                     return of(cache.get(userName));
                 }
                 else {
@@ -80,7 +80,7 @@ export class EmployeesService {
         return this.cache$.pipe(
             take(1),
             switchMap(cache => {
-                if (cache.size > 1){
+                if (cache.size > 2){
                     const employees = Array.from(cache.values());
                     return [employees];
                 }
@@ -97,13 +97,9 @@ export class EmployeesService {
         );
     }
     
-    updateEmployee(updatedEmployee: Employee): Observable<Employee> {
+    updateEmployee(updatedEmployee: EmployeeTypePriorityRequest): Observable<EmployeeTypePriorityRequest> {
         this.cacheUpsert([updatedEmployee]);
-<<<<<<< Updated upstream
-        return this.http.put<Employee>(`${this.apiUrl}/manager/employee`, updatedEmployee);
-=======
         return this.http.put<EmployeeTypePriorityRequest>(`${this.apiUrl}/manager/employee/${updatedEmployee.userName}`, updatedEmployee);
->>>>>>> Stashed changes
     } 
 
     deleteEmployee(userName: string) {
