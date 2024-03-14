@@ -120,7 +120,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                 }
             });
             this.subscriptions.push(saveSub);
-        });
+        }).subscribe();
     }
 
     delete() {
@@ -139,7 +139,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                     this.back();
                 }
             });                
-        });
+        }).subscribe();
     }
 
     back() {

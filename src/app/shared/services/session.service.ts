@@ -59,13 +59,17 @@ export class SessionService {
         return this.user$;
     }
     
-    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { this.router.navigate(["/login"]) }): Observable<any> {
+    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { console.log("test1"); this.router.navigate(["/login"]) }): Observable<any> {
+        console.log("in auth guard");
         if (this.isActive()){
+            console.log("success!");
             return of(onSuccess());
         }
         else {
             return this.refresh().pipe(
                 map(success => {
+                    console.log("after refresh");
+                    console.log(success);
                     if (success){
                         return onSuccess();
                     }
@@ -91,6 +95,7 @@ export class SessionService {
             this.logout();
             return of(false);
         }
+        
         return this.http.post(`${this.apiUrl}/renewAccess`, {"refreshToken": refreshToken}).pipe(
             tap((res: any) => this.setSessionValues(res["accessToken"], res["accessTokenExpiresAt"])),
             map(_ => true),

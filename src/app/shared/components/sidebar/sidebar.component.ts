@@ -67,7 +67,7 @@ export class SidebarComponent extends BaseComponent {
 
     openProfile() {
         this.dropdownOpen = false;
-        this.session.guardWithAuth(() => this.router.navigate([`dashboard/profile/`]));
+        this.session.guardWithAuth(() => this.router.navigate([`dashboard/profile/`])).subscribe();
     }
 
     logout(){
