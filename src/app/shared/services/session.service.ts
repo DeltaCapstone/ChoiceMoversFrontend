@@ -59,17 +59,13 @@ export class SessionService {
         return this.user$;
     }
     
-    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { console.log("test1"); this.router.navigate(["/login"]) }): Observable<any> {
-        console.log("in auth guard");
+    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { this.router.navigate(["/login"]) }): Observable<any> {
         if (this.isActive()){
-            console.log("success!");
             return of(onSuccess());
         }
         else {
             return this.refresh().pipe(
                 map(success => {
-                    console.log("after refresh");
-                    console.log(success);
                     if (success){
                         return onSuccess();
                     }

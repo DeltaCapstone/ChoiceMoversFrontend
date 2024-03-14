@@ -6,7 +6,7 @@ import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
 import { BaseComponent } from '../base-component';
 import { filter, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable, Subscription, combineLatest, of } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { Employee, EmployeeType } from '../../../models/user';
 
@@ -29,7 +29,7 @@ export class SidebarComponent extends BaseComponent {
     @ViewChild(TuiHostedDropdownComponent)
     component?: TuiHostedDropdownComponent;
     
-    user$: Observable<Employee| undefined>; 
+    user$: Observable<Employee | undefined>; 
     sidebarItems$: Observable<SidebarItem[]> = of([]);
     subscriptions: Subscription[] = [];
 

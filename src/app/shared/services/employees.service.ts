@@ -19,7 +19,9 @@ export class EmployeesService {
         this.cache$.next(new Map);
     }
 
+    // TODO: integrate with the multi-step creation process
     createEmployee(newEmployee: EmployeeCreateRequest): Observable<EmployeeCreateRequest> {
+        this.cacheUpsert([newEmployee]);
         return this.http.post<EmployeeCreateRequest>(`${this.apiUrl}/manager/employee`, newEmployee);
     }
 
@@ -32,9 +34,10 @@ export class EmployeesService {
                     return of(cache.get(userName));
                 } else {
                     return this.http.get<Employee>(`${this.apiUrl}/employee/profile`, { observe: 'body' }).pipe(
-                        tap(employee => this.updateCache([employee])),
+                        tap(employee => this.cacheUpsert([employee])),
                         switchMap(employee => this.cache$.pipe(
-                            map(cache => cache.get(employee.userName))
+                            map(cache => cache.get(employee.userName)),
+                            take(1)
                         ))
                     );
                 }
@@ -43,10 +46,12 @@ export class EmployeesService {
     }
 
     updateProfile(updatedEmployee: EmployeeProfileUpdateRequest): Observable<Employee> {
+        this.cacheUpsert([updatedEmployee]);
         return this.http.put<Employee>(`${this.apiUrl}/employee/profile`, updatedEmployee).pipe(
-            tap(_ => this.updateCache([updatedEmployee])),
+            tap(_ => this.cacheUpsert([updatedEmployee])),
             switchMap(_ => this.cache$.pipe(
-                map(cache => cache.get(updatedEmployee.userName) as Employee)
+                map(cache => cache.get(updatedEmployee.userName) as Employee),
+                take(1)
             ))
         );
     }
@@ -60,9 +65,10 @@ export class EmployeesService {
                 }
                 else {
                     return this.http.get<Employee>(`${this.apiUrl}/manager/employee/${userName}`).pipe(
-                        tap(employee => this.updateCache([employee])),
+                        tap(employee => this.cacheUpsert([employee])),
                         switchMap(_ => this.cache$.pipe(
-                            map(cache => cache.get(userName))
+                            map(cache => cache.get(userName)),
+                            take(1)
                         ))
                     );
                 }
@@ -80,9 +86,10 @@ export class EmployeesService {
                 }
                 else {
                     return this.http.get<Employee[]>(`${this.apiUrl}/manager/employee`).pipe(
-                        tap(employees => this.updateCache(employees)),
+                        tap(employees => this.cacheUpsert(employees)),
                         switchMap(_ => this.cache$.pipe(
-                            map(cache => Array.from(cache.values()))
+                            map(cache => Array.from(cache.values())),
+                            take(1)
                         ))
                     );
                 }
@@ -91,25 +98,32 @@ export class EmployeesService {
     }
     
     updateEmployee(updatedEmployee: Employee): Observable<Employee> {
-        // TODO: route needs implemented
+        this.cacheUpsert([updatedEmployee]);
         return this.http.put<Employee>(`${this.apiUrl}/manager/employee`, updatedEmployee);
     } 
 
     deleteEmployee(userName: string) {
+        this.cacheDelete([userName]);
         return this.http.delete<Employee>(`${this.apiUrl}/manager/employee/${userName}`);        
     }
 
-    updateCache(employees: Partial<Employee>[]) {
-        this.cache$.pipe(take(1)).subscribe(existingCache => {
-            const newCache = new Map(existingCache);
+    private cacheDelete(employeeIds: string[]){
+        this.cache$.pipe(take(1)).subscribe(cache => {
+            employeeIds.forEach(employeeId => cache.delete(employeeId));
+            this.cache$.next(cache);
+        });
+    }
+
+    private cacheUpsert(employees: Partial<Employee>[]) {
+        this.cache$.pipe(take(1)).subscribe(cache => {
             // Merge new employees into the cache
             employees.forEach(newEmployee => {
                 const userName = newEmployee.userName as string;
-                const employee = newCache.get(userName) ?? new Employee();
+                const employee = cache.get(userName) ?? new Employee();
                 Object.assign(employee, newEmployee);
-                newCache.set(userName, employee);
+                cache.set(userName, employee);
             });
-            this.cache$.next(newCache);
+            this.cache$.next(cache);
         });
     }
 }
