@@ -4,7 +4,7 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/user';
+import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/employee';
 import { Observable, Subscription, map, finalize, take } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';

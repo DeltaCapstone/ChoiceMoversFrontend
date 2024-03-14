@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Employee, LoginRequest } from '../../models/user';
+import { Employee, LoginRequest } from '../../models/employee';
 import { EmployeesService } from './employees.service';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
