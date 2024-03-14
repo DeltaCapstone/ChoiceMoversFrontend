@@ -99,7 +99,11 @@ export class EmployeesService {
     
     updateEmployee(updatedEmployee: Employee): Observable<Employee> {
         this.cacheUpsert([updatedEmployee]);
+<<<<<<< Updated upstream
         return this.http.put<Employee>(`${this.apiUrl}/manager/employee`, updatedEmployee);
+=======
+        return this.http.put<EmployeeTypePriorityRequest>(`${this.apiUrl}/manager/employee/${updatedEmployee.userName}`, updatedEmployee);
+>>>>>>> Stashed changes
     } 
 
     deleteEmployee(userName: string) {
