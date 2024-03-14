@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest } from '../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeTypePriorityRequest } from '../../models/employee';
 import { Observable, switchMap, tap, of, take, map, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -97,9 +97,9 @@ export class EmployeesService {
         );
     }
     
-    updateEmployee(updatedEmployee: Employee): Observable<Employee> {
+    updateEmployee(updatedEmployee: EmployeeTypePriorityRequest): Observable<EmployeeTypePriorityRequest> {
         this.cacheUpsert([updatedEmployee]);
-        return this.http.put<Employee>(`${this.apiUrl}/manager/employee`, updatedEmployee);
+        return this.http.put<EmployeeTypePriorityRequest>(`${this.apiUrl}/manager/employee`, updatedEmployee);
     } 
 
     deleteEmployee(userName: string) {

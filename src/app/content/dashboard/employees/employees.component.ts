@@ -8,7 +8,7 @@ import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
-import { Employee } from '../../../models/user';
+import { Employee } from '../../../models/employee';
 import { EmployeesService } from '../../../shared/services/employees.service';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, startWith, debounceTime, tap } from 'rxjs/operators';

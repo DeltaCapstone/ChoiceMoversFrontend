@@ -4,7 +4,7 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
-import { EmployeeCreateRequest, Employee, EmployeeType } from '../../../models/user';
+import { EmployeeCreateRequest, Employee, EmployeeType, EmployeeTypePriorityRequest } from '../../../models/employee';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
@@ -21,6 +21,7 @@ import { SessionService } from '../../services/session.service';
 export class EmployeeInfoComponent extends BaseComponent {
     subscriptions: Subscription[] = [];
     employeeTypes: String[] = Object.values(EmployeeType);
+    employeePriorities: number[] = [1, 2, 3];
     isNew = false;
     
     readonly form = new FormGroup({
@@ -107,13 +108,18 @@ export class EmployeeInfoComponent extends BaseComponent {
                     this.isNew = false;
                 }
                 else { // UPDATE EXISTING EMPLOYEE
-                    this.employeesService.updateEmployee(newUser).subscribe({
+                    const updateRequest: EmployeeTypePriorityRequest = {
+                        userName: newUser.userName,                          
+                        employeeType: newUser.employeeType,
+                        employeePriority: newUser.employeePriority
+                    };
+                    this.employeesService.updateEmployee(updateRequest).subscribe({
                         next: (response) => {
-                            console.log('User updated successfully', response);
+                            console.log('Employee updated successfully', response);
                             this.back();
                         },
                         error: (error) => {
-                            console.error('Error updating user', error);
+                            console.error('Error updating employee', error);
                             this.back();
                         }
                     });

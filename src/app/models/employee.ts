@@ -36,7 +36,12 @@ export interface EmployeeProfileUpdateRequest {
     phonePrimary: string;
     phoneOther: string[];
     userName: string;
+}
+
+export interface EmployeeTypePriorityRequest {
+    userName: string;
     employeeType: EmployeeType;
+    employeePriority: number;
 }
 
 export class Employee implements IEmployee {

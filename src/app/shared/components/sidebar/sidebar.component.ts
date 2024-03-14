@@ -8,7 +8,7 @@ import { BaseComponent } from '../base-component';
 import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
-import { Employee, EmployeeType } from '../../../models/user';
+import { Employee, EmployeeType } from '../../../models/employee';
 
 type SidebarItem = {
     readonly name: string
