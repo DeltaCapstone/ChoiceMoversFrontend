@@ -1,30 +1,5 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        @keyframes rotateWords {
-            0%, 33%, 100% { opacity: 0; }
-            10%, 23% { opacity: 1; }
-        }
-
-
-        .rotating-words {
-            position: absolute;
-            opacity: 0;
-            white-space: nowrap; /* Prevent text from wrapping */
-            animation: rotateWords 12s infinite;
-        }
-
-        .word-container {
-            position: relative;
-            display: inline-block; /* Changed from inline to inline-block */
-            vertical-align: top; /* Aligns the container with the line of text */
-            height: 1em; /* Adjust to fit the height of your text */
-            width: 100px; /* Adjust to fit the width of your longest word */
-        }
-    </style>
-    
-</head>
 <body>
     <nav class="w-full bg-neutral text-primary font-bold">
         <div class="flex items-end">
@@ -33,7 +8,7 @@
             </div>
             <div class="w-full">
                 <div class="flex justify-center">
-                    <h1 class="inline-block">Helping People 
+                    <h1 class="inline-block  my-translate">Helping People 
                         <span class="word-container">
                             <span class="rotating-words">Move</span>
                             <span class="rotating-words" style="animation-delay: 4s;">Clean</span>

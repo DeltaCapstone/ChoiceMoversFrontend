@@ -13,3 +13,29 @@ h1 {
 li {
     font-size: 25px;
 }
+
+@keyframes rotateWords {
+    0%, 33%, 100% { opacity: 0; }
+    10%, 23% { opacity: 1; }
+}
+
+.my-translate  {
+    transform: translateY(20px)
+}
+
+.rotating-words {
+    position: absolute;
+    opacity: 0;
+    white-space: nowrap; /* Prevent text from wrapping */
+    animation: rotateWords 16s infinite;
+
+
+}
+
+.word-container {
+    position: relative;
+    display: inline-block; /* Changed from inline to inline-block */
+    vertical-align: top; /* Aligns the container with the line of text */
+    height: 1em; /* Adjust to fit the height of your text */
+    width: 100px; /* Adjust to fit the width of your longest word */
+}
