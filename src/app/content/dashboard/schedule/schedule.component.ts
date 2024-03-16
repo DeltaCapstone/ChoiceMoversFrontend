@@ -6,6 +6,7 @@ import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
 import { Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { JobsService } from '../../../shared/services/jobs.service';
 
 @Component({
     selector: 'app-schedule',
@@ -28,8 +29,9 @@ export class ScheduleComponent extends PageComponent {
 
     ]);
 
-    constructor(pageService: PageService) {
+    constructor(pageService: PageService, private jobsService: JobsService) {
         super(pageService);
+        this.jobsService.getJobs();
     }
 
     calendarOptions: CalendarOptions = {
@@ -39,6 +41,5 @@ export class ScheduleComponent extends PageComponent {
     }
 
     eventClick(info: EventClickArg) {
-        console.log(info.event.title);
     }
 }

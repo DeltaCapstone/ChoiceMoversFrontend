@@ -39,7 +39,9 @@ export class Address {
     flights: number = 0;
     aptNum: string = "";
 
-    constructor(addressId: number, street: string, city: string, state: string, zip: string, resType: ResidenceType, flights: number, aptNum: string) {
+    constructor(addressId: number = 0, street: string = "", city: string = "", state: string = "", 
+        zip: string = "", resType: ResidenceType = ResidenceType.House, flights: number = 0, aptNum: string = "") {
+
         this.addressId = addressId;
         this.street = street;
         this.city = city;
