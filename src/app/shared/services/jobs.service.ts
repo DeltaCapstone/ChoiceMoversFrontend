@@ -23,13 +23,13 @@ export class JobsService {
     }
 
     getJobs(start: string, end: string): Observable<Job[]> {
-        const needsRefresh = start === this.cacheStartDate && end === this.cacheEndDate;
+        const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
         this.cacheStartDate = start;
         this.cacheEndDate = end;
 
         return this.cacheLookupWithFallback(
             cache => {
-                if (needsRefresh && cache.size > 2) {
+                if (!needsRefresh && cache.size > 2) {
                     return of(Array.from(cache.values()));
                 } 
                 else {
