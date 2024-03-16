@@ -67,11 +67,11 @@ export class EmployeesService {
         return this.cacheLookupWithFallback(
             cache => of(Array.from(cache.values())),
             () => this.http.get<Employee[]>(`${this.apiUrl}/manager/employee`).pipe(
-                    tap(employees => this.cacheUpsert(employees)),
-                    switchMap(_ => this.cache$.pipe(
-                        map(cache => Array.from(cache.values())),
-                        take(1)
-                    ))
+                      tap(employees => this.cacheUpsert(employees)),
+                      switchMap(_ => this.cache$.pipe(
+                          map(cache => Array.from(cache.values())),
+                          take(1)
+                      ))
                 )
         );    
     }

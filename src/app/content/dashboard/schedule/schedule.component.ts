@@ -31,7 +31,10 @@ export class ScheduleComponent extends PageComponent {
 
     constructor(pageService: PageService, private jobsService: JobsService) {
         super(pageService);
-        this.jobsService.getJobs();
+        // TEST
+        this.jobsService.getJobs('2024-04-10 08:00:00', '2024-04-25 19:00:00').subscribe(jobs => {
+            console.log(jobs); 
+        });
     }
 
     calendarOptions: CalendarOptions = {
