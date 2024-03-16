@@ -18,8 +18,8 @@ export class LoginComponent extends BaseComponent {
     }
     
     readonly form = new FormGroup({
-        userName: new FormControl("mgr_sarah_m"),
-        passwordPlain: new FormControl("jklmn"),
+        userName: new FormControl(""),
+        passwordPlain: new FormControl(""),
     });
 
     login(){
