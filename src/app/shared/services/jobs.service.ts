@@ -36,7 +36,7 @@ export class JobsService {
                     map(cache => Array.from(cache.values()))
                 )),
                 catchError(error => {
-                    if (error.status == 404){
+                    if (error.status == 404) {
                         console.error("No jobs found in specified dates");
                     }
                     return of([]);
@@ -45,7 +45,7 @@ export class JobsService {
             needsRefresh
         );
     }
-    
+
     getJob(jobId: string): Observable<Job | undefined> {
         return this.cacheLookupWithFallback(
             cache => of(cache.has(jobId) ? [cache.get(jobId)!] : []),
@@ -57,18 +57,18 @@ export class JobsService {
             )
         ).pipe(map(results => results[0]));
     }
-    
-    private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]>{
+
+    private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]> {
         return this.cache$.pipe(
             take(1),
             switchMap(cache => {
-                if (cache.size > 1 && !forceMiss){
+                if (cache.size > 1 && !forceMiss) {
                     console.log("job cache hit");
                     return onHit(cache);
                 }
                 else {
                     console.log("job cache miss");
-                    return onMiss();                
+                    return onMiss();
                 }
             }),
             catchError(error => {
@@ -77,8 +77,8 @@ export class JobsService {
             })
         );
     }
-  
-    private cacheDelete(jobIds: string[]){
+
+    private cacheDelete(jobIds: string[]) {
         this.cache$.pipe(take(1)).subscribe(cache => {
             jobIds.forEach(jobIds => cache.delete(jobIds));
             this.cache$.next(cache);

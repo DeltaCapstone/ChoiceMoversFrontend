@@ -4,7 +4,7 @@ import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
-import { Observable, map, of, take } from 'rxjs';
+import { BehaviorSubject, Observable, map, of, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 
@@ -20,10 +20,10 @@ export class ScheduleComponent extends PageComponent {
         this.setTitle("Schedule");
     }
 
-    events$: Observable<EventInput>;
-    calendarOptions: CalendarOptions; 
+    events$ = new BehaviorSubject<EventInput>([]);
+    calendarOptions: CalendarOptions;
 
-    constructor(pageService: PageService, private jobsService: JobsService, private cdr: ChangeDetectorRef) {
+    constructor(pageService: PageService, private jobsService: JobsService) {
         super(pageService);
 
         this.calendarOptions = {
@@ -33,15 +33,14 @@ export class ScheduleComponent extends PageComponent {
             viewDidMount: viewInfo => {
                 const start = viewInfo.view.activeStart.toISOString();
                 const end = viewInfo.view.activeEnd.toISOString();
-                this.events$ = this.getJobEvents(start, end);
+                this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
             },
             datesSet: dateInfo => {
                 const start = dateInfo.startStr;
                 const end = dateInfo.endStr;
-                this.events$ = this.getJobEvents(start, end);
-                this.cdr.detectChanges();
+                this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
             },
-        }           
+        }
     }
 
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
@@ -53,7 +52,7 @@ export class ScheduleComponent extends PageComponent {
                     end: job.endTime
                 };
                 return eventInput;
-              })
+            })
             ),
             take(1)
         );
