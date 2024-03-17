@@ -1,37 +1,192 @@
-<mat-stepper [linear]="isLinear" #stepper>
-    <mat-step [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-            <ng-template matStepLabel>What Services Will You Be Using?</ng-template>
-            <mat-label>Service</mat-label>
-            <section class="example-section">
-                <mat-checkbox formControlName="moveService">Moving</mat-checkbox>
-                <mat-checkbox formControlName="cleanOutService">Clean Out</mat-checkbox>
-                <mat-checkbox formControlName="packingService">Packing</mat-checkbox>
-                <mat-checkbox formControlName="storageService">Storage</mat-checkbox>
-            </section>
-            <div>
-                <button mat-button matStepperNext>Next</button>
+<tui-stepper [activeItemIndex]="activeStepIndex" tuiMode="onDark" class="dark text-lg flex"
+    (activeItemIndexChange)="onActiveStepIndexChange($event)" [tuiTextfieldCleaner]="true">
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Services
+        <ng-container *ngIf="activeStepIndex === 0">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="servicesGroup">
+                    <tui-checkbox-block class="mb-4" formControlName="moving">Moving</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-4" formControlName="packing">Packing</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-4" formControlName="unpack">Unpacking</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-4" formControlName="storage">Storage</tui-checkbox-block>
+                </form>
             </div>
-        </form>
-    </mat-step>
-    <mat-step [stepControl]="secondFormGroup" label="Fill out your address">
-        <form [formGroup]="secondFormGroup">
-            <mat-form-field>
-                <mat-label>Address</mat-label>
-                <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY" required>
-            </mat-form-field>
-            <div>
-                <button mat-button matStepperPrevious>Back</button>
-                <button mat-button matStepperNext>Next</button>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Move Date
+        <ng-container *ngIf="activeStepIndex === 1">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="moveDateGroup">
+                    <tui-input-date formControlName="date" class="w-64">
+                        Choose a Move Date
+                    </tui-input-date>
+                    <tui-input-time formControlName="time" class="w-64">Choose a Move Time</tui-input-time>
+                </form>
             </div>
-        </form>
-    </mat-step>
-    <mat-step>
-        <ng-template matStepLabel>Done</ng-template>
-        <p>You are now done.</p>
-        <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="stepper.reset()">Reset</button>
-        </div>
-    </mat-step>
-</mat-stepper>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        From Address
+        <ng-container *ngIf="activeStepIndex === 2">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="fromAddressGroup">
+                    <tui-input formControlName="fromAddress" class="w-64">
+                        From Address (Street and Address)
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromCity" class="w-64">
+                        From City
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromState" class="w-64">
+                        From State
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromZip" class="w-64">
+                        From Zip Code
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromResidenceType" class="w-64">
+                        From Residence Type (House, Apartment, Condo)
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromFlights" class="w-64">
+                        From Flights of Stairs
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="fromApartmentNumber" class="w-64">
+                        From Apartment Number (Optional)
+                        <input tuiTextfield />
+                    </tui-input>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        To Address
+        <ng-container *ngIf="activeStepIndex === 3">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="toAddressGroup">
+                    <tui-input formControlName="toAddress" class="w-64">
+                        To Address (Street and Address)
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toCity" class="w-64">
+                        To City
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toState" class="w-64">
+                        To State
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toZip" class="w-64">
+                        To Zip Code
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toResidenceType" class="w-64">
+                        To Residence Type (House, Apartment, Condo)
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toFlights" class="w-64">
+                        From Flights of Stairs
+                        <input tuiTextfield />
+                    </tui-input>
+                    <tui-input formControlName="toApartmentNumber" class="w-64">
+                        To Apartment Number (Optional)
+                        <input tuiTextfield />
+                    </tui-input>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Rooms
+        <ng-container *ngIf="activeStepIndex === 4">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="roomsGroup">
+                    <tui-checkbox-block class="mb-2" formControlName="Bedroom">Bedroom</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Kitchen">Kitchen</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Dining">Dining</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Family">Family</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Living">Living</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Laundry">Laundry</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Bathroom">Bathroom</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Office">Office</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Patio">Patio</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Garage">Garage</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-2" formControlName="Attic">Attic</tui-checkbox-block>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Items
+        <ng-container *ngIf="activeStepIndex === 5">
+            <div class="absolute inset-x-0 top-full mt-4 w-64">
+                <form [formGroup]="itemsGroup">
+                    <tui-accordion class="container" [rounded]="false">
+                        <!--Iterate over selected rooms-->
+                        <!--Accordion item for each room-->
+                        <tui-accordion-item *ngFor="let room of roomItemsFiltered" borders="top-bottom"
+                            [showArrow]="false">
+                            <!--Accordion Item Label-->
+                            <div class="operation-header">
+                                <div class="operation-title">{{room.roomItems.roomName}}</div>
+                            </div>
+                            <ng-template tuiAccordionItemContent>
+                                <h3 class="form-title">Room Items</h3>
+                                <form class="operation-form">
+                                    <!--Populate room items-->
+                                    <tui-input-number class="b-form" value="value"
+                                        *ngFor="let item of room.roomItems.items">{{item}}
+                                    </tui-input-number>
+                                </form>
+                            </ng-template>
+                        </tui-accordion-item>
+                    </tui-accordion>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Specialty Items
+        <ng-container *ngIf="activeStepIndex === 6">
+            <div class="absolute inset-x-0 top-full mt-4 w-64">
+                <form [formGroup]="specialtyGroup">
+                    <!--Populate specialty items-->
+                    <tui-input-number class="b-form" value="value"
+                        *ngFor="let item of specialtyItems">{{item.specialtyItem}}
+                    </tui-input-number>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Special Requests
+        <ng-container *ngIf="activeStepIndex === 7">
+            <div class="absolute inset-x-0 top-full mt-4 w-64">
+                <form [formGroup]="specialRequestGroup">
+                    <textarea name="specialTextArea" formGroupName="specialTextArea" id="specialTextArea" cols="30"
+                        rows="10" class="fixed-size">  Enter any special requests here</textarea>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Finalize and Submit
+        <ng-container *ngIf="activeStepIndex === 8">
+            <div class="absolute inset-x-0 top-full mt-4 w-64">
+                <ng-template #icon>
+                    <tui-svg src="tuiIconCheckLarge"></tui-svg>
+                </ng-template>
+                <p>
+                    <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
+                        (click)="submitForm()">
+                        Submit Move Form
+                    </button>
+
+            </div>
+        </ng-container>
+    </a>
+</tui-stepper>
