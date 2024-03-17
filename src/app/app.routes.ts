@@ -17,6 +17,7 @@ import { ProfileComponent } from './shared/components/profile/profile.component'
 import { LoginComponent } from './shared/components/login/login.component';
 import { dashboardGuard } from './shared/guards/dashboard.guard';
 import { EmployeeInfoComponent } from './shared/components/employee-info/employee-info.component';
+import { JobInfoComponent } from './shared/components/job-info/job-info.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -38,11 +39,12 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
             { path: 'schedule', component: ScheduleComponent },
+            { path: 'schedule/job/:jobId', component: JobInfoComponent },
             { path: 'employees', component: EmployeesComponent },
             { path: 'employees/employee/:userName', component: EmployeeInfoComponent },
             { path: 'statistics', component: StatisticsComponent },
             { path: 'settings', component: SettingsComponent },
-            { path: 'profile', component: ProfileComponent},
+            { path: 'profile', component: ProfileComponent },
         ]
     },
     { path: 'login', pathMatch: 'full', component: LoginComponent },

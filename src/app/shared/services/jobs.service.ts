@@ -47,15 +47,7 @@ export class JobsService {
     }
 
     getJob(jobId: string): Observable<Job | undefined> {
-        return this.cacheLookupWithFallback(
-            cache => of(cache.has(jobId) ? [cache.get(jobId)!] : []),
-            () => this.getJobs(this.cacheStartDate, this.cacheEndDate).pipe(
-                map(jobs => {
-                    const job = jobs.find(job => job.jobId == jobId);
-                    return job ? [job] : [];
-                })
-            )
-        ).pipe(map(results => results[0]));
+        return this.cache$.pipe(map(cache => cache.get(jobId)));
     }
 
     private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]> {
@@ -89,7 +81,7 @@ export class JobsService {
         this.cache$.pipe(take(1)).subscribe(cache => {
             // Merge new employees into the cache
             jobs.forEach(newJob => {
-                const jobId = newJob.jobId as string;
+                const jobId = String(newJob.jobId);
                 const job = cache.get(jobId) ?? new Job();
                 Object.assign(job, newJob);
                 cache.set(jobId, job);

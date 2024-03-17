@@ -7,6 +7,7 @@ import { PageService } from '../../../shared/services/page.service';
 import { BehaviorSubject, Observable, map, of, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-schedule',
@@ -23,13 +24,15 @@ export class ScheduleComponent extends PageComponent {
     events$ = new BehaviorSubject<EventInput>([]);
     calendarOptions: CalendarOptions;
 
-    constructor(pageService: PageService, private jobsService: JobsService) {
+    constructor(pageService: PageService,
+        private router: Router,
+        private jobsService: JobsService) {
         super(pageService);
 
         this.calendarOptions = {
             initialView: 'dayGridMonth',
             plugins: [dayGridPlugin],
-            eventClick: this.eventClick,
+            eventClick: this.eventClick.bind(this),
             viewDidMount: viewInfo => {
                 const start = viewInfo.view.activeStart.toISOString();
                 const end = viewInfo.view.activeEnd.toISOString();
@@ -49,7 +52,10 @@ export class ScheduleComponent extends PageComponent {
                 const eventInput: EventInput = {
                     title: job.customer.email,
                     start: job.startTime,
-                    end: job.endTime
+                    end: job.endTime,
+                    extendedProps: {
+                        jobId: job.jobId
+                    }
                 };
                 return eventInput;
             })
@@ -59,5 +65,7 @@ export class ScheduleComponent extends PageComponent {
     }
 
     eventClick(info: EventClickArg) {
+        const jobId: string = info.event.extendedProps.jobId;
+        this.router.navigate(["dashboard/schedule/job/", jobId]);
     }
 }
