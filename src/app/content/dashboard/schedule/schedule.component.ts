@@ -8,6 +8,7 @@ import { BehaviorSubject, Observable, map, of, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 import { Router } from '@angular/router';
+import { SessionService } from '../../../shared/services/session.service';
 
 @Component({
     selector: 'app-schedule',
@@ -25,6 +26,7 @@ export class ScheduleComponent extends PageComponent {
     calendarOptions: CalendarOptions;
 
     constructor(pageService: PageService,
+        private session: SessionService,
         private router: Router,
         private jobsService: JobsService) {
         super(pageService);
@@ -34,14 +36,18 @@ export class ScheduleComponent extends PageComponent {
             plugins: [dayGridPlugin],
             eventClick: this.eventClick.bind(this),
             viewDidMount: viewInfo => {
-                const start = viewInfo.view.activeStart.toISOString();
-                const end = viewInfo.view.activeEnd.toISOString();
-                this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
+                this.session.guardWithAuth(() => {
+                    const start = viewInfo.view.activeStart.toISOString();
+                    const end = viewInfo.view.activeEnd.toISOString();
+                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
+                }).subscribe();
             },
             datesSet: dateInfo => {
-                const start = dateInfo.startStr;
-                const end = dateInfo.endStr;
-                this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
+                this.session.guardWithAuth(() => {
+                    const start = dateInfo.startStr;
+                    const end = dateInfo.endStr;
+                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
+                }).subscribe();
             },
         }
     }
@@ -58,14 +64,15 @@ export class ScheduleComponent extends PageComponent {
                     }
                 };
                 return eventInput;
-            })
-            ),
+            })),
             take(1)
         );
     }
 
     eventClick(info: EventClickArg) {
-        const jobId: string = info.event.extendedProps.jobId;
-        this.router.navigate(["dashboard/schedule/job/", jobId]);
+        this.session.guardWithAuth(() => {
+            const jobId: string = info.event.extendedProps.jobId;
+            this.router.navigate(["dashboard/schedule/job/", jobId]);
+        }).subscribe();
     }
 }
