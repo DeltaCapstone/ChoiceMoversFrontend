@@ -22,7 +22,7 @@ export class JobsService {
         this.cache$.next(new Map);
     }
 
-    getJobs(start: string, end: string): Observable<Job[]> {        
+    getJobs(start: string, end: string): Observable<Job[]> {
         const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
         this.cacheStartDate = start;
         this.cacheEndDate = end;
