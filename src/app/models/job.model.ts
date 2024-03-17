@@ -2,20 +2,20 @@ import { Address } from "./address.model";
 import { Customer } from "./customer.model";
 import { Employee } from "./employee";
 import { Room } from "./room.model";
+
 /**
  * Interface that describes the Job type
  */
 export interface IJobRequest {
-    username: string;
-    loadAddr: string;
-    unloadAddr: string;
-    startTime: Date;
-    rooms: Room[];
-    pack: boolean;
-    unpack: boolean;
-    load: boolean;
-    unload: boolean;
-    clean: boolean;
+    jobId: string;
+    manHours: number;
+    rate: number;
+    cost: number;
+    finalized: boolean;
+    actualManHours: number;
+    finalCost: number;
+    amountPaid: number;
+    assignedEmp: Employee[];
     notes: string;
 }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, map, of, switchMap, take, tap } from 'rxjs';
+import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Job } from '../../models/job.model';
@@ -22,31 +22,29 @@ export class JobsService {
         this.cache$.next(new Map);
     }
 
-    getJobs(start: string, end: string): Observable<Job[]> {
-        const needsRefresh = start === this.cacheStartDate && end === this.cacheEndDate;
+    getJobs(start: string, end: string): Observable<Job[]> {        
+        const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
         this.cacheStartDate = start;
         this.cacheEndDate = end;
 
         return this.cacheLookupWithFallback(
-            cache => {
-                if (needsRefresh && cache.size > 2) {
-                    return of(Array.from(cache.values()));
-                } 
-                else {
-                    this.cacheRefresh();
-                    return of([]);
-                }
-            },
+            cache => of(Array.from(cache.values())),
             () => this.http.get<Job[]>(`${this.apiUrl}/employee/jobs?start=${start}&end=${end}`).pipe(
                 tap(jobs => this.cacheUpsert(jobs)),
                 switchMap(() => this.cache$.pipe(
                     take(1),
                     map(cache => Array.from(cache.values()))
-                ))
-            )
+                )),
+                catchError(error => {
+                    if (error.status == 404){
+                        console.error("No jobs found in specified dates");
+                    }
+                    return of([]);
+                })
+            ),
+            needsRefresh
         );
     }
-
     
     getJob(jobId: string): Observable<Job | undefined> {
         return this.cacheLookupWithFallback(
@@ -60,11 +58,11 @@ export class JobsService {
         ).pipe(map(results => results[0]));
     }
     
-    private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>): Observable<Job[]>{
+    private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]>{
         return this.cache$.pipe(
             take(1),
             switchMap(cache => {
-                if (cache.size > 2){
+                if (cache.size > 1 && !forceMiss){
                     console.log("job cache hit");
                     return onHit(cache);
                 }
@@ -72,16 +70,12 @@ export class JobsService {
                     console.log("job cache miss");
                     return onMiss();                
                 }
+            }),
+            catchError(error => {
+                console.error(error);
+                return of([]);
             })
         );
-    }
-
-    private cacheRefresh(){
-        this.http.get<Job[]>(`${this.apiUrl}/employee/jobs?start=${this.cacheStartDate}&end=${this.cacheEndDate}`)
-          .pipe(take(1))
-          .subscribe(jobs => {
-              this.cacheUpsert(jobs);
-        });
     }
   
     private cacheDelete(jobIds: string[]){
