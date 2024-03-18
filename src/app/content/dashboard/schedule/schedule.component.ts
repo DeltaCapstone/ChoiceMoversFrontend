@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -47,16 +47,15 @@ export class ScheduleComponent extends PageComponent {
                 this.session.guardWithAuth(() => {
                     const start = dateInfo.startStr;
                     const end = dateInfo.endStr;
-                    localStorage.setItem("calendarStart", start);
-                    localStorage.setItem("calendarEnd", end);
 
                     this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
                 }).subscribe();
             },
         }
 
-        const calendarStart = localStorage.getItem("calendarStart");
-        // TODO: figure out proper solution
+        // restore state
+        const calendarStart = this.jobsService.cacheStartDate;
+        // TODO: figure out better solution
         if (calendarStart) {
             const date = new Date(calendarStart);
             date.setUTCDate(date.getUTCDate() + 5);
