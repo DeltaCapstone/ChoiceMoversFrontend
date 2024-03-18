@@ -72,7 +72,8 @@
             </div>
             <div class="tui-form__row tui-form__row_multi-fields">
               <div class="tui-form__multi-field">
-                <tui-input-phone [readOnly]=true phoneMaskAfterCountryCode="### ###-####" countryCode="+1" formControlName="phonePrimary">Phone primary</tui-input-phone>
+                <tui-input-phone [readOnly]=true phoneMaskAfterCountryCode="### ###-####" countryCode="+1"
+                  formControlName="phonePrimary">Phone primary</tui-input-phone>
                 <tui-error formControlName="phonePrimary" [error]="[] | tuiFieldError | async"></tui-error>
               </div>
               <!-- <div class="tui-form__multi-field"> -->
@@ -91,12 +92,14 @@
               <tui-error formControlName="email"></tui-error>
             </div>
           </ng-container>
-          
+
           <div class="tui-form__buttons">
-            <button (click)="save()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+            <button (click)="save()" tuiButton type="submit"
+              class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Submit
             </button>
-            <button *ngIf="!isNew" (click)="delete()" tuiButton type="submit" class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+            <button *ngIf="!isNew" (click)="delete()" tuiButton type="submit"
+              class="bg-secondary p-3 rounded-md text-lg tui-form__button">
               Delete
             </button>
             <button (click)="back()" tuiButton type="button" class="text-lg tui-form__button">
@@ -108,4 +111,3 @@
     </form>
   </div>
 </div>
-

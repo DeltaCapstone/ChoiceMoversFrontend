@@ -26,23 +26,17 @@ export class EmployeesService {
     }
 
     getProfile(): Observable<Employee | undefined> {
-        return this.cache$.pipe(
-            take(1),
-            switchMap(cache => {
-                const userName = sessionStorage.getItem("userName") ?? "";
-                if (cache.size > 2) {
-                    return of(cache.get(userName));
-                } else {
-                    return this.http.get<Employee>(`${this.apiUrl}/employee/profile`, { observe: 'body' }).pipe(
-                        tap(employee => this.cacheUpsert([employee])),
-                        switchMap(employee => this.cache$.pipe(
-                            map(cache => cache.get(employee.userName)),
-                            take(1)
-                        ))
-                    );
-                }
-            })
-        );
+        const userName = sessionStorage.getItem("userName") ?? "";
+        return this.cacheLookupWithFallback(
+            cache => of([cache.get(userName)!]),
+            () => this.http.get<Employee>(`${this.apiUrl}/employee/profile`).pipe(
+                tap(employee => this.cacheUpsert([employee])),
+                switchMap(() => this.cache$.pipe(
+                    take(1),
+                    map(cache => [cache.get(userName)!])
+                ))
+            )
+        ).pipe(map(results => results[0]));
     }
 
     updateProfile(updatedEmployee: EmployeeProfileUpdateRequest): Observable<Employee> {
@@ -50,51 +44,36 @@ export class EmployeesService {
         return this.http.put<Employee>(`${this.apiUrl}/employee/profile`, updatedEmployee).pipe(
             tap(_ => this.cacheUpsert([updatedEmployee])),
             switchMap(_ => this.cache$.pipe(
-                map(cache => cache.get(updatedEmployee.userName) as Employee),
+                map(cache => cache.get(updatedEmployee.userName)!),
                 take(1)
             ))
         );
     }
 
     getEmployee(userName: string): Observable<Employee | undefined> {
-        return this.cache$.pipe(
-            take(1),
-            switchMap(cache => {
-                if (cache.size > 2){
-                    return of(cache.get(userName));
-                }
-                else {
-                    return this.http.get<Employee>(`${this.apiUrl}/manager/employee/${userName}`).pipe(
-                        tap(employee => this.cacheUpsert([employee])),
-                        switchMap(_ => this.cache$.pipe(
-                            map(cache => cache.get(userName)),
-                            take(1)
-                        ))
-                    );
-                }
-            })
-        )
+        return this.cacheLookupWithFallback(
+            cache => of(cache.has(userName) ? [cache.get(userName)!] : []),
+            () => this.http.get<Employee>(`${this.apiUrl}/manager/employee/${userName}`).pipe(
+                tap(employee => this.cacheUpsert([employee])),
+                switchMap(() => this.cache$.pipe(
+                    take(1),
+                    map(cache => [cache.get(userName)!])
+                ))
+            )
+        ).pipe(map(results => results[0]));
     }
 
     getEmployees(): Observable<Employee[]> {
-        return this.cache$.pipe(
-            take(1),
-            switchMap(cache => {
-                if (cache.size > 2){
-                    const employees = Array.from(cache.values());
-                    return [employees];
-                }
-                else {
-                    return this.http.get<Employee[]>(`${this.apiUrl}/manager/employee`).pipe(
-                        tap(employees => this.cacheUpsert(employees)),
-                        switchMap(_ => this.cache$.pipe(
-                            map(cache => Array.from(cache.values())),
-                            take(1)
-                        ))
-                    );
-                }
-            })
-        );
+        return this.cacheLookupWithFallback(
+            cache => of(Array.from(cache.values())),
+            () => this.http.get<Employee[]>(`${this.apiUrl}/manager/employee`).pipe(
+                      tap(employees => this.cacheUpsert(employees)),
+                      switchMap(_ => this.cache$.pipe(
+                          map(cache => Array.from(cache.values())),
+                          take(1)
+                      ))
+                )
+        );    
     }
     
     updateEmployee(updatedEmployee: EmployeeTypePriorityRequest): Observable<EmployeeTypePriorityRequest> {
@@ -105,6 +84,19 @@ export class EmployeesService {
     deleteEmployee(userName: string) {
         this.cacheDelete([userName]);
         return this.http.delete<Employee>(`${this.apiUrl}/manager/employee/${userName}`);        
+    }
+
+    private cacheLookupWithFallback(onHit: (cache: Map<string, Employee>) => Observable<Employee[]>, onMiss: () => Observable<Employee[]>): Observable<Employee[]>{
+        return this.cache$.pipe(
+            take(1),
+            switchMap(cache => {
+                if (cache.size > 2){
+                    return onHit(cache);
+                }
+                else {
+                    return onMiss();                }
+            })
+        );
     }
 
     private cacheDelete(employeeIds: string[]){
