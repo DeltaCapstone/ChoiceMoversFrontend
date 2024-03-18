@@ -19,10 +19,8 @@ export class CustomerNavBarComponent {
   items: MenuBarItem[] = [
     { title: "Home", route: "customer-home" },
     { title: "Moving", route: "moving" },
-    { title: "Clean Out", route: "clean-out" },
     { title: "Packing", route: "packing" },
     { title: "Storage", route: "storage" },
-    { title: "Quote", route: "quote" },
     { title: "Contact", route: "contact" },
   ]
 }
