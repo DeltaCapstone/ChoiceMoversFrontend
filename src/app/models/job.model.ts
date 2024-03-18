@@ -6,7 +6,7 @@ import { Room } from "./room.model";
 /**
  * Interface that describes the Job type
  */
-export interface IJobRequest {
+export interface IJob {
     jobId: string;
     manHours: number;
     rate: number;
@@ -19,40 +19,77 @@ export interface IJobRequest {
     notes: string;
 }
 
-export class Estimate {
-    	estimateID: number;                 
-    	customer: Customer;
-    	loadAddr: Address;          
-    	unloadAddr: Address;             
-    	startTime: string;    
-    	endTime: string;
+/**
+ * Interface that describes the estimate type
+ */
+export interface IEstimate {
+    estimateID: number;
+    customer: Customer;
+    loadAddr: Address;
+    unloadAddr: Address;
+    startTime: string;
+    endTime: string;
 
-    	rooms: Map<string, object> 
-    	special: Map<string, object>
-    	small: number;                    
-    	medium: number;                    
-    	large: number;                   
-    	boxes: number;                    
-    	itemLoad: number;                
-    	flightMult: number;
+    rooms: Map<string, object>
+    special: Map<string, object>
+    small: number;
+    medium: number;
+    large: number;
+    boxes: number;
+    itemLoad: number;
+    flightMult: number;
 
-    	pack: boolean; 
-    	unpack: boolean;
-    	load: boolean; 
-    	unload: boolean; 
+    pack: boolean;
+    unpack: boolean;
+    load: boolean;
+    unload: boolean;
 
-    	clean: boolean; 
+    clean: boolean;
 
-    	needTruck: boolean; 
-    	numberWorkers: number;  
-    	distToJob: number;  
-    	distMove: number;  
+    needTruck: boolean;
+    numberWorkers: number;
+    distToJob: number;
+    distMove: number;
 
-    	estimateManHours: number;
-    	estimateRate: number;         
-    	estimateCost: number;         
+    estimateManHours: number;
+    estimateRate: number;
+    estimateCost: number;
+}
 
-        constructor(
+export class Estimate implements IEstimate {
+    estimateID: number;
+    customer: Customer;
+    loadAddr: Address;
+    unloadAddr: Address;
+    startTime: string;
+    endTime: string;
+
+    rooms: Map<string, object>
+    special: Map<string, object>
+    small: number;
+    medium: number;
+    large: number;
+    boxes: number;
+    itemLoad: number;
+    flightMult: number;
+
+    pack: boolean;
+    unpack: boolean;
+    load: boolean;
+    unload: boolean;
+
+    clean: boolean;
+
+    needTruck: boolean;
+    numberWorkers: number;
+    distToJob: number;
+    distMove: number;
+
+    estimateManHours: number;
+    estimateRate: number;
+    estimateCost: number;
+
+    constructor(
         estimateID: number = 0,
         customer: Customer = new Customer(),
         loadAddr: Address = new Address(),
@@ -112,7 +149,7 @@ export class Estimate {
 /**
  * Class that defines a Job object and its properties and methods
  */
-export class Job extends Estimate {
+export class Job extends Estimate implements IJob, IEstimate {
     jobId: string;
     manHours: number;
     rate: number;
@@ -123,8 +160,8 @@ export class Job extends Estimate {
     amountPaid: number;
     assignedEmp: Employee[];
     notes: string;
-    
-    constructor(jobId: string = "", manHours: number = 0, rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: number = 0, 
+
+    constructor(jobId: string = "", manHours: number = 0, rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: number = 0,
         finalCost: number = 0, amountPaid: number = 0, assignedEmp: Employee[] = [], notes: string = "") {
         super();
         this.jobId = jobId;

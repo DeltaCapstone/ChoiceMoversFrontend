@@ -22,6 +22,11 @@ export class JobsService {
         this.cache$.next(new Map);
     }
 
+    createJob(newJob: Job): Observable<Job> {
+        this.cacheUpsert([newJob]);
+        return this.http.post<Job>(`${this.apiUrl}/customer/job`, newJob);
+    }
+
     getJobs(start: string, end: string): Observable<Job[]> {
         const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
         this.cacheStartDate = start;
