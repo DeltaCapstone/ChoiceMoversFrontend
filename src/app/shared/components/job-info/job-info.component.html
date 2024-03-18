@@ -1,57 +1,50 @@
 <div *ngIf="(job$ | async) as job">
-  <div class="flex">
-    <button (click)="back()" class="m-2">
-      <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
-    </button>
-    <tui-tabs [(activeItemIndex)]="activeItemIndex">
-      <button tuiTab>
-        <tui-svg src="tuiIconBriefcaseLarge" class="tui-space_right-2"></tui-svg>
-        Info
-      </button>
-      <button tuiTab>
-        <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
-        Workers
-      </button>
-      <button tuiTab>
-        <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
-        Contacts
-      </button>
-    </tui-tabs>
-  </div>
-
-  <div class="m-4 flex">
-    <div class="flex flex-col text-left justify-center">
-      <p class="text-4xl">{{ job.jobId }}</p>
+    <div class="flex">
+        <button (click)="back()" class="m-2">
+            <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
+        </button>
+        <tui-tabs [underline]=false [(activeItemIndex)]="activeItemIndex">
+            <button tuiTab>
+                <tui-svg src="tuiIconBriefcaseLarge" class="tui-space_right-2"></tui-svg>
+                Info
+            </button>
+            <button tuiTab>
+                <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
+                Workers
+            </button>
+            <button tuiTab>
+                <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
+                Contacts
+            </button>
+        </tui-tabs>
     </div>
-  </div>
 
-  <div class="tui-container w-full mt-5">
-    <form [formGroup]="form">
-      <div class="tui-row tui-row_sme">
-        <div class="tui-col_8 w-5/6 m-auto mt-8">
-          <div class="tui-form__row">
-            <tui-input formControlName="jobId" [readOnly]=true>
-              Job
-              <input tuiTextfield />
-            </tui-input>
-            <tui-error formControlName="jobId"></tui-error>
-          </div>
-          <div class="tui-form__row tui-form__row_multi-fields">
-            <div class="tui-form__multi-field">
-              <tui-input formControlName="jobId" [readOnly]=true>
-                Job
-              </tui-input>
-              <tui-error formControlName="jobId" [error]="[] | tuiFieldError | async"></tui-error>
-            </div>
-
-            <div class="tui-form__multi-field">
-              <tui-input formControlName="jobId" [readOnly]=true>
-                Job
-              </tui-input>
-              <tui-error formControlName="jobId" [error]="[] | tuiFieldError | async"></tui-error>
-            </div>
-          </div>
+    <div class="m-4 flex">
+        <div class="flex flex-col text-left justify-center">
+            <p class="text-4xl">{{ job.customer.email }}</p>
         </div>
-      </div>
-    </form>
-  </div>
+    </div>
+
+    <div class="tui-container w-full mt-5">
+        <form [formGroup]="form">
+            <div class="tui-row tui-row_sme">
+                <div class="tui-col_8 w-5/6 m-auto mt-8">
+                    <div class="tui-form__row tui-form__row_multi-fields">
+                        <div class="tui-form__multi-field">
+                            <tui-input-date formControlName="startTime" [readOnly]=true>
+                                Start
+                            </tui-input-date>
+                            <tui-error formControlName="startTime" [error]="[] | tuiFieldError | async"></tui-error>
+                        </div>
+
+                        <div class="tui-form__multi-field">
+                            <tui-input-date formControlName="endTime" [readOnly]=true>
+                                End
+                            </tui-input-date>
+                            <tui-error formControlName="endTime" [error]="[] | tuiFieldError | async"></tui-error>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
