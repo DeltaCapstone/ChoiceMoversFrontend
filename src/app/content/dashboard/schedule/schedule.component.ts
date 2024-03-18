@@ -53,7 +53,7 @@ export class ScheduleComponent extends PageComponent {
     }
 
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
-        return this.jobsService.getJobs(start, end).pipe(
+        return this.jobsService.getEmployeeJobs(start, end).pipe(
             map(jobs => jobs.map(job => {
                 const eventInput: EventInput = {
                     title: job.customer.email,

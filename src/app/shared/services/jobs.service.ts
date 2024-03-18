@@ -12,6 +12,7 @@ import { Job } from '../../models/job.model';
 })
 
 export class JobsService {
+    // currently, the cache only works for read operations, which occur on the dashboard
     cacheStartDate: string;
     cacheEndDate: string;
     cache$ = new ReplaySubject<Map<string, Job>>(1);
@@ -22,12 +23,26 @@ export class JobsService {
         this.cache$.next(new Map);
     }
 
-    createJob(newJob: Job): Observable<Job> {
-        this.cacheUpsert([newJob]);
+    // -----------------------
+    // CUSTOMER REQUESTS
+    // -----------------------
+
+    // TODO: needs implemented on the backend
+    createCustomerJob(newJob: Job): Observable<Job> {
         return this.http.post<Job>(`${this.apiUrl}/customer/job`, newJob);
     }
 
-    getJobs(start: string, end: string): Observable<Job[]> {
+    // TODO: needs implemented on the backend
+    updateCustomerJob(updatedJob: Job): Observable<Job> {
+        return this.http.put<Job>(`${this.apiUrl}/customer/job/${updatedJob.jobId}`, updatedJob);
+    }
+
+
+    // -----------------------
+    // EMPLOYEE REQUESTS
+    // -----------------------
+
+    getEmployeeJobs(start: string, end: string): Observable<Job[]> {
         const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
         this.cacheStartDate = start;
         this.cacheEndDate = end;
@@ -50,6 +65,11 @@ export class JobsService {
             needsRefresh
         );
     }
+
+
+    // -----------------------
+    // GENERAL REQUESTS
+    // -----------------------
 
     getJob(jobId: string): Observable<Job | undefined> {
         return this.cache$.pipe(map(cache => cache.get(jobId)));
