@@ -50,7 +50,9 @@ export class MovePlannerComponent extends PageComponent {
 
   specialRequestGroup: FormGroup;
 
-  roomItems: { roomItems: Room, count: number }[] = [];
+  masterForm: FormGroup;
+
+  roomItems: Room[] = [];
 
   activeStepIndex: number = 0;
 
@@ -58,13 +60,15 @@ export class MovePlannerComponent extends PageComponent {
 
   specialtyItems: { specialtyItem: string, count: number }[] = [];
 
-  get roomItemsFiltered(): { roomItems: Room, count: number }[] {
-    return this.roomItems.filter(item => this.checkedRooms.includes(item.roomItems.roomName));
+  get roomItemsFiltered(): Room[] {
+    return this.roomItems.filter(item => this.checkedRooms.includes(item.roomName));
   }
 
   /**
    * Constructor method that injects dependencies needed in the MovePlannerComponent
    * @param pageService A service that handles basic page-related behavior such as setting the title and interacting with the window
+   * @param _formBuilder A utility used to simplify the process of creating and managing reactive forms
+   * @param _router A module that provides a powerful way to handle navigation within the component page
    */
   constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router) {
     super(pageService);
@@ -76,6 +80,87 @@ export class MovePlannerComponent extends PageComponent {
     this.initRoomItems();
     this.initSpecialtyItems();
     this.buildForm();
+    this.masterForm = this._formBuilder.group({
+      servicesGroup: this._formBuilder.group({
+        moving: [''],
+        packing: [''],
+        unpack: [''],
+        storage: ['']
+      }),
+
+      moveDateGroup: this._formBuilder.group({
+        date: [''],
+        time: ['']
+      }),
+
+      fromAddressGroup: this._formBuilder.group({
+        fromAddress: [''],
+        fromCity: [''],
+        fromState: [''],
+        fromZip: [''],
+        fromResidenceType: [''],
+        fromFlights: [''],
+        fromApartmentNumber: [''],
+      }),
+
+      toAddressGroup: this._formBuilder.group({
+        toAddress: [''],
+        toCity: [''],
+        toState: [''],
+        toZip: [''],
+        toResidenceType: [''],
+        toFlights: [''],
+        toApartmentNumber: ['']
+      }),
+
+      roomsGroup: this._formBuilder.group({
+        Bedroom: [''],
+        Kitchen: [''],
+        Dining: [''],
+        Family: [''],
+        Living: [''],
+        Laundry: [''],
+        Bathroom: [''],
+        Office: [''],
+        Patio: [''],
+        Garage: [''],
+        Attic: [''],
+      }),
+
+      itemsGroup: this._formBuilder.group({
+        items: ['']
+      }),
+
+      specialtyGroup: this._formBuilder.group({
+        keyboard: [''],
+        spinetPiano: [''],
+        consolePiano: [''],
+        studioPiano: [''],
+        organ: [''],
+        safe3: [''],
+        safe4: [''],
+        poolTable: [''],
+        arcadeGames: [''],
+        weightEquipment: [''],
+        machinery: [''],
+      }),
+
+      specialRequestGroup: this._formBuilder.group({
+        specialTextArea: ['']
+      }),
+    })
+  }
+
+  getCounts(item: string): number {
+    const room = this.roomItems.find(room => room.items.includes(item));
+    return room ? room.getItemCounts(item) : 0;
+  }
+
+  updateCounts(value: number, item: string): void {
+    const room = this.roomItems.find(room => room.items.includes(item));
+    if (room) {
+      room.setItemCounts
+    }
   }
 
   buildForm(): void {
@@ -109,7 +194,7 @@ export class MovePlannerComponent extends PageComponent {
       toResidenceType: new FormControl('Apartment'),
       toFlights: new FormControl('3'),
       toApartmentNumber: new FormControl('Apt 321')
-    })
+    });
 
     this.roomsGroup = this._formBuilder.group({
       Bedroom: new FormControl(false),
@@ -123,7 +208,7 @@ export class MovePlannerComponent extends PageComponent {
       Patio: new FormControl(false),
       Garage: new FormControl(false),
       Attic: new FormControl(false),
-    })
+    });
 
     this.specialtyGroup = this._formBuilder.group({
       keyboard: new FormControl(false),
@@ -137,12 +222,11 @@ export class MovePlannerComponent extends PageComponent {
       arcadeGames: new FormControl(false),
       weightEquipment: new FormControl(false),
       machinery: new FormControl(false),
-    })
+    });
 
     this.specialRequestGroup = this._formBuilder.group({
       specialTextArea: new FormControl('Enter and special requests here', Validators.required)
-    })
-    console.log(this.specialRequestGroup);
+    });
   }
 
   onActiveStepIndexChange(index: number): void {
@@ -175,17 +259,17 @@ export class MovePlannerComponent extends PageComponent {
 
   initRoomItems(): void {
     this.roomItems = [
-      { roomItems: new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'T.V.', 'Dresser']), count: 0 },
-      { roomItems: new Room('Kitchen', ['Table', 'Chairs', 'Refridgerator', 'Stove', 'Microwave', 'Dishwasher', 'Pots and Pans', 'Dishes', 'Trash Can']), count: 0 },
-      { roomItems: new Room('Dining', ['Table', 'Chairs', 'Lighting', 'China', 'Art', 'Chadelier', 'Centerpieces', 'Tablecloths', 'Cabinets', 'Shelving']), count: 0 },
-      { roomItems: new Room('Family', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']), count: 0 },
-      { roomItems: new Room('Living', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']), count: 0 },
-      { roomItems: new Room('Laundry', ['Washer', 'Dryer', 'Ironing Board', 'Laundry Sink', 'Cleaning Supplies']), count: 0 },
-      { roomItems: new Room('Bathroom', ['Bath rugs/mats', 'Shower Curtains', 'Shower Curtain Rod', 'Trash Can', 'Scale', 'Toilet Brush', 'Plunger', 'Bathroom Accessories']), count: 0 },
-      { roomItems: new Room('Office', ['Computer', 'Desk', 'Lighting', 'Arm Chair', 'T.V.', 'Cabinets', 'Bookeshelves', 'Printer', 'Keyboard and Mouse', 'Cables/Wiring', 'Office Chair']), count: 0 },
-      { roomItems: new Room('Patio', ['Outdoor Tables', 'Chairs', 'Umbrella', 'Grill', 'Grill Accessories', 'Outdoor Furniture', 'Storage Containers', 'Gardening Tools']), count: 0 },
-      { roomItems: new Room('Garage', ['Tools', 'Toolbox', 'Gardening Equipment', 'Workbench', 'Sports Equipment', 'Outdoor Furniture', 'Lawn Care Equipment', 'Automotive Supplies']), count: 0 },
-      { roomItems: new Room('Attic', ['Seasonal Decorations', 'Stored Clothing', 'Furniture', 'Lighting', 'Boxed Items', 'Miscellaneous Items']), count: 0 }
+      new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'T.V.', 'Dresser']),
+      new Room('Kitchen', ['Table', 'Chairs', 'Refridgerator', 'Stove', 'Microwave', 'Dishwasher', 'Pots and Pans', 'Dishes', 'Trash Can']),
+      new Room('Dining', ['Table', 'Chairs', 'Lighting', 'China', 'Art', 'Chadelier', 'Centerpieces', 'Tablecloths', 'Cabinets', 'Shelving']),
+      new Room('Family', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
+      new Room('Living', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
+      new Room('Laundry', ['Washer', 'Dryer', 'Ironing Board', 'Laundry Sink', 'Cleaning Supplies']),
+      new Room('Bathroom', ['Bath rugs/mats', 'Shower Curtains', 'Shower Curtain Rod', 'Trash Can', 'Scale', 'Toilet Brush', 'Plunger', 'Bathroom Accessories']),
+      new Room('Office', ['Computer', 'Desk', 'Lighting', 'Arm Chair', 'T.V.', 'Cabinets', 'Bookeshelves', 'Printer', 'Keyboard and Mouse', 'Cables/Wiring', 'Office Chair']),
+      new Room('Patio', ['Outdoor Tables', 'Chairs', 'Umbrella', 'Grill', 'Grill Accessories', 'Outdoor Furniture', 'Storage Containers', 'Gardening Tools']),
+      new Room('Garage', ['Tools', 'Toolbox', 'Gardening Equipment', 'Workbench', 'Sports Equipment', 'Outdoor Furniture', 'Lawn Care Equipment', 'Automotive Supplies']),
+      new Room('Attic', ['Seasonal Decorations', 'Stored Clothing', 'Furniture', 'Lighting', 'Boxed Items', 'Miscellaneous Items'])
     ]
   }
 
@@ -207,8 +291,8 @@ export class MovePlannerComponent extends PageComponent {
 
   getRoomItems(roomName: string): string[] {
     //retreive room items based on roomName
-    const room = this.roomItems.find(item => item.roomItems.roomName === roomName);
-    return room ? room.roomItems.items : [];
+    const room = this.roomItems.find(item => item.roomName === roomName);
+    return room ? room.items : [];
   }
 
   submitForm(): void {

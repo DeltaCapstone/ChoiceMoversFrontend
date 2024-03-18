@@ -19,7 +19,7 @@ export interface IJobRequest {
 /**
  * Class that defines a Job object and its properties and methods
  */
-export class JobRequest {
+export class JobRequest implements IJobRequest {
     username: string;
     loadAddr: string = "";
     unloadAddr: string = "";

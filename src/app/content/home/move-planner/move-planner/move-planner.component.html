@@ -132,14 +132,15 @@
                             [showArrow]="false">
                             <!--Accordion Item Label-->
                             <div class="operation-header">
-                                <div class="operation-title">{{room.roomItems.roomName}}</div>
+                                <div class="operation-title">{{room.roomName}}</div>
                             </div>
                             <ng-template tuiAccordionItemContent>
                                 <h3 class="form-title">Room Items</h3>
                                 <form class="operation-form">
                                     <!--Populate room items-->
-                                    <tui-input-number class="b-form" value="value"
-                                        *ngFor="let item of room.roomItems.items">{{item}}
+                                    <tui-input-number class="b-form" [ngModel]="getCounts(item)"
+                                        (ngModelChange)="updateCounts($event, item)"
+                                        *ngFor="let item of room.items">{{item}}
                                     </tui-input-number>
                                 </form>
                             </ng-template>
