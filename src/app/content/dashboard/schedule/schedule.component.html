@@ -2,7 +2,8 @@
   <full-calendar
     class="bg-[white] w-full p-5"
     [options]="calendarOptions"
-    [events]="events | async">
+    [deepChangeDetection]="true"
+    [events]="events$ | async">
   </full-calendar>
 </div>
 

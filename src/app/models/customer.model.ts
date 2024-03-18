@@ -23,7 +23,9 @@ export class Customer {
     phonePrimary: string = "";
     phoneOther: string = "";
 
-    constructor(username: string, passwordHash: string, firstName: string, lastName: string, email: string, phonePrimary: string, phoneOther: string) {
+    constructor(username: string = "", passwordHash: string = "", firstName: string = "", lastName: string = "", 
+        email: string = "", phonePrimary: string = "", phoneOther: string = "") {
+
         this.username = username;
         this.passwordHash = passwordHash;
         this.firstName = firstName;

@@ -23,7 +23,7 @@ export class EmployeeInfoComponent extends BaseComponent {
     employeeTypes: String[] = Object.values(EmployeeType);
     employeePriorities: number[] = [1, 2, 3];
     isNew = false;
-    
+
     readonly form = new FormGroup({
         userName: new FormControl(""),
         firstName: new FormControl(""),
@@ -40,7 +40,7 @@ export class EmployeeInfoComponent extends BaseComponent {
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
             this.user$ = this.employeesService.getEmployee(userName);
-            
+
             const userSub = this.user$.subscribe(user => {
                 this.form.patchValue({
                     email: user?.email ?? "",
@@ -65,9 +65,9 @@ export class EmployeeInfoComponent extends BaseComponent {
     }
 
     constructor(private location: Location,
-                private route: ActivatedRoute,
-                private session: SessionService,
-                private employeesService: EmployeesService) {
+        private route: ActivatedRoute,
+        private session: SessionService,
+        private employeesService: EmployeesService) {
         super();
     }
 
@@ -77,7 +77,7 @@ export class EmployeeInfoComponent extends BaseComponent {
             const saveSub = this.user$.pipe(
                 map(user => ({
                     ...user,
-                    email:  formValues.email ?? user?.email ?? "",
+                    email: formValues.email ?? user?.email ?? "",
                     firstName: formValues.firstName ?? user?.firstName ?? "",
                     lastName: formValues.lastName ?? user?.lastName ?? "",
                     userName: formValues.userName ?? user?.userName ?? "",
@@ -87,14 +87,14 @@ export class EmployeeInfoComponent extends BaseComponent {
                     employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 3,
                 }))
             ).subscribe(newUser => {
-                if (this.isNew){ // CREATE NEW EMPLOYEE
+                if (this.isNew) { // CREATE NEW EMPLOYEE
                     const createEmployeeRequest: EmployeeCreateRequest = {
                         ...newUser,
                         phoneOther: [],
                         employeePriority: 3,
                         passwordPlain: "test1234"
                     };
-                
+
                     this.employeesService.createEmployee(createEmployeeRequest).subscribe({
                         next: (response) => {
                             console.log('User created successfully', response);
@@ -104,12 +104,12 @@ export class EmployeeInfoComponent extends BaseComponent {
                             console.error('Error creating user', error);
                             this.back();
                         }
-                    });                
+                    });
                     this.isNew = false;
                 }
                 else { // UPDATE EXISTING EMPLOYEE
                     const updateRequest: EmployeeTypePriorityRequest = {
-                        userName: newUser.userName,                          
+                        userName: newUser.userName,
                         employeeType: newUser.employeeType,
                         employeePriority: newUser.employeePriority
                     };
@@ -134,7 +134,7 @@ export class EmployeeInfoComponent extends BaseComponent {
             const userName: string | null = this.route.snapshot.paramMap.get('userName');
             if (!userName)
                 return;
-        
+
             this.employeesService.deleteEmployee(userName).subscribe({
                 next: (response) => {
                     console.log('User deleted successfully', response);
@@ -144,7 +144,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                     console.error('Error deleting user', error);
                     this.back();
                 }
-            });                
+            });
         }).subscribe();
     }
 
@@ -152,7 +152,7 @@ export class EmployeeInfoComponent extends BaseComponent {
         this.location.back();
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }
