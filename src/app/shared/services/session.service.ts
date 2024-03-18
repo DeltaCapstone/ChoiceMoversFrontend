@@ -51,7 +51,8 @@ export class SessionService {
     }
 
     logout() {
-        this.setSessionValues("", "", "", "", "");
+        localStorage.clear();
+        sessionStorage.clear();
         this.user$ = of(undefined);
     }
 

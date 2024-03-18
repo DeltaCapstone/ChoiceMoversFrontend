@@ -36,6 +36,7 @@ export class ScheduleComponent extends PageComponent {
             plugins: [dayGridPlugin],
             eventClick: this.eventClick.bind(this),
             viewDidMount: viewInfo => {
+                console.log("mount");
                 this.session.guardWithAuth(() => {
                     const start = viewInfo.view.activeStart.toISOString();
                     const end = viewInfo.view.activeEnd.toISOString();
@@ -46,9 +47,20 @@ export class ScheduleComponent extends PageComponent {
                 this.session.guardWithAuth(() => {
                     const start = dateInfo.startStr;
                     const end = dateInfo.endStr;
+                    localStorage.setItem("calendarStart", start);
+                    localStorage.setItem("calendarEnd", end);
+
                     this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
                 }).subscribe();
             },
+        }
+
+        const calendarStart = localStorage.getItem("calendarStart");
+        // TODO: figure out proper solution
+        if (calendarStart) {
+            const date = new Date(calendarStart);
+            date.setUTCDate(date.getUTCDate() + 5);
+            this.calendarOptions.initialDate = date.toISOString();
         }
     }
 
