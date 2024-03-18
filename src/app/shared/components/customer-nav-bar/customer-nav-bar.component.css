@@ -39,4 +39,5 @@ li {
     vertical-align: top; /* Aligns the container with the line of text */
     height: 1em; /* Adjust to fit the height of your text */
     width: 100px; /* Adjust to fit the width of your longest word */
+    
 }
