@@ -88,24 +88,6 @@ export class Estimate implements IEstimate {
     estimateManHours: number;
     estimateRate: number;
     estimateCost: number;
-    notes: string;
-}
-
-/**
- * Class that defines a Job object and its properties and methods
- */
-export class JobRequest implements IJobRequest {
-    username: string;
-    loadAddr: string = "";
-    unloadAddr: string = "";
-    startTime: Date = new Date();
-    rooms: Room[] = [];
-    pack: boolean = false;
-    unpack: boolean = false;
-    load: boolean = false;
-    unload: boolean = false;
-    clean: boolean = false;
-    notes: string = "";
 
     constructor(
         estimateID: number = 0,

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
@@ -24,7 +24,7 @@ import { Room } from '../../../../models/room.model';
     {
       provide: TUI_BUTTON_OPTIONS,
       useValue: {
-        appearance: 'flat',
+        appearance: 'primary',
         size: 'm',
         shape: 'rounded'
       }
@@ -33,6 +33,8 @@ import { Room } from '../../../../models/room.model';
 })
 
 export class MovePlannerComponent extends PageComponent {
+
+  @Input() public userName?: string;
 
   servicesGroup: FormGroup;
 
@@ -72,14 +74,17 @@ export class MovePlannerComponent extends PageComponent {
    */
   constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router) {
     super(pageService);
-
   }
 
   ngOnInit(): void {
     this.setTitle("Move Planner");
+
     this.initRoomItems();
+
     this.initSpecialtyItems();
+
     this.buildForm();
+
     this.masterForm = this._formBuilder.group({
       servicesGroup: this._formBuilder.group({
         moving: [''],
@@ -148,21 +153,12 @@ export class MovePlannerComponent extends PageComponent {
       specialRequestGroup: this._formBuilder.group({
         specialTextArea: ['']
       }),
-    })
+    });
   }
 
-  getCounts(item: string): number {
-    const room = this.roomItems.find(room => room.items.includes(item));
-    return room ? room.getItemCounts(item) : 0;
-  }
-
-  updateCounts(value: number, item: string): void {
-    const room = this.roomItems.find(room => room.items.includes(item));
-    if (room) {
-      room.setItemCounts
-    }
-  }
-
+  /**
+   * Builds the form groups, creating an AbstractControl from a user-specified configuration
+   */
   buildForm(): void {
     this.servicesGroup = this._formBuilder.group({
       moving: new FormControl(false),
@@ -229,6 +225,10 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
+  /**
+   * Changes the activeStepIndex based on which stepper step the user is on currently
+   * @param index The current index to which the activeStepIndex will be set.
+   */
   onActiveStepIndexChange(index: number): void {
     this.activeStepIndex = index;
     if (this.activeStepIndex === 5) {
@@ -236,6 +236,29 @@ export class MovePlannerComponent extends PageComponent {
     }
   }
 
+  /**
+   * Sets the FormControls for a FormGroup based on user input after the user progresses to the next stepper step
+   * @param currentFormGroup The current form group associated with the stepper step
+   */
+  onClickNext(currentFormGroup: FormGroup): void {
+
+    if (currentFormGroup != null) {
+      const currentControls = Object.keys(currentFormGroup.controls)
+
+      currentControls.forEach(controlName => {
+        const control: FormControl = currentFormGroup.controls[controlName] as FormControl;
+
+        const userInputValue = control.value;
+
+        control.setValue(userInputValue);
+      });
+    }
+
+    console.log(this.activeStepIndex);
+  }
+  /**
+   * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
+   */
   populateRoomItems(): void {
     // Reset the itemsGroup FormGroup
     this.itemsGroup = this._formBuilder.group({});
@@ -257,6 +280,9 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
+  /**
+   * Function that initializes the roomItems property, which will be used to populate the items accordion section of the stepper
+   */
   initRoomItems(): void {
     this.roomItems = [
       new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'T.V.', 'Dresser']),
@@ -273,6 +299,9 @@ export class MovePlannerComponent extends PageComponent {
     ]
   }
 
+  /**
+   * Initializes the specialty items property that is used in the specialtyGroup form group
+   */
   initSpecialtyItems(): void {
     this.specialtyItems = [
       { specialtyItem: 'Keyboard', count: 0 },
@@ -289,15 +318,24 @@ export class MovePlannerComponent extends PageComponent {
     ]
   }
 
+
+  /**
+   * Retreive room items based on roomName. Used to help with dynamic population of items stepper section
+   * @param roomName A specific room name checked by the user in the form
+   * @returns The items associated with the selected room names; empty array otherwise
+   */
   getRoomItems(roomName: string): string[] {
-    //retreive room items based on roomName
     const room = this.roomItems.find(item => item.roomName === roomName);
     return room ? room.items : [];
   }
 
   submitForm(): void {
     console.log('Form submitted');
+    console.log(this.masterForm);
   }
 
+  ngOnDestroy() {
+
+  }
 }
 

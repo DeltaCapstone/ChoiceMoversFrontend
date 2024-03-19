@@ -29,12 +29,10 @@ export class MovingComponent extends PageComponent {
 
   ngOnInit() {
     this.setTitle("Moving");
-    console.log("NgOnInit");
     this.googleReviews$.subscribe(data => console.log(data));
   }
 
   ngAfterViewInit() {
-    console.log("NgAfterViewInit");
     this.getReviews();
   }
 
@@ -42,9 +40,7 @@ export class MovingComponent extends PageComponent {
     const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
 
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
-      console.log(response);
       this.googleReviews$.next(response);
-      console.log(this.googleReviews$);
     });
 
     this.subscriptions.push(googleReviewSubscription);

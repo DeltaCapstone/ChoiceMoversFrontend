@@ -11,6 +11,10 @@
                     <tui-checkbox-block class="mb-4" formControlName="storage">Storage</tui-checkbox-block>
                 </form>
             </div>
+            <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3"
+                (click)="onClickNext(servicesGroup)">
+                Next
+            </button>
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
@@ -24,6 +28,10 @@
                     <tui-input-time formControlName="time" class="w-64">Choose a Move Time</tui-input-time>
                 </form>
             </div>
+            <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3"
+                (click)="onClickNext(moveDateGroup)">
+                Next
+            </button>
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
@@ -124,22 +132,21 @@
         Items
         <ng-container *ngIf="activeStepIndex === 5">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
-                <form [formGroup]="itemsGroup">
+                <form [formGroup]="roomsGroup">
                     <tui-accordion class="container" [rounded]="false">
                         <!--Iterate over selected rooms-->
                         <!--Accordion item for each room-->
                         <tui-accordion-item *ngFor="let room of roomItemsFiltered" borders="top-bottom"
-                            [showArrow]="false">
+                            [showArrow]="true">
                             <!--Accordion Item Label-->
                             <div class="operation-header">
                                 <div class="operation-title">{{room.roomName}}</div>
                             </div>
                             <ng-template tuiAccordionItemContent>
                                 <h3 class="form-title">Room Items</h3>
-                                <form class="operation-form">
+                                <form class="operation-form" [formGroup]="itemsGroup">
                                     <!--Populate room items-->
-                                    <tui-input-number class="b-form" [ngModel]="getCounts(item)"
-                                        (ngModelChange)="updateCounts($event, item)"
+                                    <tui-input-number class="b-form" formControlName="items"
                                         *ngFor="let item of room.items">{{item}}
                                     </tui-input-number>
                                 </form>
@@ -181,11 +188,10 @@
                 <ng-template #icon>
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>
                 </ng-template>
-                <p>
-                    <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
-                        (click)="submitForm()">
-                        Submit Move Form
-                    </button>
+                <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
+                    (click)="submitForm()">
+                    Submit Move Form
+                </button>
 
             </div>
         </ng-container>
