@@ -5,23 +5,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { JobsService } from '../../services/jobs.service';
 import { Observable, Subscription, of, tap } from 'rxjs';
 import { Job } from '../../../models/job.model';
-import { TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule } from '@taiga-ui/kit';
+import { TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule } from '@taiga-ui/kit';
 import { TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { CommonModule, Location } from '@angular/common';
-import { TUI_DATE_FORMAT, TUI_DATE_SEPARATOR, TuiDay } from '@taiga-ui/cdk';
+import { TuiDay } from '@taiga-ui/cdk';
 
 @Component({
     selector: 'app-job-info',
     standalone: true,
-    imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule,
+    imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule,
         TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule],
     templateUrl: './job-info.component.html',
     styleUrl: './job-info.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        { provide: TUI_DATE_FORMAT, useValue: 'YMD' },
-        { provide: TUI_DATE_SEPARATOR, useValue: '/' },
-    ]
 })
 export class JobInfoComponent extends BaseComponent {
     subscriptions: Subscription[] = [];
@@ -32,6 +28,7 @@ export class JobInfoComponent extends BaseComponent {
     });
     job$: Observable<Job | undefined>;
     activeItemIndex: number = 0;
+    status = "Pending";
 
     ngOnInit() {
         const jobId: string | null = this.route.snapshot.paramMap.get("jobId");
@@ -41,6 +38,8 @@ export class JobInfoComponent extends BaseComponent {
                 console.log(job);
                 if (!job)
                     this.router.navigate(["dashboard/schedule"]);
+
+                this.status = job?.finalized ? "Finalized" : "Pending";
 
                 this.form.patchValue({
                     jobId: job?.jobId ?? "",

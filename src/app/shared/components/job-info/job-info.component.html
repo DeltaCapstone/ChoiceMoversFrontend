@@ -19,10 +19,11 @@
         </tui-tabs>
     </div>
 
-    <div class="m-4 flex">
+    <div class="m-4 flex items-center">
         <div class="flex flex-col text-left justify-center">
             <p class="text-4xl">{{ job.customer.email }}</p>
         </div>
+        <tui-tag class="ml-5" [value]="status"></tui-tag>
     </div>
 
     <div class="tui-container w-full mt-5">
