@@ -221,7 +221,7 @@ export class MovePlannerComponent extends PageComponent {
     });
 
     this.specialRequestGroup = this._formBuilder.group({
-      specialTextArea: new FormControl('Enter and special requests here', Validators.required)
+      specialTextArea: new FormControl('Enter and special requests here')
     });
   }
 
@@ -361,8 +361,19 @@ export class MovePlannerComponent extends PageComponent {
     return room ? room.items : [];
   }
 
+  /**
+   * Final form submission
+   */
   submitForm(): void {
     console.log('Form submitted');
+    console.log(this.servicesGroup);
+    console.log(this.moveDateGroup);
+    console.log(this.fromAddressGroup);
+    console.log(this.toAddressGroup);
+    console.log(this.roomsGroup);
+    console.log(this.itemsGroup);
+    console.log(this.specialtyGroup);
+    console.log(this.specialRequestGroup);
     console.log(this.masterForm);
   }
 
