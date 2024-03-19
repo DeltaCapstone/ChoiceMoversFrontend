@@ -34,7 +34,7 @@ import { Room } from '../../../../models/room.model';
 
 export class MovePlannerComponent extends PageComponent {
 
-  @Input() public userName?: string;
+  currentFormGroup: FormGroup;
 
   servicesGroup: FormGroup;
 
@@ -60,7 +60,7 @@ export class MovePlannerComponent extends PageComponent {
 
   checkedRooms: string[] = [];
 
-  specialtyItems: { specialtyItem: string, count: number }[] = [];
+  specialtyItems: { specialtyItem: string, count: number, control: string }[] = [];
 
   get roomItemsFiltered(): Room[] {
     return this.roomItems.filter(item => this.checkedRooms.includes(item.roomName));
@@ -142,8 +142,8 @@ export class MovePlannerComponent extends PageComponent {
         consolePiano: [''],
         studioPiano: [''],
         organ: [''],
-        safe3: [''],
-        safe4: [''],
+        safe300lb: [''],
+        safe400lb: [''],
         poolTable: [''],
         arcadeGames: [''],
         weightEquipment: [''],
@@ -212,8 +212,8 @@ export class MovePlannerComponent extends PageComponent {
       consolePiano: new FormControl(false),
       studioPiano: new FormControl(false),
       organ: new FormControl(false),
-      safe3: new FormControl(false),
-      safe4: new FormControl(false),
+      safe300lb: new FormControl(false),
+      safe400lb: new FormControl(false),
       poolTable: new FormControl(false),
       arcadeGames: new FormControl(false),
       weightEquipment: new FormControl(false),
@@ -226,36 +226,68 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Changes the activeStepIndex based on which stepper step the user is on currently
+   * Changes the activeStepIndex based on which stepper step the user is on currently, and then sets the FormControls to the user input values
    * @param index The current index to which the activeStepIndex will be set.
+   * @param curentGroup The current FormGroup for the associated stepper section
    */
-  onActiveStepIndexChange(index: number): void {
+  onActiveStepIndexChange(index: number, currentGroup: FormGroup): void {
+    currentGroup = this.findCurrentFormGroup(index);
     this.activeStepIndex = index;
+    if (currentGroup != null) {
+      const currentControls = Object.keys(currentGroup.controls)
+
+      currentControls.forEach(controlName => {
+        const control: FormControl = currentGroup.controls[controlName] as FormControl;
+
+        const userInputValue = control.value;
+
+        control.setValue(userInputValue);
+        console.log(userInputValue);
+      });
+    }
+
     if (this.activeStepIndex === 5) {
       this.populateRoomItems();
     }
   }
 
   /**
-   * Sets the FormControls for a FormGroup based on user input after the user progresses to the next stepper step
-   * @param currentFormGroup The current form group associated with the stepper step
+   * Finds the current form group based on the stepper's current active index
+   * @param stepIndex the stepper's current active index
+   * @returns The current form group relative to the current active index of the stepper
    */
-  onClickNext(currentFormGroup: FormGroup): void {
-
-    if (currentFormGroup != null) {
-      const currentControls = Object.keys(currentFormGroup.controls)
-
-      currentControls.forEach(controlName => {
-        const control: FormControl = currentFormGroup.controls[controlName] as FormControl;
-
-        const userInputValue = control.value;
-
-        control.setValue(userInputValue);
-      });
+  findCurrentFormGroup(stepIndex: number): FormGroup {
+    switch (stepIndex) {
+      case 0:
+        this.currentFormGroup = this.servicesGroup;
+        break;
+      case 1:
+        this.currentFormGroup = this.moveDateGroup
+        break;
+      case 2:
+        this.currentFormGroup = this.fromAddressGroup;
+        break;
+      case 3:
+        this.currentFormGroup = this.toAddressGroup;
+        break;
+      case 4:
+        this.currentFormGroup = this.roomsGroup
+        break;
+      case 5:
+        this.currentFormGroup = this.itemsGroup;
+        break;
+      case 6:
+        this.currentFormGroup = this.specialtyGroup;
+        break;
+      case 7:
+        this.currentFormGroup = this.specialRequestGroup;
+        break;
+      default:
+        break;
     }
-
-    console.log(this.activeStepIndex);
+    return this.currentFormGroup;
   }
+
   /**
    * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
    */
@@ -304,17 +336,17 @@ export class MovePlannerComponent extends PageComponent {
    */
   initSpecialtyItems(): void {
     this.specialtyItems = [
-      { specialtyItem: 'Keyboard', count: 0 },
-      { specialtyItem: 'Spinet Piano', count: 0 },
-      { specialtyItem: 'Console Piano', count: 0 },
-      { specialtyItem: 'Studio Piano', count: 0 },
-      { specialtyItem: 'Organ', count: 0 },
-      { specialtyItem: 'Safe >300lb', count: 0 },
-      { specialtyItem: 'Safe >400lb', count: 0 },
-      { specialtyItem: 'Pool Table', count: 0 },
-      { specialtyItem: 'Arcade Games', count: 0 },
-      { specialtyItem: 'Weight Equipment', count: 0 },
-      { specialtyItem: 'Machinery', count: 0 },
+      { specialtyItem: 'Keyboard', count: 0, control: 'keyboard' },
+      { specialtyItem: 'Spinet Piano', count: 0, control: 'spinetPiano' },
+      { specialtyItem: 'Console Piano', count: 0, control: 'consolePiano' },
+      { specialtyItem: 'Studio Piano', count: 0, control: 'studioPiano' },
+      { specialtyItem: 'Organ', count: 0, control: 'organ' },
+      { specialtyItem: 'Safe > 300lb', count: 0, control: 'safe300lb' },
+      { specialtyItem: 'Safe > 400lb', count: 0, control: 'safe400lb' },
+      { specialtyItem: 'Pool Table', count: 0, control: 'poolTable' },
+      { specialtyItem: 'Arcade Games', count: 0, control: 'arcadeGames' },
+      { specialtyItem: 'Weight Equipment', count: 0, control: 'weightEquipment' },
+      { specialtyItem: 'Machinery', count: 0, control: 'machinery' },
     ]
   }
 
