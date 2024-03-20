@@ -3,8 +3,7 @@
  */
 export interface IRoom {
     roomName: string;
-    items: string[];
-    itemCounts: { [item: string]: number };
+    items: Map<string, number>;
 }
 
 /**
@@ -12,20 +11,11 @@ export interface IRoom {
  */
 export class Room implements IRoom {
     roomName: string;
-    items: string[];
-    itemCounts: { [item: string]: number };
+    items: Map<string, number>;
 
-    constructor(roomName: string, items: string[]) {
+    constructor(roomName: string, items: Map<string, number>) {
         this.roomName = roomName;
         this.items = items;
-        this.itemCounts = {};
-        this.initializeItemCounts();
-    }
-
-    initializeItemCounts(): void {
-        this.items.forEach(item => {
-            this.itemCounts[item] = 0
-        });
     }
 
     getRoomName(): string {
@@ -36,19 +26,12 @@ export class Room implements IRoom {
         this.roomName = roomName;
     }
 
-    getItems(): string[] {
+    getItems(): Map<string, number> {
         return this.items;
     }
 
-    setItems(item: string): void {
-        this.items.push(item);
+    setItems(item: Map<string, number>): void {
+        this.items = item;
     }
 
-    getItemCounts(item: string): number {
-        return this.itemCounts[item] ? this.itemCounts[item] : 0;
-    }
-
-    setItemCounts(item: string, count: number): void {
-        this.itemCounts[item] = count;
-    }
 }

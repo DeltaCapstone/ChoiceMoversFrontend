@@ -140,8 +140,8 @@
                                 <h3 class="form-title">Room Items</h3>
                                 <form class="operation-form" [formGroup]="itemsGroup">
                                     <!--Populate room items-->
-                                    <tui-input-number class="b-form" *ngFor="let item of room.items"
-                                        formControlName="{{item}}">{{item}}
+                                    <tui-input-number class="b-form" *ngFor="let item of room.items | keyvalue"
+                                        formControlName="{{item.key}}">{{item.key}}
                                     </tui-input-number>
                                 </form>
                             </ng-template>

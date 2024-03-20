@@ -251,12 +251,15 @@ export class MovePlannerComponent extends PageComponent {
     // Iterate over the selected rooms
     this.checkedRooms.forEach(roomName => {
       // Retrieve room items based on the roomName
-      const items = this.getRoomItems(roomName);
-      // Dynamically add FormControls for each item
-      items.forEach(item => {
-        // Add a FormControl for the item to the itemsGroup FormGroup
-        this.itemsGroup.addControl(item, new FormControl());
-      });
+      const itemsMap = this.getRoomItems(roomName);
+
+      console.log(itemsMap.keys());
+
+      for (const key of itemsMap.keys()) {
+        console.log(key);
+        this.itemsGroup.addControl(key, new FormControl());
+      }
+      console.log(this.itemsGroup);
     });
   }
 
@@ -265,17 +268,17 @@ export class MovePlannerComponent extends PageComponent {
    */
   initRoomItems(): void {
     this.roomItems = [
-      new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'TV', 'Dresser']),
-      new Room('Kitchen', ['Table', 'Chairs', 'Refridgerator', 'Stove', 'Microwave', 'Dishwasher', 'Pots and Pans', 'Dishes', 'Trash Can']),
-      new Room('Dining', ['Table', 'Chairs', 'Lighting', 'China', 'Art', 'Chadelier', 'Centerpieces', 'Tablecloths', 'Cabinets', 'Shelving']),
-      new Room('Family', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
-      new Room('Living', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
-      new Room('Laundry', ['Washer', 'Dryer', 'Ironing Board', 'Laundry Sink', 'Cleaning Supplies']),
-      new Room('Bathroom', ['Bath rugs/mats', 'Shower Curtains', 'Shower Curtain Rod', 'Trash Can', 'Scale', 'Toilet Brush', 'Plunger', 'Bathroom Accessories']),
-      new Room('Office', ['Computer', 'Desk', 'Lighting', 'Arm Chair', 'TV', 'Cabinets', 'Bookeshelves', 'Printer', 'Keyboard and Mouse', 'Cables/Wiring', 'Office Chair']),
-      new Room('Patio', ['Outdoor Tables', 'Chairs', 'Umbrella', 'Grill', 'Grill Accessories', 'Outdoor Furniture', 'Storage Containers', 'Gardening Tools']),
-      new Room('Garage', ['Tools', 'Toolbox', 'Gardening Equipment', 'Workbench', 'Sports Equipment', 'Outdoor Furniture', 'Lawn Care Equipment', 'Automotive Supplies']),
-      new Room('Attic', ['Seasonal Decorations', 'Stored Clothing', 'Furniture', 'Lighting', 'Boxed Items', 'Miscellaneous Items'])
+      new Room('Bedroom', new Map([['Bed', 0], ['Bed Frame', 0], ['Lighting', 0], ['Arm Chair', 0], ['TV', 0], ['Dresser', 0]])),
+      new Room('Kitchen', new Map([['Table', 0], ['Chairs', 0], ['Refrigerator', 0], ['Stove', 0], ['Microwave', 0], ['Dishwasher', 0], ['Pots and Pans', 0], ['Dishes', 0], ['Trash Can', 0]])),
+      new Room('Dining', new Map([['Table', 0], ['Chairs', 0], ['Lighting', 0], ['China', 0], ['Art', 0], ['Chadelier', 0], ['Centerpieces', 0], ['Tablecloths', 0], ['Cabinets', 0], ['Shelving', 0]])),
+      new Room('Family', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['T.V.', 0], ['Armchairs', 0], ['Recliners', 0]])),
+      new Room('Living', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['T.V.', 0], ['Armchairs', 0], ['Recliners', 0]])),
+      new Room('Laundry', new Map([['Washer', 0], ['Dryer', 0], ['Ironing Board', 0], ['Laundry Sink', 0], ['Cleaning Supplies', 0]])),
+      new Room('Bathroom', new Map([['Bath rugs and mats', 0], ['Shower Curtains', 0], ['Shower Curtain Rod', 0], ['Trash Can', 0], ['Scale', 0], ['Toilet Brush', 0], ['Plunger', 0], ['Bathroom Accessories', 0]])),
+      new Room('Office', new Map([['Computer', 0], ['Desk', 0], ['Lighting', 0], ['Arm Chair', 0], ['TV', 0], ['Cabinets', 0], ['Bookeshelves', 0], ['Printer', 0], ['Keyboard and Mouse', 0], ['Cables and Wiring', 0], ['Office Chair', 0]])),
+      new Room('Patio', new Map([['Outdoor Tables', 0], ['Chairs', 0], ['Umbrella', 0], ['Grill', 0], ['Grill Accessories', 0], ['Outdoor Furniture', 0], ['Storage Containers', 0], ['Gardening Tools', 0]])),
+      new Room('Garage', new Map([['Tools', 0], ['Toolbox', 0], ['Gardening Equipment', 0], ['Workbench', 0], ['Sports Equipment', 0], ['Outdoor Furniture', 0], ['Lawn Care Equipment', 0], ['Automotive Supplies', 0]])),
+      new Room('Attic', new Map([['Seasonal Decorations', 0], ['Stored Clothing', 0], ['Furniture', 0], ['Lighting', 0], ['Boxed Items', 0], ['Miscellaneous Items', 0]]))
     ]
   }
 
@@ -304,9 +307,9 @@ export class MovePlannerComponent extends PageComponent {
    * @param roomName A specific room name checked by the user in the form
    * @returns The items associated with the selected room names; empty array otherwise
    */
-  getRoomItems(roomName: string): string[] {
+  getRoomItems(roomName: string): Map<string, number> {
     const room = this.roomItems.find(item => item.roomName === roomName);
-    return room ? room.items : [];
+    return room ? room.items : new Map();
   }
 
   /**
