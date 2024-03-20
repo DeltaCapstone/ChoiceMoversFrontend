@@ -1,13 +1,14 @@
-import { Component, ChangeDetectionStrategy, Input, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
 import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider } from '@taiga-ui/kit';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
+import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
+import { TuiDayOfWeek } from '@taiga-ui/cdk';
 
 @Component({
   selector: 'app-move-planner',
@@ -28,6 +29,10 @@ import { Room } from '../../../../models/room.model';
         size: 'm',
         shape: 'rounded'
       }
+    },
+    {
+      provide: TUI_FIRST_DAY_OF_WEEK,
+      useValue: TuiDayOfWeek.Sunday,
     }
   ]
 })
@@ -85,75 +90,6 @@ export class MovePlannerComponent extends PageComponent {
 
     this.buildForm();
 
-    this.masterForm = this._formBuilder.group({
-      servicesGroup: this._formBuilder.group({
-        moving: [''],
-        packing: [''],
-        unpack: [''],
-        storage: ['']
-      }),
-
-      moveDateGroup: this._formBuilder.group({
-        date: [''],
-        time: ['']
-      }),
-
-      fromAddressGroup: this._formBuilder.group({
-        fromAddress: [''],
-        fromCity: [''],
-        fromState: [''],
-        fromZip: [''],
-        fromResidenceType: [''],
-        fromFlights: [''],
-        fromApartmentNumber: [''],
-      }),
-
-      toAddressGroup: this._formBuilder.group({
-        toAddress: [''],
-        toCity: [''],
-        toState: [''],
-        toZip: [''],
-        toResidenceType: [''],
-        toFlights: [''],
-        toApartmentNumber: ['']
-      }),
-
-      roomsGroup: this._formBuilder.group({
-        Bedroom: [''],
-        Kitchen: [''],
-        Dining: [''],
-        Family: [''],
-        Living: [''],
-        Laundry: [''],
-        Bathroom: [''],
-        Office: [''],
-        Patio: [''],
-        Garage: [''],
-        Attic: [''],
-      }),
-
-      itemsGroup: this._formBuilder.group({
-        items: ['']
-      }),
-
-      specialtyGroup: this._formBuilder.group({
-        keyboard: [''],
-        spinetPiano: [''],
-        consolePiano: [''],
-        studioPiano: [''],
-        organ: [''],
-        safe300lb: [''],
-        safe400lb: [''],
-        poolTable: [''],
-        arcadeGames: [''],
-        weightEquipment: [''],
-        machinery: [''],
-      }),
-
-      specialRequestGroup: this._formBuilder.group({
-        specialTextArea: ['']
-      }),
-    });
   }
 
   /**
@@ -242,7 +178,6 @@ export class MovePlannerComponent extends PageComponent {
         const userInputValue = control.value;
 
         control.setValue(userInputValue);
-        console.log(userInputValue);
       });
     }
 
@@ -317,14 +252,14 @@ export class MovePlannerComponent extends PageComponent {
    */
   initRoomItems(): void {
     this.roomItems = [
-      new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'T.V.', 'Dresser']),
+      new Room('Bedroom', ['Bed', 'Bed Frame', 'Lighting', 'Arm Chair', 'TV', 'Dresser']),
       new Room('Kitchen', ['Table', 'Chairs', 'Refridgerator', 'Stove', 'Microwave', 'Dishwasher', 'Pots and Pans', 'Dishes', 'Trash Can']),
       new Room('Dining', ['Table', 'Chairs', 'Lighting', 'China', 'Art', 'Chadelier', 'Centerpieces', 'Tablecloths', 'Cabinets', 'Shelving']),
       new Room('Family', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
       new Room('Living', ['Couch', 'Rugs', 'Lighting', 'Pillows', 'Blankets', 'Bookshelves', 'Entertainment Center', 'Consoles', 'DVD/Blu-ray Player', 'T.V.', 'Armchairs', 'Recliners', 'Lighting']),
       new Room('Laundry', ['Washer', 'Dryer', 'Ironing Board', 'Laundry Sink', 'Cleaning Supplies']),
       new Room('Bathroom', ['Bath rugs/mats', 'Shower Curtains', 'Shower Curtain Rod', 'Trash Can', 'Scale', 'Toilet Brush', 'Plunger', 'Bathroom Accessories']),
-      new Room('Office', ['Computer', 'Desk', 'Lighting', 'Arm Chair', 'T.V.', 'Cabinets', 'Bookeshelves', 'Printer', 'Keyboard and Mouse', 'Cables/Wiring', 'Office Chair']),
+      new Room('Office', ['Computer', 'Desk', 'Lighting', 'Arm Chair', 'TV', 'Cabinets', 'Bookeshelves', 'Printer', 'Keyboard and Mouse', 'Cables/Wiring', 'Office Chair']),
       new Room('Patio', ['Outdoor Tables', 'Chairs', 'Umbrella', 'Grill', 'Grill Accessories', 'Outdoor Furniture', 'Storage Containers', 'Gardening Tools']),
       new Room('Garage', ['Tools', 'Toolbox', 'Gardening Equipment', 'Workbench', 'Sports Equipment', 'Outdoor Furniture', 'Lawn Care Equipment', 'Automotive Supplies']),
       new Room('Attic', ['Seasonal Decorations', 'Stored Clothing', 'Furniture', 'Lighting', 'Boxed Items', 'Miscellaneous Items'])
@@ -362,19 +297,30 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Final form submission
+   * Final form submission. Sets the value of the master form and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
     console.log('Form submitted');
-    console.log(this.servicesGroup);
-    console.log(this.moveDateGroup);
-    console.log(this.fromAddressGroup);
-    console.log(this.toAddressGroup);
-    console.log(this.roomsGroup);
-    console.log(this.itemsGroup);
-    console.log(this.specialtyGroup);
-    console.log(this.specialRequestGroup);
-    console.log(this.masterForm);
+    console.log(this.servicesGroup.value);
+    console.log(this.moveDateGroup.value);
+    console.log(this.fromAddressGroup.value);
+    console.log(this.toAddressGroup.value);
+    console.log(this.roomsGroup.value);
+    console.log(this.itemsGroup.value);
+    console.log(this.specialtyGroup.value);
+    console.log(this.specialRequestGroup.value);
+    console.log("MasterForm values:");
+    this.masterForm = this._formBuilder.group({
+      ...this.servicesGroup.controls,
+      ...this.moveDateGroup.controls,
+      ...this.fromAddressGroup.controls,
+      ...this.toAddressGroup.controls,
+      ...this.roomsGroup.controls,
+      ...this.itemsGroup.controls,
+      ...this.specialtyGroup.controls,
+      ...this.specialRequestGroup.controls,
+    });
+    console.log(this.masterForm.value);
   }
 
   ngOnDestroy() {
