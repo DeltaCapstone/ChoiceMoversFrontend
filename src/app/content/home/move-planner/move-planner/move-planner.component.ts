@@ -9,6 +9,8 @@ import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControll
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
 import { TuiDayOfWeek } from '@taiga-ui/cdk';
+import { IEstimate } from '../../../../models/job.model';
+import { Customer } from '../../../../models/customer.model';
 
 @Component({
   selector: 'app-move-planner',
@@ -89,7 +91,6 @@ export class MovePlannerComponent extends PageComponent {
     this.initSpecialtyItems();
 
     this.buildForm();
-
   }
 
   /**
@@ -300,16 +301,6 @@ export class MovePlannerComponent extends PageComponent {
    * Final form submission. Sets the value of the master form and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
-    console.log('Form submitted');
-    console.log(this.servicesGroup.value);
-    console.log(this.moveDateGroup.value);
-    console.log(this.fromAddressGroup.value);
-    console.log(this.toAddressGroup.value);
-    console.log(this.roomsGroup.value);
-    console.log(this.itemsGroup.value);
-    console.log(this.specialtyGroup.value);
-    console.log(this.specialRequestGroup.value);
-    console.log("MasterForm values:");
     this.masterForm = this._formBuilder.group({
       ...this.servicesGroup.controls,
       ...this.moveDateGroup.controls,
@@ -320,7 +311,43 @@ export class MovePlannerComponent extends PageComponent {
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
+    console.log("MasterForm values:");
     console.log(this.masterForm.value);
+    console.log(this.masterForm.controls);
+    /*
+    const newJobEstimate: IEstimate = {
+      estimateID: 1,
+      customer: new Customer('JohnDoe', '', 'John', 'Doe', 'johndoe@johndoe.com', '330-330-3300', '330-330-3300'),
+      loadAddr: this.masterForm.value.fromAddress,
+      unloadAddr: this.masterForm.value.toAddress,
+      startTime: this.masterForm.value.time,
+      endTime: '',
+  
+      rooms: Map<string, object>,
+      special: Map<string, object>,
+      small: number,
+      medium: number,
+      large: number,
+      boxes: number,
+      itemLoad: number,
+      flightMult: number,
+  
+      pack: boolean,
+      unpack: boolean,
+      load: boolean,
+      unload: boolean,
+  
+  
+      needTruck: boolean,
+      numberWorkers: number,
+      distToJob: number,
+      distMove: number,
+  
+      estimateManHours: number,
+      estimateRate: number,
+      estimateCost: number,
+    }
+    */
   }
 
   ngOnDestroy() {
