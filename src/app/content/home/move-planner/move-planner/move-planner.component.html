@@ -9,6 +9,8 @@
                     <tui-checkbox-block class="mb-4" formControlName="packing">Packing</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="unpack">Unpacking</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="storage">Storage</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-4" formControlName="load">Load</tui-checkbox-block>
+                    <tui-checkbox-block class="mb-4" formControlName="unload">Unload</tui-checkbox-block>
                 </form>
             </div>
         </ng-container>
@@ -150,8 +152,23 @@
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
-        Specialty Items
+        Boxes Needed
         <ng-container *ngIf="activeStepIndex === 6">
+            <div class="absolute inset-x-0 top-full mt-4 w-64">
+                <form [formGroup]="boxesGroup">
+                    <tui-input-number class="b-form" value="value" formControlName="smBox">Small
+                        Boxes</tui-input-number>
+                    <tui-input-number class="b-form" value="value" formControlName="mdBox">Medium
+                        Boxes</tui-input-number>
+                    <tui-input-number class="b-form" value="value" formControlName="lgBox">Large
+                        Boxes</tui-input-number>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Specialty Items
+        <ng-container *ngIf="activeStepIndex === 7">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialtyGroup">
                     <!--Populate specialty items-->
@@ -164,7 +181,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Special Requests
-        <ng-container *ngIf="activeStepIndex === 7">
+        <ng-container *ngIf="activeStepIndex === 8">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialRequestGroup">
                     <textarea name="specialTextArea" formGroupName="specialTextArea" id="specialTextArea" cols="30"
@@ -175,7 +192,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Finalize and Submit
-        <ng-container *ngIf="activeStepIndex === 8">
+        <ng-container *ngIf="activeStepIndex === 9">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <ng-template #icon>
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>

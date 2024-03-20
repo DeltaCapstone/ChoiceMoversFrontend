@@ -55,6 +55,8 @@ export class MovePlannerComponent extends PageComponent {
 
   itemsGroup: FormGroup;
 
+  boxesGroup: FormGroup;
+
   specialtyGroup: FormGroup;
 
   specialRequestGroup: FormGroup;
@@ -68,6 +70,8 @@ export class MovePlannerComponent extends PageComponent {
   checkedRooms: string[] = [];
 
   specialtyItems: { specialtyItem: string, count: number, control: string }[] = [];
+
+  boxes: { size: string, count: number }[] = [];
 
   get roomItemsFiltered(): Room[] {
     return this.roomItems.filter(item => this.checkedRooms.includes(item.roomName));
@@ -101,7 +105,9 @@ export class MovePlannerComponent extends PageComponent {
       moving: new FormControl(false),
       packing: new FormControl(false),
       unpack: new FormControl(false),
-      storage: new FormControl(false)
+      storage: new FormControl(false),
+      load: new FormControl(false),
+      unload: new FormControl(false),
     });
 
     this.moveDateGroup = this._formBuilder.group({
@@ -142,6 +148,12 @@ export class MovePlannerComponent extends PageComponent {
       Garage: new FormControl(false),
       Attic: new FormControl(false),
     });
+
+    this.boxesGroup = this._formBuilder.group({
+      smBox: new FormControl(''),
+      mdBox: new FormControl(''),
+      lgBox: new FormControl(''),
+    })
 
     this.specialtyGroup = this._formBuilder.group({
       keyboard: new FormControl(false),
@@ -308,12 +320,16 @@ export class MovePlannerComponent extends PageComponent {
       ...this.toAddressGroup.controls,
       ...this.roomsGroup.controls,
       ...this.itemsGroup.controls,
+      ...this.boxesGroup.controls,
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
+    console.log('SevicesGroup values:');
+    console.log(this.servicesGroup);
     console.log("MasterForm values:");
     console.log(this.masterForm.value);
     console.log(this.masterForm.controls);
+    //TODO: Finish figuring out assigning values here.
     /*
     const newJobEstimate: IEstimate = {
       estimateID: 1,
@@ -325,27 +341,31 @@ export class MovePlannerComponent extends PageComponent {
   
       rooms: Map<string, object>,
       special: Map<string, object>,
-      small: number,
-      medium: number,
-      large: number,
-      boxes: number,
-      itemLoad: number,
-      flightMult: number,
+      small: this.boxesGroup.value.smBox,
+      medium: this.boxesGroup.value.mdBox,
+      large: this.boxesGroup.value.lgBox,
+      //TODO: calculate number of boxes based on summation of total boxes
+      boxes: 0,
+      //TODO: change this when item counts are added
+      itemLoad: 0,
+      flightMult: this.fromAddressGroup.value.fromFlights,
   
-      pack: boolean,
-      unpack: boolean,
-      load: boolean,
-      unload: boolean,
+      pack: this.servicesGroup.value.pack,
+      unpack: this.servicesGroup.value.unpack,
+      load: this.servicesGroup.value.load,
+      unload: this.servicesGroup.value.unload,
   
   
       needTruck: boolean,
-      numberWorkers: number,
-      distToJob: number,
-      distMove: number,
+      numberWorkers: 0,
+      //TODO: add with google api response
+      distToJob: 0,
+      //TODO: add with google api response
+      distMove: 0,
   
-      estimateManHours: number,
-      estimateRate: number,
-      estimateCost: number,
+      estimateManHours: 0,
+      estimateRate: 0,
+      estimateCost: 0,
     }
     */
   }
