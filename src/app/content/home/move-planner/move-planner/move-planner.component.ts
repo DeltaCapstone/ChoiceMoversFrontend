@@ -9,7 +9,9 @@ import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControll
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
 import { TuiDayOfWeek } from '@taiga-ui/cdk';
-
+import { CreateJobEstimate } from '../../../../models/create-job-estimate.model';
+import { Customer } from '../../../../models/customer.model';
+import { Address } from '../../../../models/address.model';
 @Component({
   selector: 'app-move-planner',
   standalone: true,
@@ -67,6 +69,7 @@ export class MovePlannerComponent extends PageComponent {
 
   checkedRooms: string[] = [];
 
+  //TODO: make this a map
   specialtyItems: { specialtyItem: string, count: number, control: string }[] = [];
 
   boxes: { size: string, count: number }[] = [];
@@ -283,6 +286,7 @@ export class MovePlannerComponent extends PageComponent {
   /**
    * Initializes the specialty items property that is used in the specialtyGroup form group
    */
+  //TODO: Change this to a map initialization
   initSpecialtyItems(): void {
     this.specialtyItems = [
       { specialtyItem: 'Keyboard', count: 0, control: 'keyboard' },
@@ -330,6 +334,33 @@ export class MovePlannerComponent extends PageComponent {
     console.log("MasterForm values:");
     console.log(this.masterForm.value);
     console.log(this.masterForm.controls);
+
+    const newJob: CreateJobEstimate = {
+      estimateId: 0 + Math.floor(Math.random() + 1000),
+      customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
+      loadAddr: this.masterForm.value.fromAddress,
+      unloadAddr: this.masterForm.value.toAddress,
+      startTime: this.masterForm.value.time,
+      endTime: '',
+
+      rooms: this.masterForm.value.rooms,
+      special: this.masterForm.value.specialtyItems,
+      boxes: this.masterForm.value.boxes,
+
+      pack: this.masterForm.value.pack,
+      unpack: this.masterForm.value.unpack,
+      load: this.masterForm.value.load,
+      unload: this.masterForm.value.unload,
+
+      clean: false,
+
+      //TODO implement needTruck FormGroup
+      needTruck: false,
+      distanceToJob: 0,
+      distanceTotal: 0
+
+    }
+
   }
 
   ngOnDestroy() {
