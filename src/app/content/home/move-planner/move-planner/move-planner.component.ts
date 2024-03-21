@@ -4,7 +4,7 @@ import { NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
 import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider } from '@taiga-ui/kit';
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
@@ -315,9 +315,24 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Final form submission. Sets the value of the master form and sends the newly created estimate to the backend database.
+   * Converts the boolean value of the FormControl to its FormControl name if the checkbox value is true
+   */
+  roomBoolToString(): void {
+    Object.keys(this.roomsGroup.controls).forEach(roomControl => {
+      const roomValue = this.roomsGroup.get(roomControl)?.value;
+      roomValue ? this.roomsGroup.get(roomControl)?.setValue(roomControl) : '';
+    });
+  }
+
+  /**
+   * Final form submission. Sets the value of the master form and master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
+
+    console.log('RoomsGroup converted values:');
+    this.roomBoolToString();
+    console.log(this.roomsGroup);
+
     this.masterForm = this._formBuilder.group({
       ...this.servicesGroup.controls,
       ...this.moveDateGroup.controls,
@@ -329,18 +344,14 @@ export class MovePlannerComponent extends PageComponent {
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
-    console.log('SevicesGroup values:');
-    console.log(this.servicesGroup);
     console.log("MasterForm values:");
     console.log(this.masterForm.value);
-    console.log(this.masterForm.controls);
-
     const newJob: CreateJobEstimate = {
       estimateId: 0 + Math.floor(Math.random() + 1000),
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
-      loadAddr: this.masterForm.value.fromAddress,
-      unloadAddr: this.masterForm.value.toAddress,
-      startTime: this.masterForm.value.time,
+      loadAddr: this.masterForm.value.fromAddress ?? '',
+      unloadAddr: this.masterForm.value.toAddress ?? '',
+      startTime: this.masterForm.value.date,
       endTime: '',
 
       rooms: this.masterForm.value.rooms,
