@@ -61,6 +61,8 @@ export class MovePlannerComponent extends PageComponent {
 
   specialRequestGroup: FormGroup;
 
+  specialRequestSubmissionSuccess: boolean = false;
+
   masterForm: FormGroup;
 
   roomItems: Room[] = [];
@@ -171,7 +173,7 @@ export class MovePlannerComponent extends PageComponent {
     });
 
     this.specialRequestGroup = this._formBuilder.group({
-      specialTextArea: new FormControl('Enter and special requests here')
+      specialTextArea: new FormControl('No Special Requests')
     });
   }
 
@@ -324,14 +326,22 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
+  addSpecialRequest(requests: string): void {
+    const textAreaControl = Object.keys(this.specialRequestGroup.controls);
+
+    this.specialRequestGroup.get(textAreaControl)?.setValue(requests);
+
+    this.specialRequestSubmissionSuccess = true;
+    console.log("Special Request submission success value:", this.specialRequestSubmissionSuccess);
+  }
+
   /**
    * Final form submission. Sets the value of the master form and master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
-
-    console.log('RoomsGroup converted values:');
+    console.log("Special request controls:", this.specialRequestGroup.controls);
+    console.log("Special request values:", this.specialRequestGroup.value);
     this.roomBoolToString();
-    console.log(this.roomsGroup);
 
     this.masterForm = this._formBuilder.group({
       ...this.servicesGroup.controls,

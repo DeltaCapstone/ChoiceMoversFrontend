@@ -184,9 +184,14 @@
         <ng-container *ngIf="activeStepIndex === 8">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialRequestGroup">
-                    <textarea name="specialTextArea" formGroupName="specialTextArea" id="specialTextArea" cols="30"
+                    <textarea name="specialTextArea" formGroupName="specialTextArea" #specialTextArea cols="30"
                         rows="10" class="fixed-size">  Enter any special requests here</textarea>
+                    <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3"
+                        (click)="addSpecialRequest(specialTextArea.value)">
+                        Add Special Request
+                    </button>
                 </form>
+                <div *ngIf="specialRequestSubmissionSuccess">Special Request Added to Form</div>
             </div>
         </ng-container>
     </a>
@@ -201,7 +206,6 @@
                     (click)="submitForm()">
                     Submit Move Form
                 </button>
-
             </div>
         </ng-container>
     </a>
