@@ -46,6 +46,8 @@ export class MovePlannerComponent extends PageComponent {
 
   servicesGroup: FormGroup;
 
+  needTruckGroup: FormGroup;
+
   moveDateGroup: FormGroup;
 
   fromAddressGroup: FormGroup;
@@ -72,10 +74,9 @@ export class MovePlannerComponent extends PageComponent {
 
   checkedRooms: string[] = [];
 
-  //TODO: make this a map
   specialtyItems: { specialtyItem: string, count: number, control: string }[] = [];
 
-  boxes: { size: string, count: number }[] = [];
+  boxes: Map<string, number>;
 
   get roomItemsFiltered(): Room[] {
     return this.roomItems.filter(item => this.checkedRooms.includes(item.roomName));
@@ -113,6 +114,10 @@ export class MovePlannerComponent extends PageComponent {
       load: new FormControl(false),
       unload: new FormControl(false),
     });
+
+    this.needTruckGroup = this._formBuilder.group({
+      needTruck: new FormControl(false)
+    })
 
     this.moveDateGroup = this._formBuilder.group({
       date: new FormControl(),
@@ -198,7 +203,7 @@ export class MovePlannerComponent extends PageComponent {
       });
     }
 
-    if (this.activeStepIndex === 5) {
+    if (this.activeStepIndex === 6) {
       this.populateRoomItems();
     }
 
@@ -308,7 +313,6 @@ export class MovePlannerComponent extends PageComponent {
     ]
   }
 
-
   /**
    * Retreive room items based on roomName. Used to help with dynamic population of items stepper section
    * @param roomName A specific room name checked by the user in the form
@@ -362,21 +366,20 @@ export class MovePlannerComponent extends PageComponent {
     console.log("MasterForm values:");
     console.log(this.masterForm.value);
     const newJob: CreateJobEstimate = {
-      estimateId: 0 + Math.floor(Math.random() + 1000),
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
       loadAddr: this.masterForm.value.fromAddress ?? '',
       unloadAddr: this.masterForm.value.toAddress ?? '',
-      startTime: this.masterForm.value.date,
-      endTime: '',
+      startTime: this.masterForm.value.date ?? '',
+      endTime: '' ?? '',
 
-      rooms: this.masterForm.value.rooms,
-      special: this.masterForm.value.specialtyItems,
-      boxes: this.masterForm.value.boxes,
+      rooms: this.masterForm.value.rooms ?? [],
+      special: this.masterForm.value.specialtyItems ?? [],
+      boxes: this.masterForm.value.boxes ?? new Map(),
 
-      pack: this.masterForm.value.pack,
-      unpack: this.masterForm.value.unpack,
-      load: this.masterForm.value.load,
-      unload: this.masterForm.value.unload,
+      pack: this.masterForm.value.pack ?? false,
+      unpack: this.masterForm.value.unpack ?? false,
+      load: this.masterForm.value.load ?? false,
+      unload: this.masterForm.value.unload ?? false,
 
       clean: false,
 

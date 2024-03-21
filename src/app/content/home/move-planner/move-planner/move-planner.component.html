@@ -16,8 +16,19 @@
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
-        Move Date
+        Need a Truck?
         <ng-container *ngIf="activeStepIndex === 1">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form [formGroup]="needTruckGroup">
+                    <tui-checkbox-block class="mb-4" formControlName="needTruck">Will you be needing a
+                        truck?</tui-checkbox-block>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        Move Date
+        <ng-container *ngIf="activeStepIndex === 2">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="moveDateGroup">
                     <tui-input-date formControlName="date" class="w-64">
@@ -30,7 +41,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         From Address
-        <ng-container *ngIf="activeStepIndex === 2">
+        <ng-container *ngIf="activeStepIndex === 3">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="fromAddressGroup">
                     <tui-input formControlName="fromAddress" class="w-64">
@@ -67,7 +78,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         To Address
-        <ng-container *ngIf="activeStepIndex === 3">
+        <ng-container *ngIf="activeStepIndex === 4">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="toAddressGroup">
                     <tui-input formControlName="toAddress" class="w-64">
@@ -104,7 +115,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Rooms
-        <ng-container *ngIf="activeStepIndex === 4">
+        <ng-container *ngIf="activeStepIndex === 5">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="roomsGroup">
                     <tui-checkbox-block class="mb-2" formControlName="Bedroom">Bedroom</tui-checkbox-block>
@@ -124,7 +135,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Items
-        <ng-container *ngIf="activeStepIndex === 5">
+        <ng-container *ngIf="activeStepIndex === 6">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="roomsGroup">
                     <tui-accordion class="container" [rounded]="false">
@@ -140,7 +151,8 @@
                                 <h3 class="form-title">Room Items</h3>
                                 <form class="operation-form" [formGroup]="itemsGroup">
                                     <!--Populate room items-->
-                                    <tui-input-number class="b-form" *ngFor="let item of room.items | keyvalue"
+                                    <tui-input-number [min]="0" class="b-form"
+                                        *ngFor="let item of room.items | keyvalue"
                                         formControlName="{{item.key}}">{{item.key}}
                                     </tui-input-number>
                                 </form>
@@ -153,14 +165,14 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Boxes Needed
-        <ng-container *ngIf="activeStepIndex === 6">
+        <ng-container *ngIf="activeStepIndex === 7">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="boxesGroup">
-                    <tui-input-number class="b-form" value="value" formControlName="smBox">Small
+                    <tui-input-number [min]="0" class="b-form" value="value" formControlName="smBox">Small
                         Boxes</tui-input-number>
-                    <tui-input-number class="b-form" value="value" formControlName="mdBox">Medium
+                    <tui-input-number [min]="0" class="b-form" value="value" formControlName="mdBox">Medium
                         Boxes</tui-input-number>
-                    <tui-input-number class="b-form" value="value" formControlName="lgBox">Large
+                    <tui-input-number [min]="0" class="b-form" value="value" formControlName="lgBox">Large
                         Boxes</tui-input-number>
                 </form>
             </div>
@@ -168,11 +180,11 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Specialty Items
-        <ng-container *ngIf="activeStepIndex === 7">
+        <ng-container *ngIf="activeStepIndex === 8">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialtyGroup">
                     <!--Populate specialty items-->
-                    <tui-input-number class="b-form" value="value" *ngFor="let item of specialtyItems"
+                    <tui-input-number [min]="0" class="b-form" value="value" *ngFor="let item of specialtyItems"
                         formControlName="{{item.control}}">{{item.specialtyItem}}
                     </tui-input-number>
                 </form>
@@ -181,7 +193,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Special Requests
-        <ng-container *ngIf="activeStepIndex === 8">
+        <ng-container *ngIf="activeStepIndex === 9">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialRequestGroup">
                     <textarea name="specialTextArea" formGroupName="specialTextArea" #specialTextArea cols="30"
@@ -197,7 +209,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Finalize and Submit
-        <ng-container *ngIf="activeStepIndex === 9">
+        <ng-container *ngIf="activeStepIndex === 10">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <ng-template #icon>
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>

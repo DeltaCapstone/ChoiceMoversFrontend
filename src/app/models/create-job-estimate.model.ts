@@ -9,7 +9,6 @@ import { Room } from "./room.model";
  */
 
 export interface ICreateJob {
-    jobId: string;
     manHours: number;
     rate: number;
     cost: number;
@@ -25,7 +24,6 @@ export interface ICreateJob {
  */
 
 export interface ICreateJobEstimate {
-    estimateId: number;
     customer: Customer;
     loadAddr: Address;
     unloadAddr: Address;
@@ -33,7 +31,7 @@ export interface ICreateJobEstimate {
     endTime: string;
 
     rooms: Room[];
-    special: Map<string, number>;
+    special: Object[]; //change to array of objects
     boxes: Map<string, number>
 
     pack: boolean;
@@ -52,7 +50,6 @@ export interface ICreateJobEstimate {
  * Class that defines a CreateJobEstimate object and its properties and methods
  */
 export class CreateJobEstimate implements ICreateJobEstimate {
-    estimateId: number;
     customer: Customer;
     loadAddr: Address;
     unloadAddr: Address;
@@ -60,7 +57,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     endTime: string;
 
     rooms: Room[];
-    special: Map<string, number>;
+    special: Object[];
     boxes: Map<string, number>
 
     pack: boolean;
@@ -75,7 +72,6 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     distanceTotal: number;
 
     constructor(
-        estimateId: number = 0,
         customer: Customer = new Customer(),
         loadAddr: Address = new Address(),
         unloadAddr: Address = new Address(),
@@ -83,7 +79,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         endTime: string = '',
 
         rooms: Room = new Room('', new Map()),
-        special: Map<string, number> = new Map(),
+        special: Object[] = [],
         boxes: Map<string, number> = new Map(),
 
         pack: boolean = false,
@@ -97,7 +93,6 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         distanceToJob: number = 0,
         distanceTotal: number = 0
     ) {
-        this.estimateId = estimateId;
         this.customer = customer;
         this.loadAddr = loadAddr;
         this.unloadAddr = unloadAddr;
@@ -105,7 +100,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         this.endTime = endTime;
 
         this.rooms.push(rooms);
-        this.special = special;
+        this.special.push(special);
         this.boxes = boxes;
 
         this.pack = pack;
@@ -123,7 +118,6 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 }
 
 export class CreateJob extends CreateJobEstimate implements ICreateJob {
-    jobId: string;
     manHours: number;
     rate: number;
     cost: number;
@@ -135,7 +129,6 @@ export class CreateJob extends CreateJobEstimate implements ICreateJob {
     notes: string;
 
     constructor(
-        jobId: string = '',
         manHours: number = 0,
         rate: number = 0,
         cost: number = 0,
@@ -147,7 +140,6 @@ export class CreateJob extends CreateJobEstimate implements ICreateJob {
         notes: string = ''
     ) {
         super();
-        this.jobId = jobId;
         this.manHours = manHours;
         this.rate = rate;
         this.cost = cost;
