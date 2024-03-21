@@ -4,7 +4,7 @@ import { NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
 import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider } from '@taiga-ui/kit';
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
@@ -12,6 +12,7 @@ import { TuiDayOfWeek } from '@taiga-ui/cdk';
 import { CreateJobEstimate } from '../../../../models/create-job-estimate.model';
 import { Customer } from '../../../../models/customer.model';
 import { Address } from '../../../../models/address.model';
+
 @Component({
   selector: 'app-move-planner',
   standalone: true,
@@ -173,7 +174,7 @@ export class MovePlannerComponent extends PageComponent {
     });
 
     this.specialRequestGroup = this._formBuilder.group({
-      specialTextArea: new FormControl('No Special Requests')
+      specialTextArea: new FormArray([])
     });
   }
 
@@ -200,6 +201,8 @@ export class MovePlannerComponent extends PageComponent {
     if (this.activeStepIndex === 5) {
       this.populateRoomItems();
     }
+
+    this.specialRequestSubmissionSuccess = false;
   }
 
   /**
@@ -327,12 +330,14 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   addSpecialRequest(requests: string): void {
-    const textAreaControl = Object.keys(this.specialRequestGroup.controls);
 
-    this.specialRequestGroup.get(textAreaControl)?.setValue(requests);
+    const specialRequest = this.specialRequestGroup.get('specialTextArea') as FormArray
+
+    specialRequest.push(this._formBuilder.control(requests));
+
+    console.log(this.specialRequestGroup.value);
 
     this.specialRequestSubmissionSuccess = true;
-    console.log("Special Request submission success value:", this.specialRequestSubmissionSuccess);
   }
 
   /**
