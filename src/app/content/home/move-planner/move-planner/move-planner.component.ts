@@ -9,8 +9,6 @@ import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControll
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
 import { TuiDayOfWeek } from '@taiga-ui/cdk';
-import { IEstimate } from '../../../../models/job.model';
-import { Customer } from '../../../../models/customer.model';
 
 @Component({
   selector: 'app-move-planner',
@@ -332,45 +330,6 @@ export class MovePlannerComponent extends PageComponent {
     console.log("MasterForm values:");
     console.log(this.masterForm.value);
     console.log(this.masterForm.controls);
-    //TODO: Finish figuring out assigning values here.
-    /*
-    const newJobEstimate: IEstimate = {
-      estimateID: 1,
-      customer: new Customer('JohnDoe', '', 'John', 'Doe', 'johndoe@johndoe.com', '330-330-3300', '330-330-3300'),
-      loadAddr: this.masterForm.value.fromAddress,
-      unloadAddr: this.masterForm.value.toAddress,
-      startTime: this.masterForm.value.time,
-      endTime: '',
-  
-      rooms: Map<string, object>,
-      special: Map<string, object>,
-      small: this.boxesGroup.value.smBox,
-      medium: this.boxesGroup.value.mdBox,
-      large: this.boxesGroup.value.lgBox,
-      //TODO: calculate number of boxes based on summation of total boxes
-      boxes: 0,
-      //TODO: change this when item counts are added
-      itemLoad: 0,
-      flightMult: this.fromAddressGroup.value.fromFlights,
-  
-      pack: this.servicesGroup.value.pack,
-      unpack: this.servicesGroup.value.unpack,
-      load: this.servicesGroup.value.load,
-      unload: this.servicesGroup.value.unload,
-  
-  
-      needTruck: boolean,
-      numberWorkers: 0,
-      //TODO: add with google api response
-      distToJob: 0,
-      //TODO: add with google api response
-      distMove: 0,
-  
-      estimateManHours: 0,
-      estimateRate: 0,
-      estimateCost: 0,
-    }
-    */
   }
 
   ngOnDestroy() {
