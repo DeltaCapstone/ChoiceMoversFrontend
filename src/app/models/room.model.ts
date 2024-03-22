@@ -30,8 +30,8 @@ export class Room implements IRoom {
         return this.items;
     }
 
-    setItems(item: Map<string, number>): void {
-        this.items = item;
+    setItems(items: Map<string, number>): void {
+        this.items = items;
     }
 
 }

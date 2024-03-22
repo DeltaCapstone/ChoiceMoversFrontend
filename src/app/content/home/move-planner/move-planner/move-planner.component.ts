@@ -250,8 +250,8 @@ export class MovePlannerComponent extends PageComponent {
       // Retrieve room items based on the roomName
       const itemsMap = this.getRoomItems(roomName);
 
-      for (const key of itemsMap.keys()) {
-        this.itemsGroup.addControl(key, new FormControl());
+      for (const item of itemsMap.keys()) {
+        this.itemsGroup.addControl(item, new FormControl());
       }
     });
   }
@@ -264,8 +264,8 @@ export class MovePlannerComponent extends PageComponent {
       new Room('Bedroom', new Map([['Bed', 0], ['Bed Frame', 0], ['Lighting', 0], ['Arm Chair', 0], ['TV', 0], ['Dresser', 0]])),
       new Room('Kitchen', new Map([['Table', 0], ['Chairs', 0], ['Refrigerator', 0], ['Stove', 0], ['Microwave', 0], ['Dishwasher', 0], ['Pots and Pans', 0], ['Dishes', 0], ['Trash Can', 0]])),
       new Room('Dining', new Map([['Table', 0], ['Chairs', 0], ['Lighting', 0], ['China', 0], ['Art', 0], ['Chadelier', 0], ['Centerpieces', 0], ['Tablecloths', 0], ['Cabinets', 0], ['Shelving', 0]])),
-      new Room('Family', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['T.V.', 0], ['Armchairs', 0], ['Recliners', 0]])),
-      new Room('Living', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['T.V.', 0], ['Armchairs', 0], ['Recliners', 0]])),
+      new Room('Family', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['TV', 0], ['Armchairs', 0], ['Recliners', 0]])),
+      new Room('Living', new Map([['Couch', 0], ['Rugs', 0], ['Lighting', 0], ['Pillows', 0], ['Blankets', 0], ['Bookshelves', 0], ['Entertainment Center', 0], ['Consoles', 0], ['DVD or Blu-ray Player', 0], ['TV', 0], ['Armchairs', 0], ['Recliners', 0]])),
       new Room('Laundry', new Map([['Washer', 0], ['Dryer', 0], ['Ironing Board', 0], ['Laundry Sink', 0], ['Cleaning Supplies', 0]])),
       new Room('Bathroom', new Map([['Bath rugs and mats', 0], ['Shower Curtains', 0], ['Shower Curtain Rod', 0], ['Trash Can', 0], ['Scale', 0], ['Toilet Brush', 0], ['Plunger', 0], ['Bathroom Accessories', 0]])),
       new Room('Office', new Map([['Computer', 0], ['Desk', 0], ['Lighting', 0], ['Arm Chair', 0], ['TV', 0], ['Cabinets', 0], ['Bookeshelves', 0], ['Printer', 0], ['Keyboard and Mouse', 0], ['Cables and Wiring', 0], ['Office Chair', 0]])),
@@ -299,6 +299,7 @@ export class MovePlannerComponent extends PageComponent {
    * @param roomName A specific room name checked by the user in the form
    * @returns The items associated with the selected room names; empty array otherwise
    */
+  //TODO:SEE IF THIS CAN BE REPLACED WITH ROOM GETITEMS() FUNCTION 
   getRoomItems(roomName: string): Map<string, number> {
     const room = this.roomItems.find(item => item.roomName === roomName);
     return room ? room.items : new Map();
@@ -343,17 +344,48 @@ export class MovePlannerComponent extends PageComponent {
     addressGroup.addControl('fullAddress', new FormControl(fullAddress));
   }
 
-  populateFormRoomsAndItems(): Room[] {
-    let chosenRoomsAndItems: Room[] = [];
-    this.checkedRooms.forEach(room => {
-      let roomToAdd = new Room('', new Map());
-      roomToAdd.setRoomName(room);
-      chosenRoomsAndItems.push(roomToAdd);
+  /**
+   * Sets the user's chosen rooms for the move and the associated items for those rooms
+   * @returns An array of Room objects that the user chose via the form
+   */
+  populateFormRooms(): Room[] {
+    let chosenRooms: Room[] = [];
+
+    //create room objects with the given room name based on rooms the customer check in the form
+    this.checkedRooms.forEach(roomName => {
+      let roomToAdd = new Room(roomName, new Map<string, number>());
+      chosenRooms.push(roomToAdd);
     });
-    //TODO: Need to get items and item counts for associated rooms (maybe using itemsGroup.values?)
-    return chosenRoomsAndItems
+
+    console.log('Rooms added to form:', chosenRooms);
+
+    return chosenRooms;
   }
 
+  /**
+   * Populates room items based on user input from the move planner form
+   * @param formRooms An array of rooms of type Room the user selected for their move 
+   */
+  populateFormItems(formRooms: Room[]): void {
+    //for each checked room, iterate over the checked rooms to populate the itemsMap
+    formRooms.forEach(formRoom => {
+      let room = this.roomItems.find(item => item.roomName === formRoom.roomName)
+      if (room) {
+        let itemsMap = new Map<string, number>();
+
+        //iterate over room's associated items
+        room.items.forEach((value, key) => {
+          //get user input count for number of items based on FormControl
+          let control = this.itemsGroup.get(key);
+          let itemCount = control ? (control.value as number) : 0;
+
+          itemsMap.set(key, itemCount);
+        });
+
+        formRoom.setItems(itemsMap);
+      }
+    });
+  }
   /**
    * Final form submission. Sets the value of the master form and master object newJob, and sends the newly created estimate to the backend database.
    */
@@ -371,6 +403,7 @@ export class MovePlannerComponent extends PageComponent {
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
+    this.populateFormItems(this.populateFormRooms());
     console.log("MasterForm values:", this.masterForm.value);
     const newJob: CreateJobEstimate = {
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
@@ -379,8 +412,7 @@ export class MovePlannerComponent extends PageComponent {
       startTime: this.masterForm.value.date + ' ' + this.masterForm.value.time,
       endTime: '',
 
-      //NEED TO GET ITEMS, rooms adding properly now
-      rooms: this.populateFormRoomsAndItems() ?? [],
+      rooms: this.populateFormRooms() ?? [],
       //incorrectly added to form
       special: this.masterForm.value.specialtyItems ?? [],
       //incorrectly added to form
