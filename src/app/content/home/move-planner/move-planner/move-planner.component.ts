@@ -299,7 +299,6 @@ export class MovePlannerComponent extends PageComponent {
    * @param roomName A specific room name checked by the user in the form
    * @returns The items associated with the selected room names; empty array otherwise
    */
-  //TODO:SEE IF THIS CAN BE REPLACED WITH ROOM GETITEMS() FUNCTION 
   getRoomItems(roomName: string): Map<string, number> {
     const room = this.roomItems.find(item => item.roomName === roomName);
     return room ? room.items : new Map();
@@ -403,6 +402,7 @@ export class MovePlannerComponent extends PageComponent {
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
+    console.log("Boxes map value (testing specialtyGroup.value):", this.specialtyGroup.value);
     this.populateFormItems(this.populateFormRooms());
     console.log("MasterForm values:", this.masterForm.value);
     const newJob: CreateJobEstimate = {
@@ -413,10 +413,10 @@ export class MovePlannerComponent extends PageComponent {
       endTime: '',
 
       rooms: this.populateFormRooms() ?? [],
-      //incorrectly added to form
-      special: this.masterForm.value.specialtyItems ?? [],
-      //incorrectly added to form
-      boxes: this.masterForm.value.boxes ?? new Map(),
+
+      special: this.specialtyGroup.value ?? [],
+
+      boxes: this.boxesGroup.value ?? new Map(),
 
       pack: this.servicesGroup.value.packing,
       unpack: this.servicesGroup.value.unpack,
