@@ -65,8 +65,6 @@ export class MovePlannerComponent extends PageComponent {
 
   specialRequestSubmissionSuccess: boolean = false;
 
-  masterForm: FormGroup;
-
   roomItems: Room[] = [];
 
   activeStepIndex: number = 0;
@@ -365,7 +363,8 @@ export class MovePlannerComponent extends PageComponent {
    * Populates room items based on user input from the move planner form
    * @param formRooms An array of rooms of type Room the user selected for their move 
    */
-  populateFormItems(formRooms: Room[]): void {
+  populateFormItems(formRooms: Room[]): Room[] {
+    let itemsForRooms: Room[] = [];
     //for each checked room, iterate over the checked rooms to populate the itemsMap
     formRooms.forEach(formRoom => {
       let room = this.roomItems.find(item => item.roomName === formRoom.roomName)
@@ -379,40 +378,31 @@ export class MovePlannerComponent extends PageComponent {
           let itemCount = control ? (control.value as number) : 0;
 
           itemsMap.set(key, itemCount);
-        });
 
+        });
+        console.log('Items map:', itemsMap);
         formRoom.setItems(itemsMap);
+        itemsForRooms.push(formRoom);
       }
     });
+    return itemsForRooms;
   }
   /**
-   * Final form submission. Sets the value of the master form and master object newJob, and sends the newly created estimate to the backend database.
+   * Final form submission. Sets the value of the master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
     this.roomBoolToString();
     this.concatenateAddresses(this.toAddressGroup);
     this.concatenateAddresses(this.fromAddressGroup);
-    this.masterForm = this._formBuilder.group({
-      ...this.servicesGroup.controls,
-      ...this.needTruckGroup.controls,
-      ...this.moveDateGroup.controls,
-      ...this.roomsGroup.controls,
-      ...this.itemsGroup.controls,
-      ...this.boxesGroup.controls,
-      ...this.specialtyGroup.controls,
-      ...this.specialRequestGroup.controls,
-    });
-    console.log("Boxes map value (testing specialtyGroup.value):", this.specialtyGroup.value);
-    this.populateFormItems(this.populateFormRooms());
-    console.log("MasterForm values:", this.masterForm.value);
+
     const newJob: CreateJobEstimate = {
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
       loadAddr: this.fromAddressGroup.value.fullAddress,
       unloadAddr: this.toAddressGroup.value.fullAddress,
-      startTime: this.masterForm.value.date + ' ' + this.masterForm.value.time,
+      startTime: this.moveDateGroup.value.date + ' ' + this.moveDateGroup.value.time,
       endTime: '',
 
-      rooms: this.populateFormRooms() ?? [],
+      rooms: this.populateFormItems(this.populateFormRooms()) ?? [],
 
       special: this.specialtyGroup.value ?? [],
 
