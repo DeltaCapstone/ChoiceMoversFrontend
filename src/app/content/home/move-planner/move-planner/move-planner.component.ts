@@ -11,7 +11,6 @@ import { Room } from '../../../../models/room.model';
 import { TuiDayOfWeek } from '@taiga-ui/cdk';
 import { CreateJobEstimate } from '../../../../models/create-job-estimate.model';
 import { Customer } from '../../../../models/customer.model';
-import { Address } from '../../../../models/address.model';
 
 @Component({
   selector: 'app-move-planner',
@@ -107,10 +106,8 @@ export class MovePlannerComponent extends PageComponent {
    */
   buildForm(): void {
     this.servicesGroup = this._formBuilder.group({
-      moving: new FormControl(false),
       packing: new FormControl(false),
       unpack: new FormControl(false),
-      storage: new FormControl(false),
       load: new FormControl(false),
       unload: new FormControl(false),
     });
@@ -184,24 +181,13 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Changes the activeStepIndex based on which stepper step the user is on currently, and then sets the FormControls to the user input values
+   * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.
    * @param curentGroup The current FormGroup for the associated stepper section
    */
-  onActiveStepIndexChange(index: number, currentGroup: FormGroup): void {
-    currentGroup = this.findCurrentFormGroup(index);
+  onActiveStepIndexChange(index: number): void {
+
     this.activeStepIndex = index;
-    if (currentGroup != null) {
-      const currentControls = Object.keys(currentGroup.controls)
-
-      currentControls.forEach(controlName => {
-        const control: FormControl = currentGroup.controls[controlName] as FormControl;
-
-        const userInputValue = control.value;
-
-        control.setValue(userInputValue);
-      });
-    }
 
     if (this.activeStepIndex === 6) {
       this.populateRoomItems();
@@ -264,13 +250,9 @@ export class MovePlannerComponent extends PageComponent {
       // Retrieve room items based on the roomName
       const itemsMap = this.getRoomItems(roomName);
 
-      console.log(itemsMap.keys());
-
       for (const key of itemsMap.keys()) {
-        console.log(key);
         this.itemsGroup.addControl(key, new FormControl());
       }
-      console.log(this.itemsGroup);
     });
   }
 
@@ -296,7 +278,6 @@ export class MovePlannerComponent extends PageComponent {
   /**
    * Initializes the specialty items property that is used in the specialtyGroup form group
    */
-  //TODO: Change this to a map initialization
   initSpecialtyItems(): void {
     this.specialtyItems = [
       { specialtyItem: 'Keyboard', count: 0, control: 'keyboard' },
@@ -333,63 +314,90 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
+  /**
+   * Adds special requests FormControls from the form text area to the specialRequestGroup 
+   * @param requests Special requests inputted byt the customer in the special requests text area of the move form
+   */
   addSpecialRequest(requests: string): void {
 
     const specialRequest = this.specialRequestGroup.get('specialTextArea') as FormArray
 
     specialRequest.push(this._formBuilder.control(requests));
 
-    console.log(this.specialRequestGroup.value);
-
     this.specialRequestSubmissionSuccess = true;
+  }
+
+  /**
+   * Concatenates all address fields into a single string for the CreateJobEstimate object
+   * @param addressGroup Specifies the toAddress or fromAddress FormGroups
+   */
+  concatenateAddresses(addressGroup: FormGroup): void {
+    let fullAddress: string = '';
+
+    const addressControls = Object.keys(addressGroup.controls)
+
+    addressControls.forEach(control => {
+      fullAddress += addressGroup.get(control)?.value + ' ';
+    });
+
+    addressGroup.addControl('fullAddress', new FormControl(fullAddress));
+  }
+
+  populateFormRoomsAndItems(): Room[] {
+    let chosenRoomsAndItems: Room[] = [];
+    this.checkedRooms.forEach(room => {
+      let roomToAdd = new Room('', new Map());
+      roomToAdd.setRoomName(room);
+      chosenRoomsAndItems.push(roomToAdd);
+    });
+    //TODO: Need to get items and item counts for associated rooms (maybe using itemsGroup.values?)
+    return chosenRoomsAndItems
   }
 
   /**
    * Final form submission. Sets the value of the master form and master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
-    console.log("Special request controls:", this.specialRequestGroup.controls);
-    console.log("Special request values:", this.specialRequestGroup.value);
     this.roomBoolToString();
-
+    this.concatenateAddresses(this.toAddressGroup);
+    this.concatenateAddresses(this.fromAddressGroup);
     this.masterForm = this._formBuilder.group({
       ...this.servicesGroup.controls,
+      ...this.needTruckGroup.controls,
       ...this.moveDateGroup.controls,
-      ...this.fromAddressGroup.controls,
-      ...this.toAddressGroup.controls,
       ...this.roomsGroup.controls,
       ...this.itemsGroup.controls,
       ...this.boxesGroup.controls,
       ...this.specialtyGroup.controls,
       ...this.specialRequestGroup.controls,
     });
-    console.log("MasterForm values:");
-    console.log(this.masterForm.value);
+    console.log("MasterForm values:", this.masterForm.value);
     const newJob: CreateJobEstimate = {
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
-      loadAddr: this.masterForm.value.fromAddress ?? '',
-      unloadAddr: this.masterForm.value.toAddress ?? '',
-      startTime: this.masterForm.value.date ?? '',
-      endTime: '' ?? '',
+      loadAddr: this.fromAddressGroup.value.fullAddress,
+      unloadAddr: this.toAddressGroup.value.fullAddress,
+      startTime: this.masterForm.value.date + ' ' + this.masterForm.value.time,
+      endTime: '',
 
-      rooms: this.masterForm.value.rooms ?? [],
+      //NEED TO GET ITEMS, rooms adding properly now
+      rooms: this.populateFormRoomsAndItems() ?? [],
+      //incorrectly added to form
       special: this.masterForm.value.specialtyItems ?? [],
+      //incorrectly added to form
       boxes: this.masterForm.value.boxes ?? new Map(),
 
-      pack: this.masterForm.value.pack ?? false,
-      unpack: this.masterForm.value.unpack ?? false,
-      load: this.masterForm.value.load ?? false,
-      unload: this.masterForm.value.unload ?? false,
+      pack: this.servicesGroup.value.packing,
+      unpack: this.servicesGroup.value.unpack,
+      load: this.servicesGroup.value.load,
+      unload: this.servicesGroup.value.unload,
 
       clean: false,
 
-      //TODO implement needTruck FormGroup
-      needTruck: false,
+      needTruck: this.needTruckGroup.value,
       distanceToJob: 0,
       distanceTotal: 0
-
     }
-
+    console.log(newJob);
   }
 
   ngOnDestroy() {

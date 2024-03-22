@@ -1,14 +1,12 @@
 <tui-stepper [activeItemIndex]="activeStepIndex" tuiMode="onDark" class="dark text-lg flex"
-    (activeItemIndexChange)="onActiveStepIndexChange($event, currentFormGroup)" [tuiTextfieldCleaner]="true">
+    (activeItemIndexChange)="onActiveStepIndexChange($event)" [tuiTextfieldCleaner]="true">
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Services
         <ng-container *ngIf="activeStepIndex === 0">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="servicesGroup">
-                    <tui-checkbox-block class="mb-4" formControlName="moving">Moving</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="packing">Packing</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="unpack">Unpacking</tui-checkbox-block>
-                    <tui-checkbox-block class="mb-4" formControlName="storage">Storage</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="load">Load</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="unload">Unload</tui-checkbox-block>
                 </form>
