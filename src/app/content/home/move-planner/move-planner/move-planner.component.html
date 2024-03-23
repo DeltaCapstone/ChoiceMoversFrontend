@@ -28,11 +28,14 @@
         Move Date
         <ng-container *ngIf="activeStepIndex === 2">
             <div class="absolute inset-x-0 top-full mt-4">
-                <form [formGroup]="moveDateGroup">
-                    <tui-input-date formControlName="date" class="w-64">
-                        Choose a Move Date
-                    </tui-input-date>
-                    <tui-input-time formControlName="time" class="w-64">Choose a Move Time</tui-input-time>
+                <form class="b-form" [formGroup]="moveDateGroup" [tuiTextfieldCleaner]="true">
+                    <tui-input-date-time class="b-form w-64" formControlName="dateTime"
+                        [tuiTextfieldPostfix]="postfix">Choose Date and
+                        Time</tui-input-date-time>
+                    <p class="text-sm">Toggle Switch Below For AM/PM</p>
+                    <div class="bg-secondary rounded-lg w-16 p-1">
+                        <tui-toggle formControlName="isPm" size="l"></tui-toggle>
+                    </div>
                 </form>
             </div>
         </ng-container>
@@ -213,7 +216,7 @@
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>
                 </ng-template>
                 <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
-                    (click)="submitForm()">
+                    (click)="submitForm()" [disabled]="!moveDateGroup.valid">
                     Submit Move Form
                 </button>
             </div>

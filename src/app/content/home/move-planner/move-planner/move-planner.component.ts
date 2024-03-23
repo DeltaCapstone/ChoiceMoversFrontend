@@ -1,21 +1,21 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgFor } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
-import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider } from '@taiga-ui/kit';
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider, TUI_DATE_TIME_VALUE_TRANSFORMER, TuiInputDateTimeModule, tuiInputTimeOptionsProvider, TuiToggleModule } from '@taiga-ui/kit';
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray, Validators, ValidatorFn } from '@angular/forms';
 import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
-import { TuiDayOfWeek } from '@taiga-ui/cdk';
+import { TuiDay, TuiDayOfWeek, TuiTime, TuiValidatorModule } from '@taiga-ui/cdk';
 import { CreateJobEstimate } from '../../../../models/create-job-estimate.model';
 import { Customer } from '../../../../models/customer.model';
+import { ValueTransformerService } from '../../../../shared/services/value-transformer.service';
 
 @Component({
   selector: 'app-move-planner',
   standalone: true,
-  imports: [CommonModule, NgFor, TuiStepperModule, TuiCheckboxBlockModule, FormsModule, ReactiveFormsModule, TuiButtonModule, TuiSvgModule, TuiInputDateModule, TuiTextfieldControllerModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule],
+  imports: [CommonModule, NgFor, TuiStepperModule, TuiCheckboxBlockModule, FormsModule, ReactiveFormsModule, TuiButtonModule, TuiSvgModule, TuiInputDateModule, TuiTextfieldControllerModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, TuiValidatorModule, TuiInputDateTimeModule, TuiToggleModule],
   templateUrl: './move-planner.component.html',
   styleUrl: './move-planner.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,18 +23,25 @@ import { Customer } from '../../../../models/customer.model';
     tuiInputNumberOptionsProvider({
       decimal: 'never',
       step: 1,
+    }), tuiInputTimeOptionsProvider({
+      mode: 'HH:MM',
+      maxValues: { HH: 11, MM: 59, SS: 59, MS: 999 },
     }),
     {
       provide: TUI_BUTTON_OPTIONS,
       useValue: {
         appearance: 'primary',
         size: 'm',
-        shape: 'rounded'
+        shape: 'rounded',
       }
     },
     {
       provide: TUI_FIRST_DAY_OF_WEEK,
       useValue: TuiDayOfWeek.Sunday,
+    },
+    {
+      provide: TUI_DATE_TIME_VALUE_TRANSFORMER,
+      useClass: ValueTransformerService,
     }
   ]
 })
@@ -48,6 +55,14 @@ export class MovePlannerComponent extends PageComponent {
   needTruckGroup: FormGroup;
 
   moveDateGroup: FormGroup;
+
+  currentDay: TuiDay = TuiDay.currentLocal();
+
+  currentTime: TuiTime = TuiTime.currentLocal();
+
+  get postfix(): string {
+    return this.moveDateGroup.value?.isPm ? 'PM' : 'AM';
+  }
 
   fromAddressGroup: FormGroup;
 
@@ -85,7 +100,7 @@ export class MovePlannerComponent extends PageComponent {
    * @param _formBuilder A utility used to simplify the process of creating and managing reactive forms
    * @param _router A module that provides a powerful way to handle navigation within the component page
    */
-  constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router) {
+  constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router, private _valueTransformerService: ValueTransformerService) {
     super(pageService);
   }
 
@@ -115,8 +130,8 @@ export class MovePlannerComponent extends PageComponent {
     })
 
     this.moveDateGroup = this._formBuilder.group({
-      date: new FormControl(),
-      time: new FormControl()
+      dateTime: new FormControl('23.03.2024, 07:05'),
+      isPm: new FormControl(false),
     });
 
     this.fromAddressGroup = this._formBuilder.group({
@@ -178,6 +193,10 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
+  //--Validation Section-------------------------------------------------------------
+
+
+  //--End Validation Section---------------------------------------------------------
   /**
    * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.
@@ -387,6 +406,7 @@ export class MovePlannerComponent extends PageComponent {
     });
     return itemsForRooms;
   }
+
   /**
    * Final form submission. Sets the value of the master object newJob, and sends the newly created estimate to the backend database.
    */
@@ -394,12 +414,12 @@ export class MovePlannerComponent extends PageComponent {
     this.roomBoolToString();
     this.concatenateAddresses(this.toAddressGroup);
     this.concatenateAddresses(this.fromAddressGroup);
-
+    console.log(this.moveDateGroup.value);
     const newJob: CreateJobEstimate = {
       customer: new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567'),
       loadAddr: this.fromAddressGroup.value.fullAddress,
       unloadAddr: this.toAddressGroup.value.fullAddress,
-      startTime: this.moveDateGroup.value.date + ' ' + this.moveDateGroup.value.time,
+      startTime: this.moveDateGroup.value.dateTime,
       endTime: '',
 
       rooms: this.populateFormItems(this.populateFormRooms()) ?? [],
