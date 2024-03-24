@@ -28,6 +28,8 @@ import { SessionService } from '../../../shared/services/session.service';
 })
 export class EmployeesComponent extends PageComponent {
     subscriptions: Subscription[] = [];
+    readonly columns = ["name", "email", "employeeType"];
+    searchInput = new FormControl('');
     employees$: Observable<Employee[]>;
     filteredEmployees$: Observable<Employee[]> = new Observable<Employee[]>;
 
@@ -40,7 +42,7 @@ export class EmployeesComponent extends PageComponent {
             debounceTime(100),
             map(([employees, filterValue]) => employees.filter(employee => {
                 filterValue = (filterValue ?? "").toLowerCase();
-                
+
                 const fullName = `${employee.firstName} ${employee.lastName}`;
                 return fullName.toLowerCase().includes(filterValue) ||
                     employee.email.toLowerCase().includes(filterValue) ||
@@ -58,11 +60,7 @@ export class EmployeesComponent extends PageComponent {
         this.session.guardWithAuth(() => this.router.navigate(["/dashboard/employees/employee", userName])).subscribe();
     }
 
-    searchInput = new FormControl('');
-
-    readonly columns = ["name", "email", "employeeType"];
-
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }
