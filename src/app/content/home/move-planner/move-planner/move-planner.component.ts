@@ -3,7 +3,7 @@ import { CommonModule, NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
 import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider, TUI_DATE_TIME_VALUE_TRANSFORMER, TuiInputDateTimeModule, tuiInputTimeOptionsProvider, TuiToggleModule } from '@taiga-ui/kit';
-import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray, Validators, ValidatorFn } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
@@ -115,43 +115,68 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
+   * Checks that at least one checkbox of the FormGroup that it is assigned to is checked
+   * @returns A function that is used for checking the validation of a checkbox group
+   */
+  atLeastOneCheckboxChecked(): ValidatorFn {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      if (formGroup instanceof FormGroup) {
+        const hasChecked = Object.keys(formGroup.controls).some(controlName => {
+          const control = formGroup.controls[controlName];
+          return control.value === true;
+        });
+
+        //no validation error
+        if (hasChecked) {
+          return null;
+        }
+      }
+
+      //validation error
+      return { requiredTrue: true };
+    };
+  }
+
+  /**
    * Builds the form groups, creating an AbstractControl from a user-specified configuration
    */
   buildForm(): void {
     this.servicesGroup = this._formBuilder.group({
-      packing: new FormControl(false),
-      unpack: new FormControl(false),
-      load: new FormControl(false),
-      unload: new FormControl(false),
+      packing: new FormControl(false, Validators.required),
+      unpack: new FormControl(false, Validators.required),
+      load: new FormControl(false, Validators.required),
+      unload: new FormControl(false, Validators.required),
     });
+
+    this.servicesGroup.setValidators(this.atLeastOneCheckboxChecked());
 
     this.needTruckGroup = this._formBuilder.group({
       needTruck: new FormControl(false)
-    })
+    });
 
     this.moveDateGroup = this._formBuilder.group({
-      dateTime: new FormControl('23.03.2024, 07:05'),
+      dateTime: new FormControl('', Validators.required),
       isPm: new FormControl(false),
     });
 
     this.fromAddressGroup = this._formBuilder.group({
-      fromAddress: new FormControl('123 Main St.'),
-      fromCity: new FormControl('Akron'),
-      fromState: new FormControl('OH'),
-      fromZip: new FormControl('44333'),
-      fromResidenceType: new FormControl('House'),
-      fromFlights: new FormControl('2'),
-      fromApartmentNumber: new FormControl('N/A'),
+      fromAddress: new FormControl('', Validators.required),
+      fromCity: new FormControl('', Validators.required),
+      fromState: new FormControl('', Validators.required),
+      fromZip: new FormControl('', Validators.required),
+      fromResidenceType: new FormControl('', Validators.required),
+      fromFlights: new FormControl('', Validators.required),
+      fromApartmentNumber: new FormControl('', Validators.required),
     });
 
     this.toAddressGroup = this._formBuilder.group({
-      toAddress: new FormControl('234 Smith Rd.'),
-      toCity: new FormControl('Solon'),
-      toState: new FormControl('OH'),
-      toZip: new FormControl('44139'),
-      toResidenceType: new FormControl('Apartment'),
-      toFlights: new FormControl('3'),
-      toApartmentNumber: new FormControl('Apt 321')
+      toAddress: new FormControl('', Validators.required),
+      toCity: new FormControl('', Validators.required),
+      toState: new FormControl('', Validators.required),
+      toZip: new FormControl('', Validators.required),
+      toResidenceType: new FormControl('', Validators.required),
+      toFlights: new FormControl('', Validators.required),
+      toApartmentNumber: new FormControl('', Validators.required)
     });
 
     this.roomsGroup = this._formBuilder.group({
@@ -167,6 +192,8 @@ export class MovePlannerComponent extends PageComponent {
       Garage: new FormControl(false),
       Attic: new FormControl(false),
     });
+
+    this.roomsGroup.setValidators(this.atLeastOneCheckboxChecked());
 
     this.boxesGroup = this._formBuilder.group({
       smBox: new FormControl(''),
@@ -193,10 +220,6 @@ export class MovePlannerComponent extends PageComponent {
     });
   }
 
-  //--Validation Section-------------------------------------------------------------
-
-
-  //--End Validation Section---------------------------------------------------------
   /**
    * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.

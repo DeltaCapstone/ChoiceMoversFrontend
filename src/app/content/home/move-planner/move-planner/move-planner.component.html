@@ -10,6 +10,9 @@
                     <tui-checkbox-block class="mb-4" formControlName="load">Load</tui-checkbox-block>
                     <tui-checkbox-block class="mb-4" formControlName="unload">Unload</tui-checkbox-block>
                 </form>
+                <div class="bg-secondary text-neutral text-center rounded-md" *ngIf="!servicesGroup.valid">
+                    Please select at least one service.
+                </div>
             </div>
         </ng-container>
     </a>
@@ -37,11 +40,14 @@
                         <tui-toggle formControlName="isPm" size="l"></tui-toggle>
                     </div>
                 </form>
+                <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!toAddressGroup.valid">
+                    Please select a move date and time.
+                </div>
             </div>
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
-        From Address
+        Moving From Address
         <ng-container *ngIf="activeStepIndex === 3">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="fromAddressGroup">
@@ -66,7 +72,7 @@
                         <input tuiTextfield />
                     </tui-input>
                     <tui-input formControlName="fromFlights" class="w-64">
-                        From Flights of Stairs
+                        From # Flights of Stairs
                         <input tuiTextfield />
                     </tui-input>
                     <tui-input formControlName="fromApartmentNumber" class="w-64">
@@ -74,11 +80,14 @@
                         <input tuiTextfield />
                     </tui-input>
                 </form>
+                <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!fromAddressGroup.valid">
+                    *All Fields Required
+                </div>
             </div>
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
-        To Address
+        Moving To Address
         <ng-container *ngIf="activeStepIndex === 4">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="toAddressGroup">
@@ -103,7 +112,7 @@
                         <input tuiTextfield />
                     </tui-input>
                     <tui-input formControlName="toFlights" class="w-64">
-                        From Flights of Stairs
+                        To # Flights of Stairs
                         <input tuiTextfield />
                     </tui-input>
                     <tui-input formControlName="toApartmentNumber" class="w-64">
@@ -111,11 +120,18 @@
                         <input tuiTextfield />
                     </tui-input>
                 </form>
+                <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!toAddressGroup.valid">
+                    *All Fields Required
+                </div>
             </div>
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Rooms
+        <div class="bg-secondary text-neutral text-center rounded-md ml-2"
+            *ngIf="!roomsGroup.valid && activeStepIndex === 5">
+            Please select at least one room
+        </div>
         <ng-container *ngIf="activeStepIndex === 5">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="roomsGroup">
@@ -216,9 +232,14 @@
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>
                 </ng-template>
                 <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
-                    (click)="submitForm()" [disabled]="!moveDateGroup.valid">
+                    (click)="submitForm()"
+                    [disabled]="!moveDateGroup.valid || !servicesGroup.valid || !fromAddressGroup.valid || !toAddressGroup.valid || !roomsGroup.valid ">
                     Submit Move Form
                 </button>
+                <div class="bg-secondary text-neutral rounded-md"
+                    *ngIf="!moveDateGroup.valid || !servicesGroup.valid || !fromAddressGroup.valid || !toAddressGroup.valid || !roomsGroup.valid">
+                    *Missing a required form field
+                </div>
             </div>
         </ng-container>
     </a>
