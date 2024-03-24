@@ -26,10 +26,7 @@ type SidebarItem = {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent extends BaseComponent {
-    @ViewChild(TuiHostedDropdownComponent)
-    component?: TuiHostedDropdownComponent;
-    
-    user$: Observable<Employee | undefined>; 
+    user$: Observable<Employee | undefined>;
     sidebarItems$: Observable<SidebarItem[]> = of([]);
     subscriptions: Subscription[] = [];
 
@@ -50,11 +47,11 @@ export class SidebarComponent extends BaseComponent {
             map(user => {
                 let sidebarItems = [];
                 sidebarItems.push({ name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" });
-                if (user?.employeeType == EmployeeType.Manager){
+                if (user?.employeeType == EmployeeType.Manager) {
                     sidebarItems = sidebarItems.concat([
                         { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },
                         { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" }
-                    ]);   
+                    ]);
                 }
                 sidebarItems.push({ name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" });
                 return sidebarItems;
@@ -70,12 +67,12 @@ export class SidebarComponent extends BaseComponent {
         this.session.guardWithAuth(() => this.router.navigate([`dashboard/profile/`])).subscribe();
     }
 
-    logout(){
+    logout() {
         this.session.logout();
         this.router.navigate([`/login`]);
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }

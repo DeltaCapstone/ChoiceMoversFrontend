@@ -1,0 +1,21 @@
+<div class="flex">
+    <button (click)="back()" class="m-2 icons">
+        <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
+    </button>
+    <tui-tabs [underline]=false>
+        <button [routerLink]="'info'" tuiTab>
+            <tui-svg src="tuiIconBriefcaseLarge" class="tui-space_right-2"></tui-svg>
+            Info
+        </button>
+        <button [routerLink]="'workers'" tuiTab>
+            <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
+            Workers
+        </button>
+        <button tuiTab>
+            <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
+            Contacts
+        </button>
+    </tui-tabs>
+</div>
+
+<router-outlet></router-outlet>
