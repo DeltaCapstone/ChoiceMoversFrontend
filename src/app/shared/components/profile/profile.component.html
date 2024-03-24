@@ -1,4 +1,7 @@
 <div *ngIf="(user$ | async) as user">
+    <button (click)="back()" class="m-2 icons">
+        <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
+    </button>
     <div class="flex p-5 pb-0">
         <div class="flex items-center p-2">
             <tui-avatar [rounded]="true" size="xl" [text]="user.firstName + ' ' +  user.lastName"></tui-avatar>
@@ -65,9 +68,6 @@
                         <button (click)="update()" tuiButton type="submit"
                             class="bg-secondary p-3 rounded-md text-lg tui-form__button">
                             Submit
-                        </button>
-                        <button (click)="back()" tuiButton type="button" class="text-lg tui-form__button">
-                            Cancel
                         </button>
                     </div>
                 </div>

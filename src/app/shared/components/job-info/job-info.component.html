@@ -1,6 +1,6 @@
 <div *ngIf="(job$ | async) as job">
     <div class="flex">
-        <button (click)="back()" class="m-2">
+        <button (click)="back()" class="m-2 icons">
             <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
         </button>
         <tui-tabs [underline]=false [(activeItemIndex)]="activeItemIndex">

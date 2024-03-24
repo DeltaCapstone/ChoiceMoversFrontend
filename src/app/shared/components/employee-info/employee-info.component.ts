@@ -3,7 +3,7 @@ import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
+import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { EmployeeCreateRequest, Employee, EmployeeType, EmployeeTypePriorityRequest } from '../../../models/employee';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
@@ -14,7 +14,7 @@ import { SessionService } from '../../services/session.service';
     selector: 'app-employee-info',
     standalone: true,
     imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
-        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
+        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule, TuiSvgModule],
     templateUrl: './employee-info.component.html',
     styleUrl: './employee-info.component.css'
 })
