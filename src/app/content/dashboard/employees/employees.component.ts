@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
@@ -10,15 +10,15 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../../shared/components/profile/profile.component';
 import { Employee } from '../../../models/employee';
 import { EmployeesService } from '../../../shared/services/employees.service';
-import { Observable, Subscription, combineLatest } from 'rxjs';
-import { map, startWith, debounceTime, tap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
+import { SearchComponent } from '../../../shared/components/search/search.component';
 
 @Component({
     selector: 'app-employees',
     standalone: true,
-    imports: [TuiTableModule, TuiTagModule, NgIf, NgFor,
+    imports: [TuiTableModule, TuiTagModule, NgIf, NgFor, SearchComponent,
         TuiInputModule, TuiTableFiltersModule, TuiButtonModule,
         TuiLetModule, TuiButtonModule, TuiSvgModule, ProfileComponent,
         ReactiveFormsModule, CommonModule, TuiTextfieldControllerModule],
@@ -27,26 +27,21 @@ import { SessionService } from '../../../shared/services/session.service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent extends PageComponent {
+    @ViewChild(SearchComponent) searchComponent!: SearchComponent<Employee>;
     subscriptions: Subscription[] = [];
+    readonly columns = ["name", "email", "employeeType"];
+    searchInput = new FormControl('');
     employees$: Observable<Employee[]>;
-    filteredEmployees$: Observable<Employee[]> = new Observable<Employee[]>;
+    filteredEmployees$: Observable<Employee[]>;
+
+
+    ngAfterViewInit() {
+        this.filteredEmployees$ = this.searchComponent.filteredItems$;
+    }
 
     ngOnInit() {
         this.setTitle("Employees");
-        // Fetch all employees once
         this.employees$ = this.employeesService.getEmployees();
-
-        this.filteredEmployees$ = combineLatest([this.employees$, this.searchInput.valueChanges.pipe(startWith(''))]).pipe(
-            debounceTime(100),
-            map(([employees, filterValue]) => employees.filter(employee => {
-                filterValue = (filterValue ?? "").toLowerCase();
-                
-                const fullName = `${employee.firstName} ${employee.lastName}`;
-                return fullName.toLowerCase().includes(filterValue) ||
-                    employee.email.toLowerCase().includes(filterValue) ||
-                    employee.employeeType.toLowerCase().includes(filterValue)
-            }))
-        );
     }
 
     constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router, private session: SessionService) {
@@ -58,11 +53,14 @@ export class EmployeesComponent extends PageComponent {
         this.session.guardWithAuth(() => this.router.navigate(["/dashboard/employees/employee", userName])).subscribe();
     }
 
-    searchInput = new FormControl('');
-
-    readonly columns = ["name", "email", "employeeType"];
-
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
+
+    filterEmployees(employee: Employee, searchValue: string) {
+        const fullName = `${employee.firstName} ${employee.lastName}`;
+        return fullName.toLowerCase().includes(searchValue) ||
+            employee.email.toLowerCase().includes(searchValue) ||
+            employee.employeeType.toLowerCase().includes(searchValue)
     }
 }
