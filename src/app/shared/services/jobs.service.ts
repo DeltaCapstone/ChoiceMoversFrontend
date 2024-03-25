@@ -84,11 +84,15 @@ export class JobsService {
         return this.cache$.pipe(map(cache => cache.get(jobId)));
     }
 
+    // -----------------------
+    // CACHE FUNCTIONS
+    // -----------------------
+
     private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]> {
         return this.cache$.pipe(
             take(1),
             switchMap(cache => {
-                if (cache.size > 1 && !forceMiss) {
+                if (cache.size > 0 && !forceMiss) {
                     console.log("job cache hit");
                     return onHit(cache);
                 }
