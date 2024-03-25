@@ -3,7 +3,7 @@ import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
+import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/employee';
 import { Observable, Subscription, map, finalize, take } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
@@ -13,7 +13,7 @@ import { SessionService } from '../../services/session.service';
     selector: 'app-profile',
     standalone: true,
     imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
-              CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
+        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule, TuiSvgModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })

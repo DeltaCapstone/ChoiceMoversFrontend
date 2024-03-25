@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -36,6 +36,7 @@ export class ScheduleComponent extends PageComponent {
             plugins: [dayGridPlugin],
             eventClick: this.eventClick.bind(this),
             viewDidMount: viewInfo => {
+                console.log("mount");
                 this.session.guardWithAuth(() => {
                     const start = viewInfo.view.activeStart.toISOString();
                     const end = viewInfo.view.activeEnd.toISOString();
@@ -46,14 +47,24 @@ export class ScheduleComponent extends PageComponent {
                 this.session.guardWithAuth(() => {
                     const start = dateInfo.startStr;
                     const end = dateInfo.endStr;
+
                     this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
                 }).subscribe();
             },
         }
+
+        // restore state
+        const calendarStart = this.jobsService.cacheStartDate;
+        // TODO: figure out better solution
+        if (calendarStart) {
+            const date = new Date(calendarStart);
+            date.setUTCDate(date.getUTCDate() + 5);
+            this.calendarOptions.initialDate = date.toISOString();
+        }
     }
 
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
-        return this.jobsService.getJobs(start, end).pipe(
+        return this.jobsService.getEmployeeJobs(start, end).pipe(
             map(jobs => jobs.map(job => {
                 const eventInput: EventInput = {
                     title: job.customer.email,
