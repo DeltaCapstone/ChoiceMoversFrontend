@@ -24,6 +24,7 @@ export class ScheduleComponent extends PageComponent {
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
         return this.jobsService.getEmployeeJobs(start, end).pipe(
             map(jobs => jobs.map(job => {
+                console.log(job);
                 const eventInput: EventInput = {
                     title: job.customer.email,
                     start: job.startTime,
@@ -32,7 +33,6 @@ export class ScheduleComponent extends PageComponent {
                         jobId: job.jobId
                     }
                 };
-                console.log(eventInput);
                 return eventInput;
             }))
         );
