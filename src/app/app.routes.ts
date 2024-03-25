@@ -41,6 +41,7 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
             { path: 'schedule', component: ScheduleComponent },
+            { path: 'schedule/employee/:userName', component: EmployeeInfoComponent },
             {
                 path: 'schedule/job/:jobId', component: JobComponent, children: [
                     { path: '', redirectTo: 'info', pathMatch: 'full' },

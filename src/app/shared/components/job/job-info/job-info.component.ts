@@ -62,7 +62,6 @@ export class JobInfoComponent extends BaseComponent {
 
             this.status = job?.finalized ? "Finalized" : "Pending";
 
-
             this.form.patchValue({
                 jobId: job?.jobId ?? "",
                 startTime: job?.startTime ? TuiDay.fromUtcNativeDate(new Date(job.startTime)) : TuiDay.currentLocal(),
