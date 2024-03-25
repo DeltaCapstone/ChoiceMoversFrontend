@@ -43,7 +43,15 @@ export class JobsService {
     // -----------------------
 
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
-        const needsRefresh = start != this.cacheStartDate || end != this.cacheEndDate;
+        // Convert ISO strings to Date objects for comparison
+        const startDate = new Date(this.cacheStartDate);
+        const endDate = new Date(this.cacheEndDate);
+        const newStart = new Date(start);
+        const newEnd = new Date(end);
+
+        // Compare dates
+        const needsRefresh = startDate.getTime() !== newStart.getTime() || endDate.getTime() !== newEnd.getTime();
+
         this.cacheStartDate = start;
         this.cacheEndDate = end;
 
@@ -72,6 +80,7 @@ export class JobsService {
     // -----------------------
 
     getJob(jobId: string): Observable<Job | undefined> {
+        console.log("job cache hit");
         return this.cache$.pipe(map(cache => cache.get(jobId)));
     }
 

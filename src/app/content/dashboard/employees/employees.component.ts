@@ -34,7 +34,6 @@ export class EmployeesComponent extends PageComponent {
     employees$: Observable<Employee[]>;
     filteredEmployees$: Observable<Employee[]>;
 
-
     ngAfterViewInit() {
         this.filteredEmployees$ = this.searchComponent.filteredItems$;
     }
@@ -50,7 +49,9 @@ export class EmployeesComponent extends PageComponent {
 
     /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth(() => this.router.navigate(["/dashboard/employees/employee", userName])).subscribe();
+        this.session.guardWithAuth().subscribe(_ => {
+            this.router.navigate(["/dashboard/employees/employee", userName]);
+        });
     }
 
     ngOnDestroy() {

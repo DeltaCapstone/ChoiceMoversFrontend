@@ -1,15 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Job } from '../../../../models/job.model';
 import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { TuiErrorModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
 import { TuiChipModule, TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
-import { JobsService } from '../../../services/jobs.service';
 
 @Component({
     selector: 'app-job-info',
@@ -43,15 +41,7 @@ export class JobInfoComponent extends BaseComponent {
     status = "Pending";
 
     ngOnInit() {
-        const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId");
-        if (jobId) {
-            this.job$ = this.jobsService.getJob(jobId);
-        }
-
         const jobSub = this.job$.subscribe(job => {
-            if (!job)
-                this.router.navigate(["dashboard/schedule"]);
-
             this.checked = [
                 ["Truck", !!job?.needTruck, "needsTruck"],
                 ["Load", !!job?.load, "load"],
@@ -80,11 +70,7 @@ export class JobInfoComponent extends BaseComponent {
         this.subscriptions.push(jobSub);
     }
 
-    constructor(
-        private router: Router,
-        private jobsService: JobsService,
-        private route: ActivatedRoute,
-    ) {
+    constructor() {
         super();
     }
 

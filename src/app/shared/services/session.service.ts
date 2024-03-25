@@ -16,7 +16,9 @@ export class SessionService {
     constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService, private router: Router) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
 
-        this.guardWithAuth(() => this.user$ = this.employeesService.getProfile());
+        this.guardWithAuth().subscribe(_ => {
+            this.user$ = this.employeesService.getProfile();
+        });
     }
 
     login(userName: string, passwordPlain: string): Observable<boolean> {
@@ -60,19 +62,22 @@ export class SessionService {
         return this.user$;
     }
 
-    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { this.router.navigate(["/login"]) }): Observable<any> {
+    guardWithAuth(): Observable<boolean> {
+        console.log("test");
         if (this.isActive()) {
-            return of(onSuccess()).pipe(take(1));
+            return of(true).pipe(take(1));
         }
         else { // attempt a refresh
             return this.refresh().pipe(
                 take(1),
                 map(success => {
+                    console.log(success);
                     if (success) {
-                        return onSuccess();
+                        return true;
                     }
                     else {
-                        return onFailure();
+                        this.router.navigate(["login"]);
+                        return false;
                     }
                 })
             )
