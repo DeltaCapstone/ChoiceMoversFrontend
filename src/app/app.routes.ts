@@ -21,12 +21,12 @@ import { JobComponent } from './shared/components/job/job.component';
 import { JobInfoComponent } from './shared/components/job/job-info/job-info.component';
 import { JobWorkersComponent } from './shared/components/job/job-workers/job-workers.component';
 import { jobGuard } from './shared/guards/job.guard';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'home', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'dashboard', redirectTo: 'dashboard/schedule', pathMatch: 'full' },
-
     {
         path: 'home', component: HomeComponent, children: [
             { path: 'customer-home', component: CustomerHomeComponent },
@@ -58,4 +58,5 @@ export const routes: Routes = [
         ]
     },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
+    { path: '**', component: NotFoundComponent }
 ];
