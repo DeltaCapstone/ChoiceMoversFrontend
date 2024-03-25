@@ -76,7 +76,7 @@ export class EmployeeInfoComponent extends BaseComponent {
     }
 
     save() {
-        this.session.guardWithAuth(() => {
+        this.session.guardWithAuth().subscribe(_ => {
             const formValues = this.form.value;
             const saveSub = this.user$.pipe(
                 map(user => ({
@@ -130,11 +130,11 @@ export class EmployeeInfoComponent extends BaseComponent {
                 }
             });
             this.subscriptions.push(saveSub);
-        }).subscribe();
+        });
     }
 
     delete() {
-        this.session.guardWithAuth(() => {
+        this.session.guardWithAuth().subscribe(_ => {
             const userName: string | null = this.route.snapshot.paramMap.get('userName');
             if (!userName)
                 return;
@@ -149,7 +149,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                     this.back();
                 }
             });
-        }).subscribe();
+        });
     }
 
     back() {

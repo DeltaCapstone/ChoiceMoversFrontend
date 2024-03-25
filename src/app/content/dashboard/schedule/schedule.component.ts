@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -16,6 +16,7 @@ import { SessionService } from '../../../shared/services/session.service';
     imports: [FullCalendarModule, CommonModule],
     templateUrl: './schedule.component.html',
     styleUrl: './schedule.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScheduleComponent extends PageComponent {
     ngOnInit() {
@@ -35,21 +36,12 @@ export class ScheduleComponent extends PageComponent {
             initialView: 'dayGridMonth',
             plugins: [dayGridPlugin],
             eventClick: this.eventClick.bind(this),
-            viewDidMount: viewInfo => {
-                console.log("mount");
-                this.session.guardWithAuth(() => {
-                    const start = viewInfo.view.activeStart.toISOString();
-                    const end = viewInfo.view.activeEnd.toISOString();
-                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
-                }).subscribe();
-            },
             datesSet: dateInfo => {
-                this.session.guardWithAuth(() => {
+                this.session.guardWithAuth().subscribe(_ => {
                     const start = dateInfo.startStr;
                     const end = dateInfo.endStr;
-
-                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
-                }).subscribe();
+                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events));
+                });
             },
         }
 
@@ -74,6 +66,7 @@ export class ScheduleComponent extends PageComponent {
                         jobId: job.jobId
                     }
                 };
+                console.log(eventInput);
                 return eventInput;
             })),
             take(1)
@@ -81,9 +74,9 @@ export class ScheduleComponent extends PageComponent {
     }
 
     eventClick(info: EventClickArg) {
-        this.session.guardWithAuth(() => {
+        this.session.guardWithAuth().subscribe(_ => {
             const jobId: string = info.event.extendedProps.jobId;
             this.router.navigate(["dashboard/schedule/job/", jobId]);
-        }).subscribe();
+        });
     }
 }
