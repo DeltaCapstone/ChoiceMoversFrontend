@@ -1,5 +1,5 @@
 <div *ngIf="(user$ | async) as user">
-    <button (click)="back()" class="m-2 icons">
+    <button *ngIf="!readOnly" (click)="back()" class="m-2 icons">
         <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
     </button>
     <div class="p-5 pb-0 flex">
@@ -51,7 +51,8 @@
 
                         <div class="tui-form__row tui-form__row_multi-fields">
                             <div class="tui-form__multi-field">
-                                <tui-select tuiTextfieldSize="s" formControlName="employeePriority">
+                                <tui-select [readOnly]="readOnly" tuiTextfieldSize="s"
+                                    formControlName="employeePriority">
                                     Employee priority
                                     <input tuiTextfield />
                                     <tui-data-list-wrapper *tuiDataList
@@ -62,7 +63,7 @@
                             </div>
 
                             <div class="tui-form__multi-field">
-                                <tui-select tuiTextfieldSize="s" formControlName="employeeType">
+                                <tui-select [readOnly]="readOnly" tuiTextfieldSize="s" formControlName="employeeType">
                                     Employee type
                                     <input tuiTextfield />
                                     <tui-data-list-wrapper *tuiDataList [items]="employeeTypes"></tui-data-list-wrapper>
@@ -98,7 +99,7 @@
                         </div>
                     </ng-container>
 
-                    <div class="tui-form__buttons">
+                    <div *ngIf="!readOnly" class="tui-form__buttons">
                         <button (click)="save()" tuiButton type="submit"
                             class="bg-secondary p-3 rounded-md text-lg tui-form__button">
                             Submit
@@ -106,6 +107,12 @@
                         <button *ngIf="!isNew" (click)="delete()" tuiButton type="submit"
                             class="bg-secondary p-3 rounded-md text-lg tui-form__button">
                             Delete
+                        </button>
+                    </div>
+                    <div class="tui-form__buttons">
+                        <button *ngIf="readOnly" (click)="back()" tuiButton type="submit"
+                            class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+                            Back
                         </button>
                     </div>
                 </div>

@@ -19,6 +19,7 @@ import { SessionService } from '../../services/session.service';
     styleUrl: './employee-info.component.css'
 })
 export class EmployeeInfoComponent extends BaseComponent {
+    @Input() readOnly: boolean;
     subscriptions: Subscription[] = [];
     employeeTypes: String[] = Object.values(EmployeeType);
     employeePriorities: number[] = [1, 2, 3];
@@ -37,6 +38,9 @@ export class EmployeeInfoComponent extends BaseComponent {
     user$: Observable<Employee | undefined>;
 
     ngOnInit() {
+        // check if we are at a readOnly route
+        this.readOnly = !!this.route.snapshot.url.find(seg => seg.path.includes("workers"));
+
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
             this.user$ = this.employeesService.getEmployee(userName);

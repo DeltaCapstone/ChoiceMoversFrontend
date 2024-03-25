@@ -15,7 +15,7 @@
     <ng-container *ngIf="workers$ | async as employees">
         <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
             <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
-                <td (click)="openEmployee(item.userName)" class="cursor-pointer" *tuiCell="'name'" tuiTd>
+                <td [routerLink]="item.userName" class="cursor-pointer" *tuiCell="'name'" tuiTd>
                     {{ item.firstName + ' ' + item.lastName }}
                 </td>
                 <td *tuiCell="'email'" tuiTd>

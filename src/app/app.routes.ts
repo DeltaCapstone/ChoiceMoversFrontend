@@ -20,6 +20,7 @@ import { EmployeeInfoComponent } from './shared/components/employee-info/employe
 import { JobComponent } from './shared/components/job/job.component';
 import { JobInfoComponent } from './shared/components/job/job-info/job-info.component';
 import { JobWorkersComponent } from './shared/components/job/job-workers/job-workers.component';
+import { jobGuard } from './shared/guards/job.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -41,12 +42,12 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
             { path: 'schedule', component: ScheduleComponent },
-            { path: 'schedule/employee/:userName', component: EmployeeInfoComponent },
             {
-                path: 'schedule/job/:jobId', component: JobComponent, children: [
+                path: 'schedule/job/:jobId', component: JobComponent, canActivate: [jobGuard], children: [
                     { path: '', redirectTo: 'info', pathMatch: 'full' },
                     { path: 'info', component: JobInfoComponent },
                     { path: 'workers', component: JobWorkersComponent },
+                    { path: 'workers/:userName', component: EmployeeInfoComponent },
                 ]
             },
             { path: 'employees', component: EmployeesComponent },

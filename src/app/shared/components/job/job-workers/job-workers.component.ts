@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Job } from '../../../../models/job.model';
 import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { JobsService } from '../../../services/jobs.service';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
@@ -14,7 +14,7 @@ import { SessionService } from '../../../services/session.service';
 @Component({
     selector: 'app-job-workers',
     standalone: true,
-    imports: [TuiTableModule, NgIf, NgFor, TuiLetModule, CommonModule],
+    imports: [TuiTableModule, NgIf, NgFor, TuiLetModule, CommonModule, RouterModule],
     templateUrl: './job-workers.component.html',
     styleUrl: './job-workers.component.css'
 })
@@ -51,7 +51,7 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth(() => this.router.navigate(["/dashboard/schedule/employee", userName])).subscribe();
+        this.session.guardWithAuth(() => this.router.navigate([`/dashboard/schedule/job/`, userName])).subscribe();
     }
 
     ngOnDestroy() {

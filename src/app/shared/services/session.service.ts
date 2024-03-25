@@ -64,7 +64,7 @@ export class SessionService {
         if (this.isActive()) {
             return of(onSuccess()).pipe(take(1));
         }
-        else {
+        else { // attempt a refresh
             return this.refresh().pipe(
                 take(1),
                 map(success => {
