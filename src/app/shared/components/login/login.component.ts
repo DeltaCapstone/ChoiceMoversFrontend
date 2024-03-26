@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TUI_VALIDATION_ERRORS, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPasswordModule } from '@taiga-ui/kit';
@@ -7,7 +7,9 @@ import { Router } from '@angular/router';
 import { TuiErrorModule, TuiLoaderModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiValidationError } from '@taiga-ui/cdk';
-import { BehaviorSubject, Observable, Subscription, map, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, map } from 'rxjs';
+import { Employee } from '../../../models/employee';
+import { SessionType } from '../../../models/session.model';
 
 @Component({
     selector: 'app-login',
@@ -27,7 +29,8 @@ import { BehaviorSubject, Observable, Subscription, map, of, switchMap } from 'r
 })
 export class LoginComponent extends BaseComponent {
     subscriptions: Subscription[] = [];
-    constructor(private session: SessionService,
+    constructor(
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private router: Router) {
         super();
     }

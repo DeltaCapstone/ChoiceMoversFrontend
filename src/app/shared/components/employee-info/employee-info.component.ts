@@ -1,4 +1,4 @@
-import { Component, Input, } from '@angular/core';
+import { Component, Inject, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
+import { SessionType } from '../../../models/session.model';
 
 @Component({
     selector: 'app-employee-info',
@@ -70,7 +71,7 @@ export class EmployeeInfoComponent extends BaseComponent {
 
     constructor(private location: Location,
         private route: ActivatedRoute,
-        private session: SessionService,
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }

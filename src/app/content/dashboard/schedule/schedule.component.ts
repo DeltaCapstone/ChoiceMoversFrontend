@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { Calendar, CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
+import { SessionType } from '../../../models/session.model';
+import { Employee } from '../../../models/employee';
 
 @Component({
     selector: 'app-schedule',
@@ -77,7 +79,7 @@ export class ScheduleComponent extends PageComponent {
     }
 
     constructor(pageService: PageService,
-        private session: SessionService,
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private router: Router,
         private jobsService: JobsService) {
         super(pageService);
