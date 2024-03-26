@@ -56,7 +56,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     startTime: string;
     endTime: string;
 
-    rooms: Room[];
+    rooms: Room[] = [];
     special: Object[];
     boxes: Map<string, number>
 
@@ -78,7 +78,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         startTime: string = '',
         endTime: string = '',
 
-        rooms: Room = new Room('', new Map()),
+        rooms: Room[] = [],
         special: Object[] = [],
         boxes: Map<string, number> = new Map(),
 
@@ -99,8 +99,8 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         this.startTime = startTime;
         this.endTime = endTime;
 
-        this.rooms.push(rooms);
-        this.special.push(special);
+        this.rooms = rooms;
+        this.special = special;
         this.boxes = boxes;
 
         this.pack = pack;

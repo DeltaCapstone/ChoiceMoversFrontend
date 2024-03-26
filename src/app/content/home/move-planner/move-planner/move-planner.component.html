@@ -48,40 +48,38 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Moving From Address
-        <ng-container *ngIf="activeStepIndex === 3">
+        <ng-container *ngIf="this.activeStepIndex === 3">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="fromAddressGroup">
-                    <tui-input formControlName="fromAddress" class="w-64">
-                        From Address (Street and Address)
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromCity" class="w-64">
-                        From City
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromState" class="w-64">
-                        From State
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromZip" class="w-64">
-                        From Zip Code
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromResidenceType" class="w-64">
-                        From Residence Type (House, Apartment, Condo)
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromFlights" class="w-64">
-                        From # Flights of Stairs
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="fromApartmentNumber" class="w-64">
-                        From Apartment Number (Optional)
-                        <input tuiTextfield />
-                    </tui-input>
+                    <label>
+                        <span>Moving From Address*</span>
+                        <input id="fromStreetAddress" name="fromStreetAddress" formGroupName="fromAddressStreetNumber"
+                            required autocomplete="off" #fromStreetAddress />
+                    </label>
+                    <label>
+                        <span>Apartment, unit, suite, or floor #</span>
+                        <input id="fromAptNumUnitOrSuite" name="fromAptNumUnitOrSuite"
+                            formGroupName="fromApartmentNumber" #fromAptNumUnitOrSuite />
+                    </label>
+                    <label>
+                        <span>City*</span>
+                        <input id="fromLocality" name="fromLocality" formGroupName="fromCity" #fromLocality />
+                    </label>
+                    <label>
+                        <span>State/Province*</span>
+                        <input id="fromState" name="fromState" formGroupName="fromState" #fromState />
+                    </label>
+                    <label for="postal_code">
+                        <span>Postal code*</span>
+                        <input id="fromPostcode" name="fromPostcode" formGroupName="fromZip" required #fromPostcode />
+                    </label>
+                    <label>
+                        <span>Country/Region*</span>
+                        <input id="fromCountry" name="fromCountry" required #fromCountry />
+                    </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!fromAddressGroup.valid">
-                    *All Fields Required
+                    * inidicates required fields
                 </div>
             </div>
         </ng-container>
@@ -91,37 +89,35 @@
         <ng-container *ngIf="activeStepIndex === 4">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="toAddressGroup">
-                    <tui-input formControlName="toAddress" class="w-64">
-                        To Address (Street and Address)
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toCity" class="w-64">
-                        To City
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toState" class="w-64">
-                        To State
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toZip" class="w-64">
-                        To Zip Code
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toResidenceType" class="w-64">
-                        To Residence Type (House, Apartment, Condo)
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toFlights" class="w-64">
-                        To # Flights of Stairs
-                        <input tuiTextfield />
-                    </tui-input>
-                    <tui-input formControlName="toApartmentNumber" class="w-64">
-                        To Apartment Number (Optional)
-                        <input tuiTextfield />
-                    </tui-input>
+                    <label>
+                        <span>Moving To Address*</span>
+                        <input id="toStreetAddress" name="toStreetAddress" formGroupName="toAddressStreetNumber"
+                            required autocomplete="off" #toStreetAddress />
+                    </label>
+                    <label>
+                        <span>Apartment, unit, suite, or floor #</span>
+                        <input id="toAptNumUnitOrSuite" name="toAptNumUnitOrSuite" formGroupName="toApartmentNumber"
+                            #toAptNumUnitOrSuite />
+                    </label>
+                    <label>
+                        <span>City*</span>
+                        <input id="toLocality" name="toLocality" formGroupName="toCity" required #toLocality />
+                    </label>
+                    <label>
+                        <span>State/Province*</span>
+                        <input id="toState" name="toState" formGroupName="toState" required #toState />
+                    </label>
+                    <label for="postal_code">
+                        <span>Postal code*</span>
+                        <input id="toPostcode" name="toPostcode" formGroupName="toZip" required #toPostcode />
+                    </label>
+                    <label>
+                        <span>Country/Region*</span>
+                        <input id="toCountry" name="toCountry" required #toCountry />
+                    </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!toAddressGroup.valid">
-                    *All Fields Required
+                    * inidicates required fields
                 </div>
             </div>
         </ng-container>
@@ -233,7 +229,7 @@
                 </ng-template>
                 <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
                     (click)="submitForm()"
-                    [disabled]="!moveDateGroup.valid || !servicesGroup.valid || !fromAddressGroup.valid || !toAddressGroup.valid || !roomsGroup.valid ">
+                    [disabled]="!moveDateGroup.valid || !servicesGroup.valid || !roomsGroup.valid ">
                     Submit Move Form
                 </button>
                 <div class="bg-secondary text-neutral rounded-md"
