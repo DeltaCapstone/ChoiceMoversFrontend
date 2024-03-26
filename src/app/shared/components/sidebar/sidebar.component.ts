@@ -1,6 +1,6 @@
 import { NgFor, NgClass, NgIf, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { TuiDataListModule, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
@@ -9,6 +9,7 @@ import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { Employee, EmployeeType } from '../../../models/employee';
+import { SessionType } from '../../../models/session.model';
 
 type SidebarItem = {
     readonly name: string
@@ -58,7 +59,8 @@ export class SidebarComponent extends BaseComponent {
             }));
     }
 
-    constructor(private router: Router, private session: SessionService) {
+    constructor(private router: Router, 
+        @Inject(SessionType.Employee) private session: SessionService<Employee>) {
         super();
     }
 

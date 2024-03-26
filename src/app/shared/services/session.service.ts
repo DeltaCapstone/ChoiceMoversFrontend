@@ -1,27 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Employee, LoginRequest } from '../../models/employee';
-import { EmployeesService } from './employees.service';
+import { LoginRequest } from '../../models/employee';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Router } from '@angular/router';
-import { ScheduleSessionState } from '../../models/session.model';
+import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class SessionService {
-    user$: Observable<Employee | undefined> = of(undefined);
+export class SessionService<T> {
+    private config: SessionServiceConfig<T>;
+    user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
 
-    constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService, private router: Router) {
-        this.apiUrl = this.feature.getFeatureValue("api").url;
-
+    ngOnInit(){
         this.guardWithAuth().subscribe(_ => {
-            this.user$ = this.employeesService.getProfile();
+            this.user$ = this.config.getUser();
+            // this.user$ = this.employeesService.getProfile();
         });
+    }
+
+    constructor(private http: HttpClient, private feature: FeatureService, private router: Router, config: SessionServiceConfig<T>) {
+        this.apiUrl = this.feature.getFeatureValue("api").url;
+        this.config = config;
+    }
+
+    getType(): SessionType {
+        return this.config.type;
     }
 
     login(userName: string, passwordPlain: string): Observable<boolean> {
@@ -29,12 +37,12 @@ export class SessionService {
             userName: userName,
             passwordPlain: passwordPlain
         };
-        return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
+        return this.http.post<LoginRequest>(`${this.apiUrl}/${this.config.loginRoute}`, loginRequest).pipe(
             switchMap((res: any) => {
                 const accessToken = res["accessToken"];
                 this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
                 if (accessToken) {
-                    return this.employeesService.getProfile().pipe(
+                    return this.config.getUser().pipe(
                         tap(profile => {
                             this.user$ = of(profile);
                         }),
@@ -62,7 +70,7 @@ export class SessionService {
         this.user$ = of(undefined);
     }
 
-    getUser(): Observable<Employee | undefined> {
+    getUser(): Observable<T | undefined> {
         return this.user$;
     }
 

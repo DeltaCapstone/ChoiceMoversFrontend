@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { JobInfoComponent } from './job-info/job-info.component';
 import { BaseComponent } from '../base-component';
 import { TuiSvgModule } from '@taiga-ui/core';
 import { TuiTabsModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
+import { SessionType } from '../../../models/session.model';
+import { Employee } from '../../../models/employee';
 
 @Component({
     selector: 'app-job',
@@ -15,7 +17,7 @@ import { SessionService } from '../../services/session.service';
 })
 export class JobComponent extends BaseComponent {
     constructor(
-        private session: SessionService,
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private router: Router) {
         super();
     }

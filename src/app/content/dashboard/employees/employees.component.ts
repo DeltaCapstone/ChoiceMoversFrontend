@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, ViewChild } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
@@ -14,6 +14,7 @@ import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
 import { SearchComponent } from '../../../shared/components/search/search.component';
+import { SessionType } from '../../../models/session.model';
 
 @Component({
     selector: 'app-employees',
@@ -43,7 +44,9 @@ export class EmployeesComponent extends PageComponent {
         this.employees$ = this.employeesService.getEmployees();
     }
 
-    constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router, private session: SessionService) {
+    constructor(pageService: PageService, private employeesService: EmployeesService, 
+        private router: Router, 
+        @Inject(SessionType.Employee) private session: SessionService<Employee>) {
         super(pageService);
     }
 

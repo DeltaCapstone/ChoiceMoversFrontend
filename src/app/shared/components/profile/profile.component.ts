@@ -1,4 +1,4 @@
-import { Component, Input, } from '@angular/core';
+import { Component, Inject, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
@@ -8,6 +8,7 @@ import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../m
 import { Observable, Subscription, map, finalize, take } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
+import { SessionType } from '../../../models/session.model';
 
 @Component({
     selector: 'app-profile',
@@ -51,7 +52,8 @@ export class ProfileComponent extends BaseComponent {
         this.subscriptions.push(userSub);
     }
 
-    constructor(private location: Location, private session: SessionService,
+    constructor(private location: Location, 
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }

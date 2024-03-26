@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Job } from '../../../../models/job.model';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -10,6 +10,7 @@ import { Employee } from '../../../../models/employee';
 import { EmployeesService } from '../../../services/employees.service';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
+import { SessionType } from '../../../../models/session.model';
 
 @Component({
     selector: 'app-job-workers',
@@ -32,7 +33,7 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     constructor(
-        private session: SessionService,
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private employeesService: EmployeesService,
         private route: ActivatedRoute,
         private jobsService: JobsService,
