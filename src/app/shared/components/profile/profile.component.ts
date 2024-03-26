@@ -57,7 +57,7 @@ export class ProfileComponent extends BaseComponent {
     }
 
     update() {
-        this.session.guardWithAuth(() => {
+        this.session.guardWithAuth().subscribe(_ => {
             const formValues = this.form.value;
             this.user$.pipe(
                 finalize(() => this.back()),
@@ -80,7 +80,7 @@ export class ProfileComponent extends BaseComponent {
                     }
                 });
             });
-        }).pipe((take(1))).subscribe();
+        });
     }
 
     back() {
