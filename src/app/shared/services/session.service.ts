@@ -5,6 +5,8 @@ import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Router } from '@angular/router';
+import { ScheduleSessionState } from '../../models/session.model';
+
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +14,7 @@ import { Router } from '@angular/router';
 export class SessionService {
     user$: Observable<Employee | undefined> = of(undefined);
     apiUrl: string;
+    scheduleSessionState = new ScheduleSessionState;
 
     constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService, private router: Router) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
@@ -29,7 +32,7 @@ export class SessionService {
         return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
             switchMap((res: any) => {
                 const accessToken = res["accessToken"];
-                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
+                this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
                 if (accessToken) {
                     return this.employeesService.getProfile().pipe(
                         tap(profile => {
@@ -55,6 +58,7 @@ export class SessionService {
     logout() {
         localStorage.clear();
         sessionStorage.clear();
+        this.scheduleSessionState.clear();
         this.user$ = of(undefined);
     }
 
@@ -99,7 +103,7 @@ export class SessionService {
         }
 
         return this.http.post(`${this.apiUrl}/renewAccess`, { "refreshToken": refreshToken }).pipe(
-            tap((res: any) => this.setSessionValues(res["accessToken"], res["accessTokenExpiresAt"])),
+            tap((res: any) => this.setStorageValues(res["accessToken"], res["accessTokenExpiresAt"])),
             map(_ => true),
             catchError(err => {
                 console.error(err);
@@ -109,7 +113,7 @@ export class SessionService {
         )
     }
 
-    private setSessionValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
+    private setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";

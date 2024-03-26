@@ -13,8 +13,6 @@ import { Job } from '../../models/job.model';
 
 export class JobsService {
     // currently, the cache only works for read operations, which occur on the dashboard
-    cacheStartDate: string;
-    cacheEndDate: string;
     cache$ = new ReplaySubject<Map<string, Job>>(1);
     apiUrl: string = "";
 
@@ -43,37 +41,41 @@ export class JobsService {
     // -----------------------
 
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
-        // Convert ISO strings to Date objects for comparison
-        const startDate = new Date(this.cacheStartDate);
-        const endDate = new Date(this.cacheEndDate);
-        const newStart = new Date(start);
-        const newEnd = new Date(end);
+        return this.cache$.pipe(
+            take(1),
+            switchMap(cache => {
+                if (cache.size > 0) {
+                    const cachedJobs = Array.from(cache.values());
+                    const [earliestDate, latestDate] = this.getBoundaryDates(cachedJobs);
 
-        // Compare dates
-        const needsRefresh = startDate.getTime() !== newStart.getTime() || endDate.getTime() !== newEnd.getTime();
-
-        this.cacheStartDate = start;
-        this.cacheEndDate = end;
-
-        return this.cacheLookupWithFallback(
-            cache => of(Array.from(cache.values())),
-            () => this.http.get<Job[]>(`${this.apiUrl}/employee/jobs?start=${start}&end=${end}`).pipe(
-                tap(jobs => this.cacheUpsert(jobs)),
-                switchMap(() => this.cache$.pipe(
-                    take(1),
-                    map(cache => Array.from(cache.values()))
-                )),
-                catchError(error => {
-                    if (error.status == 404) {
-                        console.error("No jobs found in specified dates");
+                    if (new Date(start) >= new Date(earliestDate) && new Date(end) <= new Date(latestDate)) {
+                        // Return filtered jobs within the date range if cache covers the requested period
+                        const filteredJobs = cachedJobs.filter(job =>
+                            new Date(job.startTime) >= new Date(start) && new Date(job.endTime) <= new Date(end));
+                        return of(filteredJobs);
                     }
-                    return of([]);
-                })
-            ),
-            needsRefresh
+                }
+
+                return this.http.get<Job[]>(`${this.apiUrl}/employee/jobs?start=${start}&end=${end}`).pipe(
+                    tap(jobs => this.cacheUpsert(jobs)),
+                    switchMap(() => this.cache$.pipe(
+                        take(1),
+                        map(cache => Array.from(cache.values()))
+                    )),
+                    catchError(error => {
+                        if (error.status === 404) {
+                            console.error("No jobs found in specified dates");
+                        }
+                        return of([]);
+                    })
+                );
+            }),
+            catchError(error => {
+                console.error(error);
+                return of([]);
+            })
         );
     }
-
 
     // -----------------------
     // GENERAL REQUESTS
@@ -88,29 +90,19 @@ export class JobsService {
     // CACHE FUNCTIONS
     // -----------------------
 
-    private cacheLookupWithFallback(onHit: (cache: Map<string, Job>) => Observable<Job[]>, onMiss: () => Observable<Job[]>, forceMiss?: boolean): Observable<Job[]> {
-        return this.cache$.pipe(
-            take(1),
-            switchMap(cache => {
-                if (cache.size > 0 && !forceMiss) {
-                    console.log("job cache hit");
-                    return onHit(cache);
-                }
-                else {
-                    console.log("job cache miss");
-                    return onMiss();
-                }
-            }),
-            catchError(error => {
-                console.error(error);
-                return of([]);
-            })
-        );
+    private getBoundaryDates(jobs: Job[]): [string, string] {
+        const earliestDate = jobs.reduce((prev, curr) =>
+            new Date(curr.startTime) < new Date(prev) ? curr.startTime : prev, jobs[0].startTime);
+        const latestDate = jobs.reduce((prev, curr) =>
+            new Date(curr.endTime) > new Date(prev) ? curr.endTime : prev, jobs[0].endTime);
+        return [earliestDate, latestDate];
     }
 
     private cacheDelete(jobIds: string[]) {
         this.cache$.pipe(take(1)).subscribe(cache => {
-            jobIds.forEach(jobIds => cache.delete(jobIds));
+            jobIds.forEach(jobId => {
+                cache.delete(jobId)
+            });
             this.cache$.next(cache);
         });
     }
