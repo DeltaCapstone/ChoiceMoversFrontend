@@ -1,5 +1,5 @@
 <div class="flex justify-between">
-    <div class="flex">
+    <div class="flex items-center">
         <button (click)="back()" class="m-2 icons">
             <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
         </button>
@@ -18,10 +18,14 @@
             </a>
         </tui-tabs>
     </div>
-    <button (click)="selfAssign()" tuiButton type="submit"
-        class="bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold">
-        Assign yourself
-    </button>
+    <div class="flex flex-col" *tuiLet="conflictMessage$ | async as conflict">
+        <button (click)="selfAssign()" tuiButton type="submit" [disabled]="conflict"
+            class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
+            [ngClass]="{'opacity-50': conflict}">
+            Assign yourself
+        </button>
+        <p class="text-[red] opacity-50" *ngIf="conflict">{{ conflict }}</p>
+    </div>
 </div>
 
 <router-outlet></router-outlet>

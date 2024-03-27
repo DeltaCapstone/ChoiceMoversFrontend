@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap } from 'rxjs';
+import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { Job } from '../../models/job.model';
+import { AssignmentConflictType, Job } from '../../models/job.model';
 import { AssignedEmployee } from '../../models/employee';
 
 /**
@@ -40,6 +40,27 @@ export class JobsService {
     // -----------------------
     // EMPLOYEE REQUESTS
     // -----------------------
+
+    checkAssignmentAvailability(jobId: string): Observable<AssignedEmployee | AssignmentConflictType> {
+        return this.http.get<AssignedEmployee>(`${this.apiUrl}/employee/jobs/checkAssign?jobID=${jobId}`).pipe(
+            catchError(err => {
+                let errorType: AssignmentConflictType | null = null;
+
+                switch(err.error) {
+                    case AssignmentConflictType.JobFull:
+                        errorType = AssignmentConflictType.JobFull;
+                        break;
+                    case AssignmentConflictType.AlreadyAssigned:
+                        errorType = AssignmentConflictType.AlreadyAssigned;
+                        break;
+                    default:
+                        return throwError(() => err);
+                }
+
+                return of(errorType);
+            })
+        );
+    }
 
     selfAssign(jobId: string) {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {}).pipe(

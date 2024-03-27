@@ -178,3 +178,8 @@ export class Job extends Estimate implements IJob, IEstimate {
 
     //Getters and setters
 }
+
+export enum AssignmentConflictType {
+    JobFull = "JOB_FULL",
+    AlreadyAssigned = "ALREADY_ASSIGNED"
+}

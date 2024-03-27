@@ -5,7 +5,7 @@ export enum EmployeeType {
     FullTime = "Full-time",
     PartTime = "Part-time",
     Manager = "Manager",
-    Admin= "Admin"
+    Admin = "Admin"
 }
 
 export interface IEmployee {
