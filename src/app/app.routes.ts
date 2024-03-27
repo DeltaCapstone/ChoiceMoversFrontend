@@ -18,6 +18,7 @@ import { LoginComponent } from './shared/components/login/login.component';
 import { dashboardGuard } from './shared/guards/dashboard.guard';
 import { EmployeeInfoComponent } from './shared/components/employee-info/employee-info.component';
 import { JobInfoComponent } from './shared/components/job-info/job-info.component';
+import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -33,7 +34,8 @@ export const routes: Routes = [
             { path: 'move-planner', component: MovePlannerComponent },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
-            { path: 'storage', component: StorageComponent }
+            { path: 'storage', component: StorageComponent },
+            { path: 'customer-summary', component: CustomerSummaryComponent },
         ]
     },
     {
