@@ -40,6 +40,11 @@ export class JobsService {
     // EMPLOYEE REQUESTS
     // -----------------------
 
+    selfAssign(jobId: string) {
+        return this.http.post(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {});
+        // TODO: update cache
+    }
+
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
         return this.cache$.pipe(
             take(1),
@@ -81,6 +86,7 @@ export class JobsService {
     // GENERAL REQUESTS
     // -----------------------
 
+    // currently only looks in the cache
     getJob(jobId: string): Observable<Job | undefined> {
         console.log("job cache hit");
         return this.cache$.pipe(map(cache => cache.get(jobId)));

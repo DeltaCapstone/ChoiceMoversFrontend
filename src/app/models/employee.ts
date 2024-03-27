@@ -54,3 +54,7 @@ export class Employee implements IEmployee {
     employeeType: EmployeeType = EmployeeType.FullTime;
     employeePriority: number = 3;
 }
+
+export class AssignedEmployee extends Employee {
+    managerAssigned: boolean = false;
+}

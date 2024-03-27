@@ -1,6 +1,6 @@
 import { Address } from "./address.model";
 import { Customer } from "./customer.model";
-import { Employee } from "./employee";
+import { AssignedEmployee, Employee } from "./employee";
 import { Room } from "./room.model";
 
 /**
@@ -15,7 +15,7 @@ export interface IJob {
     actualManHours: number;
     finalCost: number;
     amountPaid: number;
-    assignedEmp: Employee[];
+    assignedEmployees: AssignedEmployee[];
     notes: string;
 }
 
@@ -158,11 +158,11 @@ export class Job extends Estimate implements IJob, IEstimate {
     actualManHours: number;
     finalCost: number;
     amountPaid: number;
-    assignedEmp: Employee[];
+    assignedEmployees: AssignedEmployee[];
     notes: string;
 
     constructor(jobId: string = "", manHours: number = 0, rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: number = 0,
-        finalCost: number = 0, amountPaid: number = 0, assignedEmp: Employee[] = [], notes: string = "") {
+        finalCost: number = 0, amountPaid: number = 0, assignedEmployees: AssignedEmployee[] = [], notes: string = "") {
         super();
         this.jobId = jobId;
         this.manHours = manHours;
@@ -172,7 +172,7 @@ export class Job extends Estimate implements IJob, IEstimate {
         this.actualManHours = actualManHours;
         this.finalCost = finalCost;
         this.amountPaid = amountPaid;
-        this.assignedEmp = assignedEmp;
+        this.assignedEmployees = assignedEmployees;
         this.notes = notes;
     }
 

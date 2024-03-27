@@ -1,13 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { Job } from '../../../../models/job.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, map, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
-import { Employee } from '../../../../models/employee';
-import { EmployeesService } from '../../../services/employees.service';
+import { AssignedEmployee, Employee } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
 import { SessionType } from '../../../../models/session.model';
@@ -20,21 +19,20 @@ import { SessionType } from '../../../../models/session.model';
     styleUrl: './job-workers.component.css'
 })
 export class JobWorkersComponent extends BaseComponent {
-    job$: Observable<Job | undefined>;
-    workers$: Observable<Employee[]>;
+    workers$: Observable<AssignedEmployee[]>;
     readonly columns = ["name", "email", "employeeType"];
     subscriptions: Subscription[] = [];
 
     ngOnInit() {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
-        this.job$ = this.jobsService.getJob(jobId);
-        // TODO: replace with get assigned employees
-        this.workers$ = this.employeesService.getEmployees();
+        this.workers$ = this.jobsService.getJob(jobId).pipe(
+            tap(job => console.log(job)),
+            map(job => job?.assignedEmployees ?? [])
+        );
     }
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
-        private employeesService: EmployeesService,
         private route: ActivatedRoute,
         private jobsService: JobsService,
         private router: Router,
