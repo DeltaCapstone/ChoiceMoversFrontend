@@ -1,6 +1,6 @@
 import { NgFor, NgClass, NgIf, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { TuiDataListModule, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
@@ -9,6 +9,7 @@ import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { Employee, EmployeeType } from '../../../models/employee';
+import { SessionType } from '../../../models/session.model';
 
 type SidebarItem = {
     readonly name: string
@@ -26,10 +27,7 @@ type SidebarItem = {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent extends BaseComponent {
-    @ViewChild(TuiHostedDropdownComponent)
-    component?: TuiHostedDropdownComponent;
-    
-    user$: Observable<Employee | undefined>; 
+    user$: Observable<Employee | undefined>;
     sidebarItems$: Observable<SidebarItem[]> = of([]);
     subscriptions: Subscription[] = [];
 
@@ -50,32 +48,35 @@ export class SidebarComponent extends BaseComponent {
             map(user => {
                 let sidebarItems = [];
                 sidebarItems.push({ name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" });
-                if (user?.employeeType == EmployeeType.Manager){
+                if (user?.employeeType == EmployeeType.Manager) {
                     sidebarItems = sidebarItems.concat([
                         { name: "Employees", icon: "tuiIconUsersLarge", route: "employees" },
                         { name: "Statistics", icon: "tuiIconTrelloLarge", route: "statistics" }
-                    ]);   
+                    ]);
                 }
                 sidebarItems.push({ name: "Settings", icon: "tuiIconSettingsLarge", route: "settings" });
                 return sidebarItems;
             }));
     }
 
-    constructor(private router: Router, private session: SessionService) {
+    constructor(private router: Router, 
+        @Inject(SessionType.Employee) private session: SessionService<Employee>) {
         super();
     }
 
     openProfile() {
         this.dropdownOpen = false;
-        this.session.guardWithAuth(() => this.router.navigate([`dashboard/profile/`])).subscribe();
+        this.session.guardWithAuth().subscribe(_ => {
+            this.router.navigate([`dashboard/profile/`]);
+        });
     }
 
-    logout(){
+    logout() {
         this.session.logout();
         this.router.navigate([`/login`]);
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 }

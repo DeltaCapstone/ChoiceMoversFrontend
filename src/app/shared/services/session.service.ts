@@ -1,22 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Employee, LoginRequest } from '../../models/employee';
-import { EmployeesService } from './employees.service';
+import { LoginRequest } from '../../models/employee';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Router } from '@angular/router';
+import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
+
 
 @Injectable({
     providedIn: 'root'
 })
-export class SessionService {
-    user$: Observable<Employee | undefined> = of(undefined);
+export class SessionService<T> {
+    private config: SessionServiceConfig<T>;
+    user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
+    scheduleSessionState = new ScheduleSessionState;
 
-    constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService, private router: Router) {
+    ngOnInit(){
+        this.guardWithAuth().subscribe(_ => {
+            this.user$ = this.config.getUser();
+            // this.user$ = this.employeesService.getProfile();
+        });
+    }
+
+    constructor(private http: HttpClient, private feature: FeatureService, private router: Router, config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
+        this.config = config;
+    }
 
-        this.guardWithAuth(() => this.user$ = this.employeesService.getProfile());
+    getType(): SessionType {
+        return this.config.type;
     }
 
     login(userName: string, passwordPlain: string): Observable<boolean> {
@@ -24,12 +37,12 @@ export class SessionService {
             userName: userName,
             passwordPlain: passwordPlain
         };
-        return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
+        return this.http.post<LoginRequest>(`${this.apiUrl}/${this.config.loginRoute}`, loginRequest).pipe(
             switchMap((res: any) => {
                 const accessToken = res["accessToken"];
-                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
+                this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
                 if (accessToken) {
-                    return this.employeesService.getProfile().pipe(
+                    return this.config.getUser().pipe(
                         tap(profile => {
                             this.user$ = of(profile);
                         }),
@@ -51,27 +64,31 @@ export class SessionService {
     }
 
     logout() {
-        this.setSessionValues("", "", "", "", "");
+        localStorage.clear();
+        sessionStorage.clear();
+        this.scheduleSessionState.clear();
         this.user$ = of(undefined);
     }
 
-    getUser(): Observable<Employee | undefined> {
+    getUser(): Observable<T | undefined> {
         return this.user$;
     }
 
-    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { this.router.navigate(["/login"]) }): Observable<any> {
+    guardWithAuth(): Observable<boolean> {
         if (this.isActive()) {
-            return of(onSuccess()).pipe(take(1));
+            return of(true).pipe(take(1));
         }
-        else {
+        else { // attempt a refresh
             return this.refresh().pipe(
                 take(1),
                 map(success => {
+                    console.log(success);
                     if (success) {
-                        return onSuccess();
+                        return true;
                     }
                     else {
-                        return onFailure();
+                        this.router.navigate(["login"]);
+                        return false;
                     }
                 })
             )
@@ -94,7 +111,7 @@ export class SessionService {
         }
 
         return this.http.post(`${this.apiUrl}/renewAccess`, { "refreshToken": refreshToken }).pipe(
-            tap((res: any) => this.setSessionValues(res["accessToken"], res["accessTokenExpiresAt"])),
+            tap((res: any) => this.setStorageValues(res["accessToken"], res["accessTokenExpiresAt"])),
             map(_ => true),
             catchError(err => {
                 console.error(err);
@@ -104,7 +121,7 @@ export class SessionService {
         )
     }
 
-    private setSessionValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
+    private setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";

@@ -15,16 +15,20 @@ import { StorageComponent } from './content/home/storage/storage/storage.compone
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 import { LoginComponent } from './shared/components/login/login.component';
-import { dashboardGuard } from './shared/guards/dashboard.guard';
+import { DashboardGuard } from './shared/guards/dashboard.guard';
 import { EmployeeInfoComponent } from './shared/components/employee-info/employee-info.component';
-import { JobInfoComponent } from './shared/components/job-info/job-info.component';
+import { JobComponent } from './shared/components/job/job.component';
+import { JobInfoComponent } from './shared/components/job/job-info/job-info.component';
+import { JobWorkersComponent } from './shared/components/job/job-workers/job-workers.component';
+import { jobGuard } from './shared/guards/job.guard';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { inject } from '@angular/core';
 import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'home', redirectTo: 'home/customer-home', pathMatch: 'full' },
     { path: 'dashboard', redirectTo: 'dashboard/schedule', pathMatch: 'full' },
-
     {
         path: 'home', component: HomeComponent, children: [
             { path: 'customer-home', component: CustomerHomeComponent },
@@ -39,9 +43,16 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
+        path: 'dashboard', component: DashboardComponent, canActivate: [() => inject(DashboardGuard).canActivate()], children: [
             { path: 'schedule', component: ScheduleComponent },
-            { path: 'schedule/job/:jobId', component: JobInfoComponent },
+            {
+                path: 'schedule/job/:jobId', component: JobComponent, canActivate: [jobGuard], children: [
+                    { path: '', redirectTo: 'info', pathMatch: 'full' },
+                    { path: 'info', component: JobInfoComponent },
+                    { path: 'workers', component: JobWorkersComponent },
+                    { path: 'workers/:userName', component: EmployeeInfoComponent },
+                ]
+            },
             { path: 'employees', component: EmployeesComponent },
             { path: 'employees/employee/:userName', component: EmployeeInfoComponent },
             { path: 'statistics', component: StatisticsComponent },
@@ -50,4 +61,5 @@ export const routes: Routes = [
         ]
     },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
+    { path: '**', component: NotFoundComponent }
 ];

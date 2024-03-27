@@ -1,0 +1,127 @@
+<div *ngIf="(job$ | async) as job">
+    <div class="m-4 flex items-center">
+        <div class="flex flex-col text-left justify-center">
+            <p class="text-4xl">{{ job.customer.email }}</p>
+        </div>
+        <tui-tag class="ml-5" [value]="status"></tui-tag>
+    </div>
+
+    <section class="ml-6 mt-6">
+        <div class="flex flex-wrap gap-2">
+            <ng-container *ngFor="let item of checked; index as i">
+                <label tuiLabel class="flex items-center gap-2">
+                    <input tuiCheckbox type="checkbox" [(ngModel)]="checked[i][1]" class="tui-checkbox" />
+                    <span>{{ checked[i][0] }}</span>
+                </label>
+            </ng-container>
+        </div>
+    </section>
+
+    <div class="flex w-full">
+        <div class="tui-container w-1/2">
+            <form [formGroup]="form">
+                <div class="tui-row tui-row_sme">
+                    <div class="tui-col_8 w-5/6 m-auto mt-8">
+                        <div class="tui-form__row tui-form__row_multi-fields">
+                            <div class="tui-form__multi-field">
+                                <tui-input-date tuiTextfieldSize="m" formControlName="startTime" [readOnly]=true>
+                                    Start
+                                </tui-input-date>
+                                <tui-error formControlName="startTime" [error]="[] | tuiFieldError | async"></tui-error>
+                            </div>
+
+                            <div class="tui-form__multi-field">
+                                <tui-input-date tuiTextfieldSize="m" formControlName="endTime" [readOnly]=true>
+                                    End
+                                </tui-input-date>
+                                <tui-error formControlName="endTime" [error]="[] | tuiFieldError | async"></tui-error>
+                            </div>
+                        </div>
+
+                        <ng-container *ngIf="checked[1][1]">
+                            <div class="m-3 ml-0" tuiHeader="xxs">
+                                <h1 tuiTitle>Load address</h1>
+                            </div>
+                            <div class="tui-form__row">
+                                <tui-input tuiTextfieldSize="m" formControlName="loadAddrStreet">
+                                    Street
+                                </tui-input>
+                            </div>
+
+                            <div class="tui-form__row tui-form__row_multi-fields">
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="loadAddrState" [readOnly]=true>
+                                        State
+                                    </tui-input>
+                                </div>
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="loadAddrCity" [readOnly]=true>
+                                        City
+                                    </tui-input>
+                                </div>
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="loadAddrZip" [readOnly]=true>
+                                        Zip
+                                    </tui-input>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="checked[2][1]">
+                            <div class="m-3 ml-0" tuiHeader="xxs">
+                                <h1 tuiTitle>Unload address</h1>
+                            </div>
+                            <div class="tui-form__row">
+                                <tui-input tuiTextfieldSize="m" formControlName="unloadAddrStreet">
+                                    Street
+                                </tui-input>
+                            </div>
+
+                            <div class="tui-form__row tui-form__row_multi-fields">
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="unloadAddrState" [readOnly]=true>
+                                        State
+                                    </tui-input>
+                                </div>
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="unloadAddrCity" [readOnly]=true>
+                                        City
+                                    </tui-input>
+                                </div>
+                                <div class="tui-form__multi-field">
+                                    <tui-input tuiTextfieldSize="m" formControlName="unloadAddrZip" [readOnly]=true>
+                                        Zip
+                                    </tui-input>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div class="tui-form__row tui-form__row_multi-fields">
+                            <div class="tui-form__multi-field">
+                                <tui-textarea tuiTextfieldSize="m" formControlName="notes">
+                                    Notes
+                                </tui-textarea>
+                            </div>
+                            <div class="flex flex-col items-center justify-center tui-form__multi-field">
+                                <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
+                                    <span>Rooms</span>
+                                    <span class="opacity-45">5</span>
+                                </div>
+                                <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
+                                    <span>Boxes</span>
+                                    <span class="opacity-45">5</span>
+                                </div>
+                                <a class="opacity-50 py-0.5 text-left text-m w-3/4">More info...</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="tui-container w-1/2">
+            <div>
+                <img src="/assets/map.jpg" class="mx-auto max-w-full h-[500px]" />
+            </div>
+        </div>
+    </div>
+</div>

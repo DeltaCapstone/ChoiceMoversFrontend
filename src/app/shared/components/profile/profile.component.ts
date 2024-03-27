@@ -1,19 +1,20 @@
-import { Component, Input, } from '@angular/core';
+import { Component, Inject, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { TuiDataListModule, TuiErrorModule } from '@taiga-ui/core';
+import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/employee';
 import { Observable, Subscription, map, finalize, take } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
+import { SessionType } from '../../../models/session.model';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
     imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
-              CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule],
+        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule, TuiSvgModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -51,13 +52,14 @@ export class ProfileComponent extends BaseComponent {
         this.subscriptions.push(userSub);
     }
 
-    constructor(private location: Location, private session: SessionService,
+    constructor(private location: Location, 
+        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }
 
     update() {
-        this.session.guardWithAuth(() => {
+        this.session.guardWithAuth().subscribe(_ => {
             const formValues = this.form.value;
             this.user$.pipe(
                 finalize(() => this.back()),
@@ -80,7 +82,7 @@ export class ProfileComponent extends BaseComponent {
                     }
                 });
             });
-        }).pipe((take(1))).subscribe();
+        });
     }
 
     back() {
