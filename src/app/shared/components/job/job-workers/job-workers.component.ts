@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { Job } from '../../../../models/job.model';
-import { Observable, Subscription, map, tap } from 'rxjs';
+import { Observable, Subscription, map, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
@@ -10,6 +9,7 @@ import { AssignedEmployee, Employee } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
 import { SessionType } from '../../../../models/session.model';
+import { EmployeesService } from '../../../services/employees.service';
 
 @Component({
     selector: 'app-job-workers',
@@ -26,15 +26,30 @@ export class JobWorkersComponent extends BaseComponent {
     ngOnInit() {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.workers$ = this.jobsService.getJob(jobId).pipe(
-            tap(job => console.log(job)),
-            map(job => job?.assignedEmployees ?? [])
-        );
+            switchMap(job => {
+                const assignedEmployees = job?.assignedEmployees ?? [];
+                return this.employeesService.getEmployees().pipe(
+                    map(employees => {
+                        const assignedEmps = [];
+                        for (const emp of employees){
+                            const assignedEmp = assignedEmployees.find(assignedEmp => emp.userName == assignedEmp.userName);
+                            if (assignedEmp){
+                                Object.assign(assignedEmp, emp);
+                                assignedEmps.push(assignedEmp);
+                            }
+                        }
+                        return assignedEmps;
+                    })
+                );
+            })
+        )
     }
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
         private route: ActivatedRoute,
         private jobsService: JobsService,
+        private employeesService: EmployeesService,
         private router: Router,
     ) {
         super();

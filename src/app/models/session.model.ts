@@ -8,17 +8,20 @@ export interface IScheduleSessionState {
     jobsStartDate: string;
     jobsEndDate: string;
     jobId: string;
+    tabIndex: number;
 }
 
 export class ScheduleSessionState implements IScheduleSessionState, ISessionState {
     jobsStartDate = "";
     jobsEndDate = "";
     jobId = "";
+    tabIndex = 0;
 
     clear(): void {
         this.jobsStartDate = "";
         this.jobsEndDate = "";
         this.jobId = "";
+        this.tabIndex = 0;
     }
 }
 

@@ -32,6 +32,7 @@ export class JobComponent extends BaseComponent {
     ngOnInit() {
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
+        this.navigateToTab(this.session.scheduleSessionState.tabIndex);
     }
 
     selfAssign() {
@@ -43,7 +44,31 @@ export class JobComponent extends BaseComponent {
         ).subscribe(); 
     }
 
+    setTabIndex(tabIndex: number){
+        this.session.scheduleSessionState.tabIndex = tabIndex;
+    }
+
+    private navigateToTab(tabIndex: number){
+        const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
+
+        let tabRoute = `dashboard/schedule/job/${jobId}`;
+        switch (tabIndex){
+            case 0:
+                tabRoute += "/info";
+                break;
+            case 1:
+                tabRoute += "/workers";
+                break;
+            case 2:
+                // TODO
+                tabRoute += "/workers";
+                break;
+        }
+        this.router.navigate([tabRoute]);
+    }
+
     back() {
+        this.session.scheduleSessionState.tabIndex = 0;
         this.session.scheduleSessionState.jobId = "";
         this.router.navigate(["/dashboard/schedule"]);
     }
