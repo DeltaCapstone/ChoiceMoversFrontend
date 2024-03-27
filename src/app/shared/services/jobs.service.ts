@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap } from 'rxjs';
+import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { Job } from '../../models/job.model';
+import { AssignmentConflictType, Job } from '../../models/job.model';
+import { AssignedEmployee } from '../../models/employee';
 
 /**
  * Service that provides an interface for creating and updating jobs from the customer facing Moving page.
@@ -39,6 +40,51 @@ export class JobsService {
     // -----------------------
     // EMPLOYEE REQUESTS
     // -----------------------
+
+    checkAssignmentAvailability(jobId: string): Observable<AssignedEmployee | AssignmentConflictType | null> {
+        return this.http.get<AssignedEmployee>(`${this.apiUrl}/employee/jobs/checkAssign?jobID=${jobId}`).pipe(
+            catchError(err => {
+                let errorType: AssignmentConflictType | null = null;
+
+                switch(err.error) {
+                    case AssignmentConflictType.JobFull:
+                        errorType = AssignmentConflictType.JobFull;
+                        break;
+                    case AssignmentConflictType.AlreadyAssigned:
+                        errorType = AssignmentConflictType.AlreadyAssigned;
+                        break;
+                    default:
+                        return throwError(() => err);
+                }
+
+                return of(errorType);
+            })
+        );
+    }
+
+    selfAssign(jobId: string) {
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
+    }
+
+    selfRemove(jobId: string) {
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfRemove?jobID=${jobId}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
+    }
 
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
         return this.cache$.pipe(
@@ -81,6 +127,7 @@ export class JobsService {
     // GENERAL REQUESTS
     // -----------------------
 
+    // currently only looks in the cache
     getJob(jobId: string): Observable<Job | undefined> {
         console.log("job cache hit");
         return this.cache$.pipe(map(cache => cache.get(jobId)));

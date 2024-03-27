@@ -1,32 +1,35 @@
-<table class="w-full mt-4 p-4" tuiTable [columns]="columns">
-    <thead>
-        <tr tuiThGroup>
-            <th *tuiHead="'email'" tuiTh>
-                E-mail
-            </th>
-            <th *tuiHead="'name'" tuiTh>
-                Name
-            </th>
-            <th *tuiHead="'employeeType'" tuiTh>
-                Employee Type
-            </th>
-        </tr>
-    </thead>
+<div class="mt-4 p-4 w-full" *ngIf="maxWorkers$ | async as maxWorkers">
     <ng-container *ngIf="workers$ | async as employees">
-        <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
-            <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
-                <td [routerLink]="item.userName" class="cursor-pointer" *tuiCell="'name'" tuiTd>
-                    {{ item.firstName + ' ' + item.lastName }}
-                </td>
-                <td *tuiCell="'email'" tuiTd>
-                    <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
-                        {{ item.email }}
-                    </a>
-                </td>
-                <td *tuiCell="'employeeType'" tuiTd>
-                    {{ item.employeeType }}
-                </td>
-            </tr>
-        </tbody>
+        <tui-tag class="mb-4" [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
+        <table class="w-full" tuiTable [columns]="columns">
+            <thead>
+                <tr tuiThGroup>
+                    <th *tuiHead="'email'" tuiTh>
+                        E-mail
+                    </th>
+                    <th *tuiHead="'name'" tuiTh>
+                        Name
+                    </th>
+                    <th *tuiHead="'employeeType'" tuiTh>
+                        Employee Type
+                    </th>
+                </tr>
+            </thead>
+            <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
+                <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
+                    <td [routerLink]="item.userName" class="cursor-pointer" *tuiCell="'name'" tuiTd>
+                        {{ item.firstName + ' ' + item.lastName }}
+                    </td>
+                    <td *tuiCell="'email'" tuiTd>
+                        <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
+                            {{ item.email }}
+                        </a>
+                    </td>
+                    <td *tuiCell="'employeeType'" tuiTd>
+                        {{ item.employeeType }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </ng-container>
-</table>
+</div>
