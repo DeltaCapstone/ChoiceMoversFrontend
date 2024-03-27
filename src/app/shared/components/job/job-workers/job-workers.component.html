@@ -1,6 +1,9 @@
 <div class="mt-4 p-4 w-full" *ngIf="maxWorkers$ | async as maxWorkers">
     <ng-container *ngIf="workers$ | async as employees">
-        <tui-tag class="mb-4" [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
+        <div class="flex justify-between w-[29%] mb-4">
+            <tui-tag [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
+            <tui-tag *ngIf="canOverride$ | async" value="Override available"></tui-tag>
+        </div>
         <table class="w-full" tuiTable [columns]="columns">
             <thead>
                 <tr tuiThGroup>

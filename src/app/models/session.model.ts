@@ -1,27 +1,53 @@
-import { Observable } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
+import { AssignedEmployee } from "./employee";
 
 export interface ISessionState {
     clear(): void;
 }
 
+export interface IJobSessionState {
+    jobId: string;
+    employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
+    isFull$: ReplaySubject<boolean>;
+    alreadyAssigned$: ReplaySubject<boolean>;
+}
+
 export interface IScheduleSessionState {
+    jobSessionState: JobSessionState | null;
     jobsStartDate: string;
     jobsEndDate: string;
-    jobId: string;
     tabIndex: number;
+}
+
+export class JobSessionState implements IJobSessionState, ISessionState {
+    jobId = "";
+    employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
+    isFull$ = new ReplaySubject<boolean>(1);
+    alreadyAssigned$ = new ReplaySubject<boolean>(1);
+
+    constructor(jobId: string=""){
+        this.jobId = jobId;
+    }
+
+    clear(): void {
+        this.jobId = "";
+        this.employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
+        this.isFull$ = new ReplaySubject<boolean>(1);
+        this.alreadyAssigned$ = new ReplaySubject<boolean>(1);
+    }
 }
 
 export class ScheduleSessionState implements IScheduleSessionState, ISessionState {
     jobsStartDate = "";
     jobsEndDate = "";
-    jobId = "";
     tabIndex = 0;
+    jobSessionState = new JobSessionState();
 
     clear(): void {
         this.jobsStartDate = "";
         this.jobsEndDate = "";
-        this.jobId = "";
         this.tabIndex = 0;
+        this.jobSessionState.clear();
     }
 }
 
