@@ -46,6 +46,7 @@ export class SidebarComponent extends BaseComponent {
 
         this.sidebarItems$ = this.user$.pipe(
             map(user => {
+                console.log(user);
                 let sidebarItems = [];
                 sidebarItems.push({ name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" });
                 if (user?.employeeType == EmployeeType.Manager) {

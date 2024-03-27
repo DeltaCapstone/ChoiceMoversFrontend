@@ -16,16 +16,12 @@ export class SessionService<T> {
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
 
-    ngOnInit(){
-        this.guardWithAuth().subscribe(_ => {
-            this.user$ = this.config.getUser();
-            // this.user$ = this.employeesService.getProfile();
-        });
-    }
-
     constructor(private http: HttpClient, private feature: FeatureService, private router: Router, config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
+        this.guardWithAuth().subscribe(_ => {
+            this.user$ = this.config.getUser();
+        });
     }
 
     getType(): SessionType {
