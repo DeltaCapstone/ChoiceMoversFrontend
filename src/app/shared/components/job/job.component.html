@@ -18,13 +18,14 @@
             </a>
         </tui-tabs>
     </div>
-    <div class="flex flex-col" *tuiLet="conflictMessage$ | async as conflict">
-        <button (click)="selfAssign()" tuiButton type="submit" [disabled]="conflict"
+    <div class="flex flex-col" *tuiLet="isFull$ | async as isFull">
+        <button (click)="alreadyAssigned ? selfRemove() : selfAssign()" tuiButton type="submit" [disabled]="isFull"
+            *tuiLet="alreadyAssigned$ | async as alreadyAssigned"
             class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
-            [ngClass]="{'opacity-50': conflict}">
-            Assign yourself
+            [ngClass]="{'opacity-50': isFull}">
+            {{ alreadyAssigned ? "Unassign yourself" : "Assign yourself" }}
         </button>
-        <p class="text-[red] opacity-50" *ngIf="conflict">{{ conflict }}</p>
+        <p class="text-[red] opacity-50" *ngIf="isFull">This job is full</p>
     </div>
 </div>
 

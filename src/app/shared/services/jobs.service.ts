@@ -41,7 +41,7 @@ export class JobsService {
     // EMPLOYEE REQUESTS
     // -----------------------
 
-    checkAssignmentAvailability(jobId: string): Observable<AssignedEmployee | AssignmentConflictType> {
+    checkAssignmentAvailability(jobId: string): Observable<AssignedEmployee | AssignmentConflictType | null> {
         return this.http.get<AssignedEmployee>(`${this.apiUrl}/employee/jobs/checkAssign?jobID=${jobId}`).pipe(
             catchError(err => {
                 let errorType: AssignmentConflictType | null = null;
@@ -64,6 +64,18 @@ export class JobsService {
 
     selfAssign(jobId: string) {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
+    }
+
+    selfRemove(jobId: string) {
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfRemove?jobID=${jobId}`, {}).pipe(
             tap(assignedEmployees => {
                 const partialJob: Partial<Job> = {
                     jobId: jobId,  

@@ -6,9 +6,9 @@ import { TuiSvgModule } from '@taiga-ui/core';
 import { TuiTabsModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
 import { SessionType } from '../../../models/session.model';
-import { Employee } from '../../../models/employee';
+import { AssignedEmployee, Employee } from '../../../models/employee';
 import { JobsService } from '../../services/jobs.service';
-import { Observable, map, of, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, of, switchMap, take } from 'rxjs';
 import { AssignmentConflictType, Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
@@ -23,7 +23,9 @@ import { TuiLetModule } from '@taiga-ui/cdk';
 })
 export class JobComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
-    conflictMessage$: Observable<string>;
+    isFull$ = new BehaviorSubject(false);
+    alreadyAssigned$ = new BehaviorSubject(false);
+    employeeToBoot$ = new Subject<AssignedEmployee | null>();
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
@@ -37,7 +39,7 @@ export class JobComponent extends BaseComponent {
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
         this.navigateToTab(this.session.scheduleSessionState.tabIndex);
-        this.conflictMessage$ = this.getConflictMessage(jobId); 
+        this.updateConflicts(jobId); 
     }
 
     selfAssign() {
@@ -48,7 +50,19 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.conflictMessage$ = this.getConflictMessage(job.jobId) : null)
+                this.updateConflicts(job.jobId) : null)
+        });
+    }
+
+    selfRemove() {
+        this.job$.pipe(
+            take(1),
+            switchMap(job => job ? 
+                this.jobsService.selfRemove(job.jobId!) : 
+                of(undefined))
+        ).subscribe(_ => {
+            this.job$.pipe(take(1)).subscribe(job => job ?
+                this.updateConflicts(job.jobId) : null)
         });
     }
 
@@ -56,19 +70,25 @@ export class JobComponent extends BaseComponent {
         this.session.scheduleSessionState.tabIndex = tabIndex;
     }
 
-    getConflictMessage(jobId: string): Observable<string> {
-        return this.jobsService.checkAssignmentAvailability(jobId).pipe(
-            map(res => {
-                switch (res){
-                    case AssignmentConflictType.AlreadyAssigned:
-                        return "You are already assigned to this job";
-                    case AssignmentConflictType.JobFull:
-                        return "This job is full, and there is no one you can override";
-                    default:
-                        return "";
+    updateConflicts(jobId: string) {
+        this.jobsService.checkAssignmentAvailability(jobId)
+            .subscribe(res => {
+                if (typeof res === 'string') {
+                    switch (res) {
+                        case AssignmentConflictType.AlreadyAssigned:
+                            this.alreadyAssigned$.next(true);
+                            break;
+                        case AssignmentConflictType.JobFull:
+                            this.isFull$.next(true);
+                            break;
+                    }
                 }
+                else {
+                    this.alreadyAssigned$.next(false);
+                    this.isFull$.next(false);
+                    this.employeeToBoot$.next(res);
+                }           
             })
-        )
     }
 
     private navigateToTab(tabIndex: number){
