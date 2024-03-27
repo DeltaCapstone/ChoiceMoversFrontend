@@ -3,6 +3,7 @@ import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap } 
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Job } from '../../models/job.model';
+import { AssignedEmployee } from '../../models/employee';
 
 /**
  * Service that provides an interface for creating and updating jobs from the customer facing Moving page.
@@ -41,8 +42,15 @@ export class JobsService {
     // -----------------------
 
     selfAssign(jobId: string) {
-        return this.http.post(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {});
-        // TODO: update cache
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
     }
 
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
