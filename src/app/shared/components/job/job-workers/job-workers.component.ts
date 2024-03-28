@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
@@ -8,7 +8,7 @@ import { TuiLetModule } from '@taiga-ui/cdk';
 import { AssignedEmployee, Employee } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
-import { SessionType } from '../../../../models/session.model';
+import { JobSessionState, SessionType } from '../../../../models/session.model';
 import { EmployeesService } from '../../../services/employees.service';
 import { TuiTagModule } from '@taiga-ui/kit';
 
@@ -29,11 +29,8 @@ export class JobWorkersComponent extends BaseComponent {
     subscriptions: Subscription[] = [];
 
     ngOnInit() {        
-        this.displayOverride$ = combineLatest([
-            this.jobSessionState.isFull$, 
-            this.jobSessionState.employeeToBoot$
-        ]).pipe(
-            map(([isFull, employeeToBoot]) => isFull && !!employeeToBoot)
+        this.displayOverride$ = this.jobSessionState.employeeToBoot$.pipe(
+            map(employeeToBoot => !!employeeToBoot)
         );
         
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
