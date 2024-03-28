@@ -108,6 +108,9 @@ export class MovePlannerComponent extends PageComponent {
   constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router, private _valueTransformerService: ValueTransformerService, private _googleMapsLoaderService: GoogleMapsLoaderService, private _elementRef: ElementRef) {
     super(pageService);
 
+    // Initialize the itemsGroup FormGroup
+    this.itemsGroup = this._formBuilder.group({});
+
   }
 
   ngOnInit(): void {
@@ -257,8 +260,6 @@ export class MovePlannerComponent extends PageComponent {
    * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
    */
   populateRoomItems(): void {
-    // Reset the itemsGroup FormGroup
-    this.itemsGroup = this._formBuilder.group({});
 
     // Filter out the unchecked rooms
     this.checkedRooms = Object.entries(this.roomsGroup.controls)
