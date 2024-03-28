@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, Subscription, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, map, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
@@ -23,13 +23,17 @@ import { TuiTagModule } from '@taiga-ui/kit';
 export class JobWorkersComponent extends BaseComponent {
     maxWorkers$ = new BehaviorSubject<string>("0");
     workers$: Observable<AssignedEmployee[]>;
-    canOverride$: Observable<boolean>;
+    jobSessionState = this.session.scheduleSessionState.jobSessionState;
+    displayOverride$: Observable<boolean>;
     readonly columns = ["name", "email", "employeeType"];
     subscriptions: Subscription[] = [];
 
     ngOnInit() {        
-        this.canOverride$ = this.session.scheduleSessionState.jobSessionState.employeeToBoot$.asObservable().pipe(
-            map(emp => !!emp)
+        this.displayOverride$ = combineLatest([
+            this.jobSessionState.isFull$, 
+            this.jobSessionState.employeeToBoot$
+        ]).pipe(
+            map(([isFull, employeeToBoot]) => isFull && !!employeeToBoot)
         );
         
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";

@@ -25,7 +25,7 @@ export class JobComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
     isFull$: Observable<boolean>; 
     alreadyAssigned$: Observable<boolean>;
-    jobSessionState: JobSessionState;
+    jobSessionState = this.session.scheduleSessionState.jobSessionState;
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
@@ -36,8 +36,6 @@ export class JobComponent extends BaseComponent {
     }
 
     ngOnInit() {
-        this.jobSessionState = this.session.scheduleSessionState.jobSessionState;
-
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
         this.jobSessionState.jobId = jobId;
