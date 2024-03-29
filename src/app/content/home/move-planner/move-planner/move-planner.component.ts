@@ -290,7 +290,10 @@ export class MovePlannerComponent extends PageComponent {
 
   }
 
-  /*
+  /**
+   * Saves the current state of the move for to a session variable in case the customer navigates away from the move planner
+   * in the middle of the move planning process
+   */
   saveMovePlannerState(): void {
 
     //ServicesGroup
@@ -305,14 +308,105 @@ export class MovePlannerComponent extends PageComponent {
     //MoveDateGroup
     this.jobSessionState.currentJob.startTime = this.moveDateGroup.get('dateTime')?.value;
 
+    //FromAddressResTypeGroup
+    this.jobSessionState.currentJob.loadAddr.resType = this.fromAddressResType.get('fromResType')?.value;
+
+    //FromAddressFlightsGroup
+    this.jobSessionState.currentJob.loadAddr.flights = this.fromAddressFlights.get('fromNumberOfFlights')?.value;
+
     //FromAddressGroup
+    this.jobSessionState.currentJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
+    this.jobSessionState.currentJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
+    this.jobSessionState.currentJob.loadAddr.state = this.fromAddressGroup.get('fromState')?.value;
+    this.jobSessionState.currentJob.loadAddr.zip = this.fromAddressGroup.get('fromZip')?.value;
+    this.jobSessionState.currentJob.loadAddr.aptNum = this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value ?? '';
 
+    //ToAddressResTypeGroup
+    this.jobSessionState.currentJob.unloadAddr.resType = this.toAddressResType.get('toResType')?.value;
 
+    //ToAddressFlightsGroup
+    this.jobSessionState.currentJob.unloadAddr.flights = this.toAddressFlights.get('toNumberOfFlights')?.value;
 
+    //ToAddressGroup
+    this.jobSessionState.currentJob.unloadAddr.street = this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value;
+    this.jobSessionState.currentJob.unloadAddr.city = this.toAddressGroup.get('toCity')?.value;
+    this.jobSessionState.currentJob.unloadAddr.state = this.toAddressGroup.get('toState')?.value;
+    this.jobSessionState.currentJob.unloadAddr.zip = this.toAddressGroup.get('toZip')?.value;
+    this.jobSessionState.currentJob.unloadAddr.aptNum = this.toAddressGroup.get('toAptNumUnitOrSuite')?.value ?? '';
+
+    //RoomsGroup
+    this.jobSessionState.currentJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
+
+    //BoxesGroup
+    this.jobSessionState.currentJob.boxes = this.boxesGroup.value ?? new Map();
+
+    //SpecialtyGroup
+    this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
+
+    //TODO:Need to add special requests group once it is created on the backend
 
   }
 
-  */
+  /**
+   * Refreshes move planner state if the customer navigates away from the move planner in the middle of planning the move
+   * @param sessionStateObject The session object that holds the current move planner session values
+   */
+  refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
+
+    //ServicesGroup
+    this.servicesGroup.get('pack')?.value !== null ? sessionStateObject.currentJob.pack : false;
+    this.servicesGroup.get('unpack')?.value !== null ? sessionStateObject.currentJob.unpack : false;
+    this.servicesGroup.get('load')?.value !== null ? sessionStateObject.currentJob.load : false;
+    this.servicesGroup.get('unload')?.value !== null ? sessionStateObject.currentJob.unload : false;
+
+    //NeedTruckGroup
+    this.needTruckGroup.get('needTruck')?.value !== null ? sessionStateObject.currentJob.needTruck : false;
+
+    //MoveDateGroup
+    this.moveDateGroup.get('dateTime')?.value !== null ? sessionStateObject.currentJob.startTime : '';
+
+    //FromAddressResTypeGroup
+    this.fromAddressResType.get('fromResType')?.value !== null ? sessionStateObject.currentJob.loadAddr.resType : 'House';
+
+    //FromAddressFlightsGroup
+    this.fromAddressFlights.get('fromNumberOfFlights')?.value !== null ? sessionStateObject.currentJob.loadAddr.flights : 0;
+
+    //FromAddressGroup
+    this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value !== null ?
+      sessionStateObject.currentJob.loadAddr.street : '';
+    this.fromAddressGroup.get('fromCity')?.value !== null ? sessionStateObject.currentJob.loadAddr.city : '';
+    this.fromAddressGroup.get('fromState')?.value !== null ? sessionStateObject.currentJob.loadAddr.state : '';
+    this.fromAddressGroup.get('fromZip')?.value !== null ? sessionStateObject.currentJob.loadAddr.zip : '';
+    this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value !== null ? sessionStateObject.currentJob.loadAddr.aptNum : '';
+
+    //ToAddressResTypeGroup
+    this.toAddressResType.get('toResType')?.value !== null ? sessionStateObject.currentJob.unloadAddr.resType : 'House';
+
+    //ToAddressFlightsGroup
+    this.toAddressFlights.get('toNumberOfFlights')?.value !== null ? sessionStateObject.currentJob.unloadAddr.flights : 0;
+
+    //ToAddressGroup
+    this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value !== null ?
+      sessionStateObject.currentJob.unloadAddr.street : '';
+    this.toAddressGroup.get('toCity')?.value !== null ? sessionStateObject.currentJob.unloadAddr.city : '';
+    this.toAddressGroup.get('toState')?.value !== null ? sessionStateObject.currentJob.unloadAddr.state : '';
+    this.toAddressGroup.get('toZip')?.value !== null ? sessionStateObject.currentJob.unloadAddr.zip : '';
+    this.toAddressGroup.get('toAptNumUnitOrSuite')?.value !== null ? sessionStateObject.currentJob.unloadAddr.aptNum : '';
+
+    //RoomsGroup
+    this.populateFormItems(this.jobSessionState.currentJob.rooms) !== null ? this.populateFormItems(sessionStateObject.currentJob.rooms) : [];
+
+    //BoxesGroup
+    this.boxesGroup.setValue(sessionStateObject.currentJob.boxes);
+
+    //SpecialtyGroup
+    this.specialtyGroup.setValue(sessionStateObject.currentJob.special);
+
+    //TODO:Need to add special requests group once it is created on the backend
+
+  }
+
+
   /**
    * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
    */
@@ -612,7 +706,7 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.unloadAddr.aptNum = this.toAddressGroup.get('toAptNumUnitOrSuite')?.value ?? '';
     this.newJob.unloadAddr.resType = this.toAddressResType.value;
     this.newJob.unloadAddr.flights = this.toAddressFlights.value;
-    this.newJob.startTime = this.moveDateGroup.value.dateTime;
+    this.newJob.startTime = this.moveDateGroup.value.dateTime + ' ' + this.postfix;
     this.newJob.endTime = '';
 
     this.newJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
