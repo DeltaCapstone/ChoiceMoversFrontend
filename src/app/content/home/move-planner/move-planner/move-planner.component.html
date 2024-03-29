@@ -47,31 +47,58 @@
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
+        From Address Residence Type
+        <ng-container *ngIf="activeStepIndex === 3">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form class="b-form" [formGroup]="fromAddressResType">
+                    <ng-container *ngIf=""></ng-container>
+                    <tui-radio-block class="mb-4" formControlName="fromResType" item="House">House</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="fromResType"
+                        item="apartment">Apartment</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="fromResType" item="Condo">Condo</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="fromResType" item="Storage">Storage</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="fromResType" item="Other">Other</tui-radio-block>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        From Residence Number of Fights of Stairs
+        <ng-container *ngIf="activeStepIndex === 4">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form class="b-form" [formGroup]="fromAddressFlights">
+                    <tui-input-number [min]="0" formControlName="fromNumberOfFlights" class="b-form w-64">Flights of
+                        Stairs</tui-input-number>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
         Moving From Address
-        <ng-container *ngIf="this.activeStepIndex === 3">
+        <ng-container *ngIf="this.activeStepIndex === 5">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="fromAddressGroup">
                     <label>
                         <span>Moving From Address*</span>
-                        <input id="fromStreetAddress" name="fromStreetAddress" formGroupName="fromAddressStreetNumber"
-                            required autocomplete="off" #fromStreetAddress />
+                        <input id="fromStreetAddress" name="fromStreetAddress" required autocomplete="off"
+                            #fromStreetAddress />
                     </label>
                     <label>
                         <span>Apartment, unit, suite, or floor #</span>
                         <input id="fromAptNumUnitOrSuite" name="fromAptNumUnitOrSuite"
-                            formGroupName="fromApartmentNumber" #fromAptNumUnitOrSuite />
+                            formControlName="fromAptNumUnitOrSuite" #fromAptNumUnitOrSuite />
                     </label>
                     <label>
                         <span>City*</span>
-                        <input id="fromLocality" name="fromLocality" formGroupName="fromCity" #fromLocality />
+                        <input id="fromLocality" name="fromLocality" #fromLocality />
                     </label>
                     <label>
                         <span>State/Province*</span>
-                        <input id="fromState" name="fromState" formGroupName="fromState" #fromState />
+                        <input id="fromState" name="fromState" #fromState />
                     </label>
                     <label for="postal_code">
                         <span>Postal code*</span>
-                        <input id="fromPostcode" name="fromPostcode" formGroupName="fromZip" required #fromPostcode />
+                        <input id="fromPostcode" name="fromPostcode" required #fromPostcode />
                     </label>
                     <label>
                         <span>Country/Region*</span>
@@ -85,31 +112,57 @@
         </ng-container>
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
+        To Address Residence Type
+        <ng-container *ngIf="activeStepIndex === 6">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form class="b-form" [formGroup]="toAddressResType">
+                    <tui-radio-block class="mb-4" formControlName="toResType" item="House">House</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="toResType"
+                        item="apartment">Apartment</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="toResType" item="Condo">Condo</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="toResType" item="Storage">Storage</tui-radio-block>
+                    <tui-radio-block class="mb-4" formControlName="toResType" item="Other">Other</tui-radio-block>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
+        To Residence Number of Flights of Stairs
+        <ng-container *ngIf="activeStepIndex === 7">
+            <div class="absolute inset-x-0 top-full mt-4">
+                <form class="b-form" [formGroup]="toAddressFlights">
+                    <tui-input-number [min]="0" formControlName="toNumberOfFlights" class="b-form w-64">Flights of
+                        Stairs</tui-input-number>
+                </form>
+            </div>
+        </ng-container>
+    </a>
+    <a routerLink="/move-planner" routerLinkActive tuiStep>
         Moving To Address
-        <ng-container *ngIf="activeStepIndex === 4">
+        <ng-container *ngIf="activeStepIndex === 8">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="toAddressGroup">
                     <label>
                         <span>Moving To Address*</span>
-                        <input id="toStreetAddress" name="toStreetAddress" formGroupName="toAddressStreetNumber"
-                            required autocomplete="off" #toStreetAddress />
+                        <input id="toStreetAddress" name="toStreetAddress" required autocomplete="off"
+                            #toStreetAddress />
                     </label>
                     <label>
                         <span>Apartment, unit, suite, or floor #</span>
-                        <input id="toAptNumUnitOrSuite" name="toAptNumUnitOrSuite" formGroupName="toApartmentNumber"
+                        <input id="toAptNumUnitOrSuite" name="toAptNumUnitOrSuite" formControlName="toAptNumUnitOrSuite"
                             #toAptNumUnitOrSuite />
                     </label>
                     <label>
                         <span>City*</span>
-                        <input id="toLocality" name="toLocality" formGroupName="toCity" required #toLocality />
+                        <input id="toLocality" name="toLocality" required #toLocality />
                     </label>
                     <label>
                         <span>State/Province*</span>
-                        <input id="toState" name="toState" formGroupName="toState" required #toState />
+                        <input id="toState" name="toState" required #toState />
                     </label>
                     <label for="postal_code">
                         <span>Postal code*</span>
-                        <input id="toPostcode" name="toPostcode" formGroupName="toZip" required #toPostcode />
+                        <input id="toPostcode" name="toPostcode" required #toPostcode />
                     </label>
                     <label>
                         <span>Country/Region*</span>
@@ -125,10 +178,10 @@
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Rooms
         <div class="bg-secondary text-neutral text-center rounded-md ml-2"
-            *ngIf="!roomsGroup.valid && activeStepIndex === 5">
+            *ngIf="!roomsGroup.valid && activeStepIndex === 9">
             Please select at least one room
         </div>
-        <ng-container *ngIf="activeStepIndex === 5">
+        <ng-container *ngIf="activeStepIndex === 9">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form [formGroup]="roomsGroup">
                     <tui-checkbox-block class="mb-2" formControlName="Bedroom">Bedroom</tui-checkbox-block>
@@ -148,7 +201,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Items
-        <ng-container *ngIf="activeStepIndex === 6">
+        <ng-container *ngIf="activeStepIndex === 10">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="roomsGroup">
                     <tui-accordion class="container" [rounded]="false">
@@ -178,7 +231,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Boxes Needed
-        <ng-container *ngIf="activeStepIndex === 7">
+        <ng-container *ngIf="activeStepIndex === 11">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="boxesGroup">
                     <tui-input-number [min]="0" class="b-form" value="value" formControlName="smBox">Small
@@ -193,7 +246,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Specialty Items
-        <ng-container *ngIf="activeStepIndex === 8">
+        <ng-container *ngIf="activeStepIndex === 12">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialtyGroup">
                     <!--Populate specialty items-->
@@ -206,7 +259,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Special Requests
-        <ng-container *ngIf="activeStepIndex === 9">
+        <ng-container *ngIf="activeStepIndex === 13">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialRequestGroup">
                     <textarea name="specialTextArea" formGroupName="specialTextArea" #specialTextArea cols="30"
@@ -222,7 +275,7 @@
     </a>
     <a routerLink="/move-planner" routerLinkActive tuiStep>
         Finalize and Submit
-        <ng-container *ngIf="activeStepIndex === 10">
+        <ng-container *ngIf="activeStepIndex === 14">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <ng-template #icon>
                     <tui-svg src="tuiIconCheckLarge"></tui-svg>

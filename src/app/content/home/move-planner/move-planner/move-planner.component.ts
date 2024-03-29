@@ -1,10 +1,10 @@
-import { Component, ChangeDetectionStrategy, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ElementRef, Inject, ViewChild } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
-import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider, TUI_DATE_TIME_VALUE_TRANSFORMER, TuiInputDateTimeModule, tuiInputTimeOptionsProvider, TuiToggleModule } from '@taiga-ui/kit';
+import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider, TUI_DATE_TIME_VALUE_TRANSFORMER, TuiInputDateTimeModule, tuiInputTimeOptionsProvider, TuiToggleModule, TuiRadioBlockModule } from '@taiga-ui/kit';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
+import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK, TuiHostedDropdownModule, TuiDataListModule } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
 import { TuiDay, TuiDayOfWeek, TuiTime, TuiValidatorModule } from '@taiga-ui/cdk';
@@ -12,11 +12,14 @@ import { CreateJobEstimate } from '../../../../models/create-job-estimate.model'
 import { Customer } from '../../../../models/customer.model';
 import { ValueTransformerService } from '../../../../shared/services/value-transformer.service';
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
+import { SessionService } from '../../../../shared/services/session.service';
+import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
+
 
 @Component({
   selector: 'app-move-planner',
   standalone: true,
-  imports: [CommonModule, NgFor, TuiStepperModule, TuiCheckboxBlockModule, FormsModule, ReactiveFormsModule, TuiButtonModule, TuiSvgModule, TuiInputDateModule, TuiTextfieldControllerModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, TuiValidatorModule, TuiInputDateTimeModule, TuiToggleModule],
+  imports: [CommonModule, NgFor, TuiStepperModule, TuiCheckboxBlockModule, FormsModule, ReactiveFormsModule, TuiButtonModule, TuiSvgModule, TuiInputDateModule, TuiTextfieldControllerModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, TuiValidatorModule, TuiInputDateTimeModule, TuiToggleModule, TuiRadioBlockModule],
   templateUrl: './move-planner.component.html',
   styleUrl: './move-planner.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,7 +68,15 @@ export class MovePlannerComponent extends PageComponent {
     return this.moveDateGroup.value?.isPm ? 'PM' : 'AM';
   }
 
+  fromAddressResType: FormGroup;
+
+  fromAddressFlights: FormGroup;
+
   fromAddressGroup: FormGroup;
+
+  toAddressResType: FormGroup;
+
+  toAddressFlights: FormGroup;
 
   toAddressGroup: FormGroup;
 
@@ -99,18 +110,24 @@ export class MovePlannerComponent extends PageComponent {
 
   newJob: CreateJobEstimate = new CreateJobEstimate();
 
+  jobSessionState: CreateEstimateSessionState = new CreateEstimateSessionState();
+
   /**
    * Constructor method that injects dependencies needed in the MovePlannerComponent
    * @param pageService A service that handles basic page-related behavior such as setting the title and interacting with the window
    * @param _formBuilder A utility used to simplify the process of creating and managing reactive forms
    * @param _router A module that provides a powerful way to handle navigation within the component page
    */
-  constructor(pageService: PageService, private _formBuilder: FormBuilder, private _router: Router, private _valueTransformerService: ValueTransformerService, private _googleMapsLoaderService: GoogleMapsLoaderService, private _elementRef: ElementRef) {
+  constructor(pageService: PageService,
+    private _formBuilder: FormBuilder,
+    private _router: Router,
+    private _valueTransformerService: ValueTransformerService,
+    private _googleMapsLoaderService: GoogleMapsLoaderService,
+    private _elementRef: ElementRef,) {
     super(pageService);
 
     // Initialize the itemsGroup FormGroup
     this.itemsGroup = this._formBuilder.group({});
-
   }
 
   ngOnInit(): void {
@@ -169,6 +186,15 @@ export class MovePlannerComponent extends PageComponent {
       isPm: new FormControl(false),
     });
 
+    this.fromAddressResType = this._formBuilder.group({
+      fromResType: new FormControl('House', Validators.required),
+    });
+
+    this.fromAddressFlights = this._formBuilder.group({
+      fromNumberOfFlights: new FormControl(0, Validators.required)
+    });
+
+
     this.fromAddressGroup = this._formBuilder.group({
       fromAddressStreetNumber: new FormControl('', Validators.required),
       fromAddressStreetName: new FormControl('', Validators.required),
@@ -177,7 +203,15 @@ export class MovePlannerComponent extends PageComponent {
       fromZip: new FormControl('', Validators.required),
       fromResidenceType: new FormControl(''),
       fromFlights: new FormControl(''),
-      fromApartmentNumber: new FormControl('', Validators.required),
+      fromAptNumUnitOrSuite: new FormControl('', Validators.required),
+    });
+
+    this.toAddressResType = this._formBuilder.group({
+      toResType: new FormControl('House', Validators.required),
+    })
+
+    this.toAddressFlights = this._formBuilder.group({
+      toNumberOfFlights: new FormControl(0, Validators.required)
     });
 
     this.toAddressGroup = this._formBuilder.group({
@@ -188,7 +222,7 @@ export class MovePlannerComponent extends PageComponent {
       toZip: new FormControl('', Validators.required),
       toResidenceType: new FormControl(''),
       toFlights: new FormControl(''),
-      toApartmentNumber: new FormControl('', Validators.required)
+      toAptNumUnitOrSuite: new FormControl('', Validators.required)
     });
 
     this.roomsGroup = this._formBuilder.group({
@@ -208,23 +242,23 @@ export class MovePlannerComponent extends PageComponent {
     this.roomsGroup.setValidators(this.atLeastOneCheckboxChecked());
 
     this.boxesGroup = this._formBuilder.group({
-      smBox: new FormControl(''),
-      mdBox: new FormControl(''),
-      lgBox: new FormControl(''),
+      smBox: new FormControl(0),
+      mdBox: new FormControl(0),
+      lgBox: new FormControl(0),
     })
 
     this.specialtyGroup = this._formBuilder.group({
-      keyboard: new FormControl(false),
-      spinetPiano: new FormControl(false),
-      consolePiano: new FormControl(false),
-      studioPiano: new FormControl(false),
-      organ: new FormControl(false),
-      safe300lb: new FormControl(false),
-      safe400lb: new FormControl(false),
-      poolTable: new FormControl(false),
-      arcadeGames: new FormControl(false),
-      weightEquipment: new FormControl(false),
-      machinery: new FormControl(false),
+      keyboard: new FormControl(0),
+      spinetPiano: new FormControl(0),
+      consolePiano: new FormControl(0),
+      studioPiano: new FormControl(0),
+      organ: new FormControl(0),
+      safe300lb: new FormControl(0),
+      safe400lb: new FormControl(0),
+      poolTable: new FormControl(0),
+      arcadeGames: new FormControl(0),
+      weightEquipment: new FormControl(0),
+      machinery: new FormControl(0),
     });
 
     this.specialRequestGroup = this._formBuilder.group({
@@ -240,15 +274,15 @@ export class MovePlannerComponent extends PageComponent {
 
     this.activeStepIndex = index;
 
-    if (this.activeStepIndex === 3) {
+    if (this.activeStepIndex === 5) {
       this._googleMapsLoaderService.initFromAutoComplete();
     }
 
-    if (this.activeStepIndex === 4) {
+    if (this.activeStepIndex === 8) {
       this._googleMapsLoaderService.initToAutoComplete();
     }
 
-    if (this.activeStepIndex === 6) {
+    if (this.activeStepIndex === 10) {
       this.populateRoomItems();
     }
 
@@ -256,6 +290,29 @@ export class MovePlannerComponent extends PageComponent {
 
   }
 
+  /*
+  saveMovePlannerState(): void {
+
+    //ServicesGroup
+    this.jobSessionState.currentJob.pack = this.servicesGroup.get('pack')?.value;
+    this.jobSessionState.currentJob.unpack = this.servicesGroup.get('unpack')?.value;
+    this.jobSessionState.currentJob.load = this.servicesGroup.get('load')?.value;
+    this.jobSessionState.currentJob.unload = this.servicesGroup.get('unload')?.value;
+
+    //NeedTruckGroup
+    this.jobSessionState.currentJob.needTruck = this.needTruckGroup.get('needTruck')?.value;
+
+    //MoveDateGroup
+    this.jobSessionState.currentJob.startTime = this.moveDateGroup.get('dateTime')?.value;
+
+    //FromAddressGroup
+
+
+
+
+  }
+
+  */
   /**
    * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
    */
@@ -328,10 +385,10 @@ export class MovePlannerComponent extends PageComponent {
   /**
    * Converts the boolean value of the FormControl to its FormControl name if the checkbox value is true
    */
-  roomBoolToString(): void {
-    Object.keys(this.roomsGroup.controls).forEach(roomControl => {
-      const roomValue = this.roomsGroup.get(roomControl)?.value;
-      roomValue ? this.roomsGroup.get(roomControl)?.setValue(roomControl) : '';
+  boolToString(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(control => {
+      const roomValue = this.roomsGroup.get(control)?.value;
+      roomValue ? this.roomsGroup.get(control)?.setValue(control) : '';
     });
   }
 
@@ -379,8 +436,6 @@ export class MovePlannerComponent extends PageComponent {
       chosenRooms.push(roomToAdd);
     });
 
-    console.log('Rooms added to form:', chosenRooms);
-
     return chosenRooms;
   }
 
@@ -405,7 +460,6 @@ export class MovePlannerComponent extends PageComponent {
           itemsMap.set(key, itemCount);
 
         });
-        console.log('Items map:', itemsMap);
         formRoom.setItems(itemsMap);
         itemsForRooms.push(formRoom);
       }
@@ -418,8 +472,8 @@ export class MovePlannerComponent extends PageComponent {
    * @param autocomplete Autocomplete object that contains the user's 'moving from' address
    */
   writeFromAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    console.log("Entered writeAddressValuesToForm");
     const place = autocomplete.getPlace();
+    console.log('From Place object value:', place);
     place.address_components?.forEach(component => {
       switch (component.types[0]) {
         case 'street_number':
@@ -445,11 +499,11 @@ export class MovePlannerComponent extends PageComponent {
 
   /**
    * Takes a google maps autocomplete object and writes the associated 'to' address components to the Move Planner form
-   * @param autocomplete Autocomplete object that containe the user's 'moving to' address
+   * @param autocomplete Autocomplete object that contains the user's 'moving to' address
    */
   writeToAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    console.log("Entered writeAddressValuesToForm");
     const place = autocomplete.getPlace();
+    console.log('To Place object value:', place);
     place.address_components?.forEach(component => {
       switch (component.types[0]) {
         case 'street_number':
@@ -476,17 +530,20 @@ export class MovePlannerComponent extends PageComponent {
   /**
    * Function that extracts the numerical value of the Promise<number> and sets the distanceToJob
    */
-  async extractDistanceToJobMileage() {
+  async extractDistanceToJobMileage(): Promise<number | undefined> {
     try {
       const distance = await this._googleMapsLoaderService.geocodeAndCalculateDistance(
         this.choiceMoversAddress,
         this.concatenateAddresses(this.fromAddressGroup)
       );
-      console.log('Extract Distance To Job Mileage value is:', distance)
+      console.log('Distance To Job Mileage value is:', distance)
 
       this.newJob.distanceToJob = distance !== undefined ? distance : 0;
+
+      return distance;
     } catch (error) {
       console.error('Error', error);
+      return undefined;
     }
   }
 
@@ -499,7 +556,7 @@ export class MovePlannerComponent extends PageComponent {
         this.concatenateAddresses(this.fromAddressGroup),
         this.concatenateAddresses(this.toAddressGroup)
       );
-      console.log('Extract Distance Between Addresses Mileage value is:', distance)
+      console.log('Distance Between Addresses Mileage value is:', distance)
 
       return distance;
 
@@ -514,13 +571,15 @@ export class MovePlannerComponent extends PageComponent {
    */
   async totalJobDistanceCalculation() {
     try {
-      let totalJobDistance = await this.extractDistanceBetweenAddressesMileage();
+      let totalJobDistance: number | undefined = await this.extractDistanceBetweenAddressesMileage();
+      let distanceToJob: number | undefined = await this.extractDistanceToJobMileage();
+      console.log('Total Job distance after initialization', totalJobDistance);
 
-      totalJobDistance !== undefined ? totalJobDistance += this.newJob.distanceToJob : 0;
+      totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
+      console.log('Total Job distance first assignment', totalJobDistance);
 
       totalJobDistance !== undefined ? this.newJob.distanceTotal += totalJobDistance : 0;
-
-      console.log('Total job distance is:', totalJobDistance);
+      console.log('Total Job distance second assignment', totalJobDistance);
 
     } catch (error) {
       console.error('Error:', error);
@@ -531,17 +590,28 @@ export class MovePlannerComponent extends PageComponent {
    * Final form submission. Sets the value of the master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
-    this.roomBoolToString();
+    this.boolToString(this.roomsGroup);
     this.writeFromAddressValuesToForm(this._googleMapsLoaderService.fromAutocomplete);
     this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
     this.extractDistanceToJobMileage();
     this.extractDistanceBetweenAddressesMileage();
     this.totalJobDistanceCalculation();
 
-    console.log(this.moveDateGroup.value);
     this.newJob.customer = new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567');
-    this.newJob.loadAddr = this.fromAddressGroup.value.fullAddress;
-    this.newJob.unloadAddr = this.toAddressGroup.value.fullAddress;
+    this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
+    this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
+    this.newJob.loadAddr.state = this.fromAddressGroup.get('fromState')?.value;
+    this.newJob.loadAddr.zip = this.fromAddressGroup.get('fromZip')?.value;
+    this.newJob.loadAddr.aptNum = this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value ?? '';
+    this.newJob.loadAddr.resType = this.fromAddressResType.value;
+    this.newJob.loadAddr.flights = this.fromAddressFlights.value;
+    this.newJob.unloadAddr.street = this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value;
+    this.newJob.unloadAddr.city = this.toAddressGroup.get('toCity')?.value;
+    this.newJob.unloadAddr.state = this.toAddressGroup.get('toState')?.value;
+    this.newJob.unloadAddr.zip = this.toAddressGroup.get('toZip')?.value;
+    this.newJob.unloadAddr.aptNum = this.toAddressGroup.get('toAptNumUnitOrSuite')?.value ?? '';
+    this.newJob.unloadAddr.resType = this.toAddressResType.value;
+    this.newJob.unloadAddr.flights = this.toAddressFlights.value;
     this.newJob.startTime = this.moveDateGroup.value.dateTime;
     this.newJob.endTime = '';
 
@@ -549,7 +619,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.special = this.specialtyGroup.value ?? [];
 
-    this.boxes = this.boxesGroup.value ?? new Map();
+    this.newJob.boxes = this.boxesGroup.value ?? new Map();
 
     this.newJob.pack = this.servicesGroup.value.packing;
     this.newJob.unpack = this.servicesGroup.value.unpack;
@@ -559,7 +629,6 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.clean = false;
 
     this.newJob.needTruck = this.needTruckGroup.value;
-    this.newJob.distanceTotal = 0;
 
     console.log(this.newJob);
   }
