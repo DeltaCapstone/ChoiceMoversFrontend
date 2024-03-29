@@ -1,5 +1,5 @@
 import { provideAnimations } from "@angular/platform-browser/animations";
-import { TuiRootModule } from "@taiga-ui/core";
+import { TuiDialogModule, TuiRootModule } from "@taiga-ui/core";
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router, provideRouter } from "@angular/router";
@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(
             withInterceptorsFromDi()
         ),
-        importProvidersFrom(HttpClientModule, TuiRootModule,
+        importProvidersFrom(HttpClientModule, TuiRootModule, TuiDialogModule,
             JwtModule.forRoot({
                 config: {
                     tokenGetter: () => sessionStorage.getItem("accessToken"),

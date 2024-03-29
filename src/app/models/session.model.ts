@@ -8,8 +8,8 @@ export interface ISessionState {
 export interface IJobSessionState {
     jobId: string;
     employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
-    isFull$: ReplaySubject<boolean>;
     alreadyAssigned$: ReplaySubject<boolean>;
+    assignmentAvailable$: ReplaySubject<boolean>;
 }
 
 export interface IScheduleSessionState {
@@ -22,18 +22,21 @@ export interface IScheduleSessionState {
 export class JobSessionState implements IJobSessionState, ISessionState {
     jobId = "";
     employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
-    isFull$ = new ReplaySubject<boolean>(1);
     alreadyAssigned$ = new ReplaySubject<boolean>(1);
+    assignmentAvailable$ = new ReplaySubject<boolean>(1);
 
     constructor(jobId: string=""){
         this.jobId = jobId;
+        this.employeeToBoot$.next(null);
+        this.alreadyAssigned$.next(false);
+        this.assignmentAvailable$.next(false);
     }
 
     clear(): void {
         this.jobId = "";
-        this.employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
-        this.isFull$ = new ReplaySubject<boolean>(1);
-        this.alreadyAssigned$ = new ReplaySubject<boolean>(1);
+        this.employeeToBoot$.next(null);
+        this.alreadyAssigned$.next(false);
+        this.assignmentAvailable$.next(false);
     }
 }
 

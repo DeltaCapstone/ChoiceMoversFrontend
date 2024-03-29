@@ -8,7 +8,7 @@ import { TuiLetModule } from '@taiga-ui/cdk';
 import { AssignedEmployee, Employee } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
-import { JobSessionState, SessionType } from '../../../../models/session.model';
+import { SessionType } from '../../../../models/session.model';
 import { EmployeesService } from '../../../services/employees.service';
 import { TuiTagModule } from '@taiga-ui/kit';
 
@@ -21,22 +21,33 @@ import { TuiTagModule } from '@taiga-ui/kit';
     styleUrl: './job-workers.component.css'
 })
 export class JobWorkersComponent extends BaseComponent {
+    jobSessionState = this.session.scheduleSessionState.jobSessionState;
     maxWorkers$ = new BehaviorSubject<string>("0");
     workers$: Observable<AssignedEmployee[]>;
-    jobSessionState = this.session.scheduleSessionState.jobSessionState;
+    isFull$ = new BehaviorSubject<boolean>(false);
     displayOverride$: Observable<boolean>;
     readonly columns = ["name", "email", "employeeType"];
     subscriptions: Subscription[] = [];
 
     ngOnInit() {        
         this.displayOverride$ = this.jobSessionState.employeeToBoot$.pipe(
-            map(employeeToBoot => !!employeeToBoot)
+            map(employeeToBoot => {
+                return !!employeeToBoot;
+            })
         );
+
+        this.displayOverride$ = combineLatest([
+            this.jobSessionState.employeeToBoot$,
+            this.isFull$
+        ]).pipe(
+            map(([employeeToBoot, isFull]) => !!employeeToBoot && isFull)
+        )
         
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.workers$ = this.jobsService.getJob(jobId).pipe(
             switchMap(job => {
-                this.maxWorkers$.next(String(job?.numberWorkers) ?? "0");
+                const maxWorkers = job?.numberWorkers ?? 0;
+                this.maxWorkers$.next(String(maxWorkers));
                 const assignedEmployees = job?.assignedEmployees ?? [];
 
                 return this.employeesService.getEmployees().pipe(
@@ -49,6 +60,7 @@ export class JobWorkersComponent extends BaseComponent {
                                 assignedEmps.push(assignedEmp);
                             }
                         }
+                        this.isFull$.next(assignedEmps.length >= maxWorkers);
                         return assignedEmps;
                     })
                 );

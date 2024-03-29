@@ -1,14 +1,14 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { JobInfoComponent } from './job-info/job-info.component';
 import { BaseComponent } from '../base-component';
-import { TuiSvgModule } from '@taiga-ui/core';
-import { TuiTabsModule } from '@taiga-ui/kit';
+import { TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
+import { TUI_PROMPT, TuiPromptModule, TuiTabsModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
-import { JobSessionState, SessionType } from '../../../models/session.model';
-import { Employee } from '../../../models/employee';
+import { SessionType } from '../../../models/session.model';
+import { AssignedEmployee, Employee } from '../../../models/employee';
 import { JobsService } from '../../services/jobs.service';
-import { Observable, of, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Observable, of, switchMap, take, tap } from 'rxjs';
 import { AssignmentConflictType, Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
@@ -17,18 +17,24 @@ import { TuiLetModule } from '@taiga-ui/cdk';
     selector: 'app-job',
     standalone: true,
     imports: [JobInfoComponent, RouterOutlet, RouterModule, TuiLetModule, NgClass, 
-        TuiSvgModule, TuiTabsModule, CommonModule],
+        TuiSvgModule, TuiTabsModule, CommonModule, TuiPromptModule],
     templateUrl: './job.component.html',
-    styleUrl: './job.component.css'
+    styleUrl: './job.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JobComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
-    isFull$: Observable<boolean>; 
-    alreadyAssigned$: Observable<boolean>;
     jobSessionState = this.session.scheduleSessionState.jobSessionState;
+    assignmentAvailable$ = this.jobSessionState.assignmentAvailable$.asObservable(); 
+    alreadyAssigned$ = this.jobSessionState.alreadyAssigned$.asObservable();
+    employeeToBoot$ = this.jobSessionState.employeeToBoot$.asObservable();
+    isFull$ = new BehaviorSubject<boolean>(false);
+
+    warningDialogOpen = false;
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(TuiDialogService) private readonly dialogs: TuiDialogService,
         private jobsService: JobsService,
         private route: ActivatedRoute,
         private router: Router) {
@@ -38,14 +44,30 @@ export class JobComponent extends BaseComponent {
     ngOnInit() {
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
+        this.job$.subscribe(job => {
+            if (job)
+                this.isFull$.next(job.assignedEmployees.length >= job.numberWorkers);
+        });
         this.jobSessionState.jobId = jobId;
 
         this.navigateToTab(this.session.scheduleSessionState.tabIndex);
-        this.checkAssignmentAvailability(jobId);
-
-        this.isFull$ = this.jobSessionState.isFull$.asObservable();        
-        this.alreadyAssigned$ = this.jobSessionState.alreadyAssigned$.asObservable();        
+        this.syncJobSessionState(jobId);
     }
+
+    openWarningDialog(employeeToBoot: AssignedEmployee) {
+        this.dialogs.open<boolean>(TUI_PROMPT, {
+            label: 'Warning',
+            data: {
+              content: `This will boot ${employeeToBoot.firstName} ${employeeToBoot.lastName}`,
+              yes: 'Ok',
+              no: 'Cancel',
+            },
+        }).subscribe(yes => {
+            if (yes){
+                this.selfAssign();
+            }
+        });
+	}
 
     selfAssign() {
         this.job$.pipe(
@@ -55,7 +77,7 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.checkAssignmentAvailability(job.jobId) : null)
+                this.syncJobSessionState(job.jobId) : null)
         });
     }
 
@@ -67,7 +89,7 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.checkAssignmentAvailability(job.jobId) : null)
+                this.syncJobSessionState(job.jobId) : null)
         });
     }
 
@@ -75,7 +97,7 @@ export class JobComponent extends BaseComponent {
         this.session.scheduleSessionState.tabIndex = tabIndex;
     }
 
-    checkAssignmentAvailability(jobId: string) {
+    syncJobSessionState(jobId: string) {
         this.jobsService.checkAssignmentAvailability(jobId)
             .subscribe(res => {
                 if (typeof res === 'string') {
@@ -84,14 +106,14 @@ export class JobComponent extends BaseComponent {
                             this.jobSessionState.alreadyAssigned$.next(true);
                             break;
                         case AssignmentConflictType.JobFull:
-                            this.jobSessionState.isFull$.next(true);
+                            this.jobSessionState.assignmentAvailable$.next(false);
                             break;
                     }
                     this.jobSessionState.employeeToBoot$.next(null);
                 }
                 else {
+                    this.jobSessionState.assignmentAvailable$.next(true);
                     this.jobSessionState.alreadyAssigned$.next(false);
-                    this.jobSessionState.isFull$.next(false);
                     this.jobSessionState.employeeToBoot$.next(res);
                 }           
             })
