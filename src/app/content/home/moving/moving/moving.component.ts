@@ -9,6 +9,7 @@ import { GoogleReviewsResponse } from '../../../../models/google-reviews-respons
 import { PageComponent } from '../../../../shared/components/page-component';
 import { PageService } from '../../../../shared/services/page.service';
 import { Subscription, Observable, of, BehaviorSubject } from 'rxjs';
+import { FeatureService } from '../../../../shared/services/feature.service';
 
 @Component({
   selector: 'app-moving',
@@ -22,7 +23,10 @@ export class MovingComponent extends PageComponent {
   googleReviews$: BehaviorSubject<GoogleReviewsResponse | null>;
   subscriptions: Subscription[] = [];
 
-  constructor(private googleMapsLoaderService: GoogleMapsLoaderService, pageService: PageService) {
+  constructor(
+    private featureService: FeatureService,
+    private googleMapsLoaderService: GoogleMapsLoaderService, 
+    pageService: PageService) {
     super(pageService);
     this.googleReviews$ = new BehaviorSubject<GoogleReviewsResponse | null>(null);
   }
@@ -39,7 +43,7 @@ export class MovingComponent extends PageComponent {
   }
 
   getReviews() {
-    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
+    const url = this.featureService.getFeatureValue("mapsApi").placesUrl;
 
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
       console.log(response);
