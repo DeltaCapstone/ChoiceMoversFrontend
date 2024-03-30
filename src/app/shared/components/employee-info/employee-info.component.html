@@ -47,19 +47,13 @@
                             <tui-error formControlName="email"></tui-error>
                         </div>
 
-
-
-                        <div class="tui-form__row tui-form__row_multi-fields">
+                        <div *ngIf="isManager$ | async" class="tui-form__row tui-form__row_multi-fields">
                             <div class="tui-form__multi-field">
-                                <tui-select [readOnly]="readOnly" tuiTextfieldSize="s"
+                                <tui-input-number [readOnly]="readOnly" [step]=1 tuiTextfieldSize="s"
                                     formControlName="employeePriority">
                                     Employee priority
-                                    <input tuiTextfield />
-                                    <tui-data-list-wrapper *tuiDataList
-                                        [items]="employeePriorities"></tui-data-list-wrapper>
-                                </tui-select>
+                                </tui-input-number>
                                 <tui-error formControlName="employeePriority"></tui-error>
-
                             </div>
 
                             <div class="tui-form__multi-field">

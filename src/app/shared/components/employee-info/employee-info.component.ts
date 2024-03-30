@@ -1,6 +1,6 @@
 import { Component, Inject, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
-import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
+import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputNumberModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
@@ -15,15 +15,16 @@ import { SessionType } from '../../../models/session.model';
     selector: 'app-employee-info',
     standalone: true,
     imports: [TuiAvatarModule, ReactiveFormsModule, TuiInputModule, TuiTextareaModule, TuiDataListModule, TuiSelectModule, TuiDataListWrapperModule,
-        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule, TuiSvgModule],
+        CommonModule, TuiErrorModule, TuiFieldErrorPipeModule, TuiInputPhoneModule, TuiSvgModule,
+        TuiInputNumberModule],
     templateUrl: './employee-info.component.html',
     styleUrl: './employee-info.component.css'
 })
 export class EmployeeInfoComponent extends BaseComponent {
     @Input() readOnly: boolean;
+    isManager$: Observable<boolean>;
     subscriptions: Subscription[] = [];
     employeeTypes: String[] = Object.values(EmployeeType);
-    employeePriorities: number[] = [1, 2, 3];
     isNew = false;
 
     readonly form = new FormGroup({
@@ -41,21 +42,24 @@ export class EmployeeInfoComponent extends BaseComponent {
     ngOnInit() {
         // check if we are at a readOnly route
         this.readOnly = !!this.route.snapshot.url.find(seg => seg.path.includes("workers"));
-
+        this.isManager$ = this.session.getUser().pipe(
+            map(user => user?.employeeType == EmployeeType.Manager)
+        );
         const userName: string | null = this.route.snapshot.paramMap.get('userName');
         if (userName) { // get this employee and set the form values
             this.user$ = this.employeesService.getEmployee(userName);
 
             const userSub = this.user$.subscribe(user => {
+                if (!user) return;
                 this.form.patchValue({
-                    email: user?.email ?? "",
-                    lastName: user?.lastName ?? "",
-                    firstName: user?.firstName ?? "",
-                    userName: user?.userName ?? "",
-                    phonePrimary: user?.phonePrimary ?? "",
-                    // phoneOther: user?.phoneOther ?? [],
-                    employeeType: user?.employeeType ?? "",
-                    employeePriority: user?.employeePriority ?? 3,
+                    email: user.email,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    userName: user.userName,
+                    phonePrimary: user.phonePrimary,
+                    // phoneOther: user.phoneOther,
+                    employeeType: user.employeeType,
+                    employeePriority: user.employeePriority,
                 });
             });
             this.subscriptions.push(userSub);
@@ -92,6 +96,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                     employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 3,
                 }))
             ).subscribe(newUser => {
+                // TODO: needs changed for email procedure
                 if (this.isNew) { // CREATE NEW EMPLOYEE
                     const createEmployeeRequest: EmployeeCreateRequest = {
                         ...newUser,
@@ -118,6 +123,7 @@ export class EmployeeInfoComponent extends BaseComponent {
                         employeeType: newUser.employeeType,
                         employeePriority: newUser.employeePriority
                     };
+                    console.log(updateRequest);
                     this.employeesService.updateEmployee(updateRequest).subscribe({
                         next: (response) => {
                             console.log('Employee updated successfully', response);

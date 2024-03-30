@@ -1,5 +1,5 @@
 import { provideAnimations } from "@angular/platform-browser/animations";
-import { TuiRootModule } from "@taiga-ui/core";
+import { TuiDialogModule, TuiRootModule } from "@taiga-ui/core";
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router, provideRouter } from "@angular/router";
@@ -12,6 +12,7 @@ import { SessionServiceConfig, SessionType } from "./models/session.model";
 import { EmployeesService } from "./shared/services/employees.service";
 import { SessionService } from "./shared/services/session.service";
 import { FeatureService } from "./shared/services/feature.service";
+import { JobsService } from "./shared/services/jobs.service";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -20,7 +21,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(
             withInterceptorsFromDi()
         ),
-        importProvidersFrom(HttpClientModule, TuiRootModule,
+        importProvidersFrom(HttpClientModule, TuiRootModule, TuiDialogModule,
             JwtModule.forRoot({
                 config: {
                     tokenGetter: () => sessionStorage.getItem("accessToken"),
@@ -30,15 +31,15 @@ export const appConfig: ApplicationConfig = {
         )), provideAnimationsAsync(),
         {
             provide: SessionType.Employee,
-            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService) => {
+            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService, jobsService: JobsService) => {
                 const config = new SessionServiceConfig(
                     () => employeesService.getProfile(), 
                     'portal/login',
                     SessionType.Employee
                 );
-                return new SessionService<Employee>(http, featureService, router, config);
+                return new SessionService<Employee>(http, featureService, router, jobsService, config);
             },
-            deps: [HttpClient, FeatureService, Router, EmployeesService]
+            deps: [HttpClient, FeatureService, Router, EmployeesService, JobsService]
         },
     ]
 };

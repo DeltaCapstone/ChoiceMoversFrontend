@@ -1,4 +1,4 @@
-<div class="flex justify-between">
+<div *tuiLet="employeeToBoot$ | async as employeeToBoot" class="flex justify-between">
     <div class="flex items-center">
         <button (click)="back()" class="m-2 icons">
             <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
@@ -12,21 +12,32 @@
                 <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
                 Workers
             </a>
-            <a (click)="setTabIndex(2)" routerLinkActive tuiTab>
+            <a (click)="setTabIndex(2)" [routerLink]="'contact'" routerLinkActive tuiTab>
                 <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
-                Contacts
+                Contact
             </a>
         </tui-tabs>
     </div>
-    <div class="flex flex-col" *tuiLet="isFull$ | async as isFull">
-        <button (click)="alreadyAssigned ? selfRemove() : selfAssign()" tuiButton type="submit" [disabled]="isFull"
-            *tuiLet="alreadyAssigned$ | async as alreadyAssigned"
-            class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
-            [ngClass]="{'opacity-50': isFull}">
-            {{ alreadyAssigned ? "Unassign yourself" : "Assign yourself" }}
-        </button>
-        <p class="text-[red] opacity-50" *ngIf="isFull">This job is full</p>
-    </div>
+
+    <ng-container *tuiLet="isFull$ | async as isFull">
+        <ng-container *tuiLet="alreadyAssigned$ | async as alreadyAssigned">
+            <div class="flex flex-col" *tuiLet="assignmentAvailable$ | async as assignmentAvailable">
+                <button *ngIf="!alreadyAssigned"
+                    (click)="(isFull && employeeToBoot) ? openWarningDialog(employeeToBoot) : selfAssign()" tuiButton
+                    type="submit" [disabled]="!assignmentAvailable"
+                    class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
+                    [ngClass]="{'opacity-50': !assignmentAvailable}">
+                    Assign yourself
+                </button>
+                <button tuiButton type="submit"
+                    class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
+                    *ngIf="alreadyAssigned" (click)="selfRemove()">
+                    Unassign yourself
+                </button>
+                <p class="text-[red] opacity-50" *ngIf="!alreadyAssigned && !assignmentAvailable">This job is full</p>
+            </div>
+        </ng-container>
+    </ng-container>
 </div>
 
 <router-outlet></router-outlet>

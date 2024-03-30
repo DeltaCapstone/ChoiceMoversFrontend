@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { Router } from '@angular/router';
 import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
-
+import { JobsService } from "../../shared/services/jobs.service";
+import { AssignmentConflictType } from "../../models/job.model";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,12 @@ export class SessionService<T> {
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
 
-    constructor(private http: HttpClient, private feature: FeatureService, private router: Router, config: SessionServiceConfig<T>) {
+    constructor(
+        private http: HttpClient, 
+        private feature: FeatureService, 
+        private router: Router, 
+        private jobsService: JobsService,
+        config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
         this.guardWithAuth().subscribe(_ => {
@@ -78,7 +84,6 @@ export class SessionService<T> {
             return this.refresh().pipe(
                 take(1),
                 map(success => {
-                    console.log(success);
                     if (success) {
                         return true;
                     }
@@ -89,6 +94,30 @@ export class SessionService<T> {
                 })
             )
         }
+    }
+
+    refreshJobSessionState() {        
+        const jobSessionState = this.scheduleSessionState.jobSessionState;
+        this.jobsService.checkAssignmentAvailability(jobSessionState.jobId)
+            .subscribe(res => {
+                console.log(res);
+                if (typeof res === 'string') {
+                    switch (res) {
+                        case AssignmentConflictType.AlreadyAssigned:
+                            jobSessionState.alreadyAssigned$.next(true);
+                            break;
+                        case AssignmentConflictType.JobFull:
+                            jobSessionState.assignmentAvailable$.next(false);
+                            break;
+                    }
+                    jobSessionState.employeeToBoot$.next(null);
+                }
+                else {
+                    jobSessionState.assignmentAvailable$.next(true);
+                    jobSessionState.alreadyAssigned$.next(false);
+                    jobSessionState.employeeToBoot$.next(res);
+                }           
+            })
     }
 
     private isActive(): boolean {

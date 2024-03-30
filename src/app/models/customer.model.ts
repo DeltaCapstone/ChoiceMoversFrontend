@@ -2,7 +2,7 @@
  * Interface that describes the Customer type
  */
 export interface ICustomer {
-    username: string;
+    userName: string;
     passwordHash: string;
     firstName: string;
     lastName: string;
@@ -15,7 +15,7 @@ export interface ICustomer {
  * Class that defines a Customer object and its properties and methods
  */
 export class Customer {
-    username: string = "";
+    userName: string = "";
     passwordHash: string = "";
     firstName: string = "";
     lastName: string = "";
@@ -23,10 +23,10 @@ export class Customer {
     phonePrimary: string = "";
     phoneOther: string = "";
 
-    constructor(username: string = "", passwordHash: string = "", firstName: string = "", lastName: string = "", 
+    constructor(userName: string = "", passwordHash: string = "", firstName: string = "", lastName: string = "", 
         email: string = "", phonePrimary: string = "", phoneOther: string = "") {
 
-        this.username = username;
+        this.userName = userName;
         this.passwordHash = passwordHash;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -36,11 +36,11 @@ export class Customer {
     }
 
     getUsername(): string {
-        return this.username;
+        return this.userName;
     }
 
-    setUsername(username: string): void {
-        this.username = username;
+    setUsername(userName: string): void {
+        this.userName = userName;
     }
 
     getPasswordHash(): string {

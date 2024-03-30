@@ -86,6 +86,30 @@ export class JobsService {
         );
     }
 
+    unassign(userName: string, jobId: string) {
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/manager/job/assign?jobID=${jobId}&toRemove=${userName}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
+    }
+
+    assign(userName: string, jobId: string) {
+        return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/manager/job/assign?jobID=${jobId}&toAdd=${userName}`, {}).pipe(
+            tap(assignedEmployees => {
+                const partialJob: Partial<Job> = {
+                    jobId: jobId,  
+                    assignedEmployees: assignedEmployees 
+                };
+                this.cacheUpsert([partialJob]);  
+            })
+        );
+    }
+
     getEmployeeJobs(start: string, end: string): Observable<Job[]> {
         return this.cache$.pipe(
             take(1),

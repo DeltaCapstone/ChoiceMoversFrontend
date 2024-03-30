@@ -23,6 +23,7 @@ import { JobWorkersComponent } from './shared/components/job/job-workers/job-wor
 import { jobGuard } from './shared/guards/job.guard';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { inject } from '@angular/core';
+import { JobContactComponent } from './shared/components/job/job-contact/job-contact.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -49,6 +50,7 @@ export const routes: Routes = [
                     { path: 'info', component: JobInfoComponent },
                     { path: 'workers', component: JobWorkersComponent },
                     { path: 'workers/:userName', component: EmployeeInfoComponent },
+                    { path: 'contact', component: JobContactComponent },
                 ]
             },
             { path: 'employees', component: EmployeesComponent },

@@ -71,7 +71,7 @@ export class ScheduleComponent extends PageComponent {
             date.setUTCDate(date.getUTCDate() + 5);
             this.calendarOptions.initialDate = date.toISOString();
         }
-        const cachedJobId = this.session.scheduleSessionState.jobId;
+        const cachedJobId = this.session.scheduleSessionState.jobSessionState.jobId;
         if (cachedJobId) {
             this.router.navigate(["dashboard/schedule/job/", cachedJobId]);
         }
@@ -118,7 +118,6 @@ export class ScheduleComponent extends PageComponent {
     eventClick(info: EventClickArg) {
         this.session.guardWithAuth().subscribe(_ => {
             const jobId: string = info.event.extendedProps.jobId;
-            this.session.scheduleSessionState.jobId = jobId;
             this.router.navigate(["dashboard/schedule/job/", jobId]);
         });
     }

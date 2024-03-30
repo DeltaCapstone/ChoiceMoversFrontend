@@ -1,15 +1,15 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { JobInfoComponent } from './job-info/job-info.component';
 import { BaseComponent } from '../base-component';
-import { TuiSvgModule } from '@taiga-ui/core';
-import { TuiTabsModule } from '@taiga-ui/kit';
+import { TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
+import { TUI_PROMPT, TuiPromptModule, TuiTabsModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
 import { SessionType } from '../../../models/session.model';
 import { AssignedEmployee, Employee } from '../../../models/employee';
 import { JobsService } from '../../services/jobs.service';
-import { BehaviorSubject, Observable, Subject, map, of, switchMap, take } from 'rxjs';
-import { AssignmentConflictType, Job } from '../../../models/job.model';
+import { BehaviorSubject, Observable, of, switchMap, take, tap } from 'rxjs';
+import { Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
 
@@ -17,18 +17,24 @@ import { TuiLetModule } from '@taiga-ui/cdk';
     selector: 'app-job',
     standalone: true,
     imports: [JobInfoComponent, RouterOutlet, RouterModule, TuiLetModule, NgClass, 
-        TuiSvgModule, TuiTabsModule, CommonModule],
+        TuiSvgModule, TuiTabsModule, CommonModule, TuiPromptModule],
     templateUrl: './job.component.html',
-    styleUrl: './job.component.css'
+    styleUrl: './job.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JobComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
-    isFull$ = new BehaviorSubject(false);
-    alreadyAssigned$ = new BehaviorSubject(false);
-    employeeToBoot$ = new Subject<AssignedEmployee | null>();
+    jobSessionState = this.session.scheduleSessionState.jobSessionState;
+    assignmentAvailable$ = this.jobSessionState.assignmentAvailable$.asObservable(); 
+    alreadyAssigned$ = this.jobSessionState.alreadyAssigned$.asObservable();
+    employeeToBoot$ = this.jobSessionState.employeeToBoot$.asObservable();
+    isFull$ = new BehaviorSubject<boolean>(false);
+
+    warningDialogOpen = false;
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(TuiDialogService) private readonly dialogs: TuiDialogService,
         private jobsService: JobsService,
         private route: ActivatedRoute,
         private router: Router) {
@@ -38,9 +44,31 @@ export class JobComponent extends BaseComponent {
     ngOnInit() {
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
+        this.job$.subscribe(job => {
+            console.log(job);
+            if (job)
+                this.isFull$.next((job.assignedEmployees?.length ?? 0) >= job.numberWorkers);
+        });
+        this.jobSessionState.jobId = jobId;
+
         this.navigateToTab(this.session.scheduleSessionState.tabIndex);
-        this.updateConflicts(jobId); 
+        this.session.refreshJobSessionState();
     }
+
+    openWarningDialog(employeeToBoot: AssignedEmployee) {
+        this.dialogs.open<boolean>(TUI_PROMPT, {
+            label: 'Warning',
+            data: {
+              content: `This will boot ${employeeToBoot.firstName} ${employeeToBoot.lastName}`,
+              yes: 'Ok',
+              no: 'Cancel',
+            },
+        }).subscribe(yes => {
+            if (yes){
+                this.selfAssign();
+            }
+        });
+	}
 
     selfAssign() {
         this.job$.pipe(
@@ -50,7 +78,7 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.updateConflicts(job.jobId) : null)
+                this.session.refreshJobSessionState() : null)
         });
     }
 
@@ -62,33 +90,12 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.updateConflicts(job.jobId) : null)
+                this.session.refreshJobSessionState() : null)
         });
     }
 
     setTabIndex(tabIndex: number){
         this.session.scheduleSessionState.tabIndex = tabIndex;
-    }
-
-    updateConflicts(jobId: string) {
-        this.jobsService.checkAssignmentAvailability(jobId)
-            .subscribe(res => {
-                if (typeof res === 'string') {
-                    switch (res) {
-                        case AssignmentConflictType.AlreadyAssigned:
-                            this.alreadyAssigned$.next(true);
-                            break;
-                        case AssignmentConflictType.JobFull:
-                            this.isFull$.next(true);
-                            break;
-                    }
-                }
-                else {
-                    this.alreadyAssigned$.next(false);
-                    this.isFull$.next(false);
-                    this.employeeToBoot$.next(res);
-                }           
-            })
     }
 
     private navigateToTab(tabIndex: number){
@@ -112,7 +119,7 @@ export class JobComponent extends BaseComponent {
 
     back() {
         this.session.scheduleSessionState.tabIndex = 0;
-        this.session.scheduleSessionState.jobId = "";
+        this.jobSessionState.clear();
         this.router.navigate(["/dashboard/schedule"]);
     }
 }
