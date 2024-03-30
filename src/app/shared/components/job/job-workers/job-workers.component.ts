@@ -31,7 +31,7 @@ export class JobWorkersComponent extends BaseComponent {
     jobId: string;
     isManager$: Observable<boolean>;
     // state for table
-    readonly columns = ["name", "email", "employeeType", "managerAssigned", "unassign"];
+    columns$ = new BehaviorSubject<string[]>([]);
     maxWorkers$ = new BehaviorSubject<string>("0");
     workers$: Observable<AssignedEmployee[]>;
     isFull$ = new BehaviorSubject<boolean>(false);
@@ -53,6 +53,13 @@ export class JobWorkersComponent extends BaseComponent {
         this.isManager$ = this.session.getUser().pipe(
             map(user => user?.employeeType == EmployeeType.Manager)
         );
+
+        const columns = ["email", "name", "employeeType", "managerAssigned"];
+        const managerSub = this.isManager$.subscribe(isManager => {
+            const newColumns = isManager ? [...columns, "unassign"] : columns;
+            this.columns$.next(newColumns);
+        });
+        this.subscriptions.push(managerSub);
         
         this.jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.workers$ = this.jobsService.getJob(this.jobId).pipe(

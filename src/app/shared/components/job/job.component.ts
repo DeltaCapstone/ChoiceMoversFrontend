@@ -9,7 +9,7 @@ import { SessionType } from '../../../models/session.model';
 import { AssignedEmployee, Employee } from '../../../models/employee';
 import { JobsService } from '../../services/jobs.service';
 import { BehaviorSubject, Observable, of, switchMap, take, tap } from 'rxjs';
-import { AssignmentConflictType, Job } from '../../../models/job.model';
+import { Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
 
