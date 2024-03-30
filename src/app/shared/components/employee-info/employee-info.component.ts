@@ -50,15 +50,16 @@ export class EmployeeInfoComponent extends BaseComponent {
             this.user$ = this.employeesService.getEmployee(userName);
 
             const userSub = this.user$.subscribe(user => {
+                if (!user) return;
                 this.form.patchValue({
-                    email: user?.email ?? "",
-                    lastName: user?.lastName ?? "",
-                    firstName: user?.firstName ?? "",
-                    userName: user?.userName ?? "",
-                    phonePrimary: user?.phonePrimary ?? "",
-                    // phoneOther: user?.phoneOther ?? [],
-                    employeeType: user?.employeeType ?? "",
-                    employeePriority: user?.employeePriority ?? 3,
+                    email: user.email,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    userName: user.userName,
+                    phonePrimary: user.phonePrimary,
+                    // phoneOther: user.phoneOther,
+                    employeeType: user.employeeType,
+                    employeePriority: user.employeePriority,
                 });
             });
             this.subscriptions.push(userSub);

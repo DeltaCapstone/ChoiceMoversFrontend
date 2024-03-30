@@ -13,7 +13,7 @@ import { EmployeesService } from '../../../services/employees.service';
 import { TUI_PROMPT, TuiDataListWrapperModule, TuiPromptModule, TuiSelectModule, TuiTagModule } from '@taiga-ui/kit';
 import { TuiIconModule } from '@taiga-ui/experimental';
 import { TuiButtonModule, TuiDataListModule, TuiDialogModule, TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-job-workers',

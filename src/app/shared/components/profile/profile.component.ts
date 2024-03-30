@@ -5,7 +5,7 @@ import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/employee';
-import { Observable, Subscription, map, finalize, take } from 'rxjs';
+import { Observable, Subscription, map, finalize } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
 import { SessionType } from '../../../models/session.model';

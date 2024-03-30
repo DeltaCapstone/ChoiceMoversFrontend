@@ -45,6 +45,7 @@ export class JobComponent extends BaseComponent {
         const jobId = this.route.snapshot.paramMap.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
         this.job$.subscribe(job => {
+            console.log(job);
             if (job)
                 this.isFull$.next((job.assignedEmployees?.length ?? 0) >= job.numberWorkers);
         });

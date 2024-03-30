@@ -39,36 +39,37 @@ export class JobInfoComponent extends BaseComponent {
         unloadAddrZip: new FormControl(""),
         unloadAddrState: new FormControl(""),
     });
-    checked: Array<Array<String | boolean>>;
+    checked: Array<Array<String | boolean>> = [];
     status = "Pending";
 
     ngOnInit() {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
         const jobSub = this.job$.subscribe(job => {
+            if (!job) return;
             this.checked = [
-                ["Truck", !!job?.needTruck, "needsTruck"],
-                ["Load", !!job?.load, "load"],
-                ["Unload", !!job?.unload, "unload"],
-                ["Pack", !!job?.pack, "pack"],
-                ["Unpack", !!job?.unpack, "clean"],
+                ["Truck", !!job.needTruck, "needsTruck"],
+                ["Load", !!job.load, "load"],
+                ["Unload", !!job.unload, "unload"],
+                ["Pack", !!job.pack, "pack"],
+                ["Unpack", !!job.unpack, "clean"],
             ];
 
             this.status = job?.finalized ? "Finalized" : "Pending";
 
             this.form.patchValue({
-                jobId: job?.jobId ?? "",
-                startTime: job?.startTime ? TuiDay.fromUtcNativeDate(new Date(job.startTime)) : TuiDay.currentLocal(),
-                endTime: job?.endTime ? TuiDay.fromUtcNativeDate(new Date(job.endTime)) : TuiDay.currentLocal(),
-                notes: job?.notes ?? "",
-                loadAddrStreet: job?.loadAddr?.street,
-                loadAddrCity: job?.loadAddr?.city,
-                loadAddrZip: job?.loadAddr?.zip,
-                loadAddrState: job?.loadAddr?.state,
-                unloadAddrStreet: job?.unloadAddr?.street,
-                unloadAddrCity: job?.unloadAddr?.city,
-                unloadAddrZip: job?.unloadAddr?.zip,
-                unloadAddrState: job?.unloadAddr?.state,
+                jobId: job.jobId,
+                startTime: TuiDay.fromUtcNativeDate(new Date(job.startTime)),
+                endTime: TuiDay.fromUtcNativeDate(new Date(job.endTime)),
+                notes: job.notes,
+                loadAddrStreet: job.loadAddr.street,
+                loadAddrCity: job.loadAddr.city,
+                loadAddrZip: job.loadAddr.zip,
+                loadAddrState: job.loadAddr.state,
+                unloadAddrStreet: job.unloadAddr.street,
+                unloadAddrCity: job.unloadAddr.city,
+                unloadAddrZip: job.unloadAddr.zip,
+                unloadAddrState: job.unloadAddr.state,
             });
         });
         this.subscriptions.push(jobSub);
