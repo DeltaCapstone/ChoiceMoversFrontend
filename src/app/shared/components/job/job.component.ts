@@ -46,12 +46,12 @@ export class JobComponent extends BaseComponent {
         this.job$ = this.jobsService.getJob(jobId);
         this.job$.subscribe(job => {
             if (job)
-                this.isFull$.next(job.assignedEmployees.length >= job.numberWorkers);
+                this.isFull$.next((job.assignedEmployees?.length ?? 0) >= job.numberWorkers);
         });
         this.jobSessionState.jobId = jobId;
 
         this.navigateToTab(this.session.scheduleSessionState.tabIndex);
-        this.syncJobSessionState(jobId);
+        this.session.refreshJobSessionState();
     }
 
     openWarningDialog(employeeToBoot: AssignedEmployee) {
@@ -77,7 +77,7 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.syncJobSessionState(job.jobId) : null)
+                this.session.refreshJobSessionState() : null)
         });
     }
 
@@ -89,34 +89,12 @@ export class JobComponent extends BaseComponent {
                 of(undefined))
         ).subscribe(_ => {
             this.job$.pipe(take(1)).subscribe(job => job ?
-                this.syncJobSessionState(job.jobId) : null)
+                this.session.refreshJobSessionState() : null)
         });
     }
 
     setTabIndex(tabIndex: number){
         this.session.scheduleSessionState.tabIndex = tabIndex;
-    }
-
-    syncJobSessionState(jobId: string) {
-        this.jobsService.checkAssignmentAvailability(jobId)
-            .subscribe(res => {
-                if (typeof res === 'string') {
-                    switch (res) {
-                        case AssignmentConflictType.AlreadyAssigned:
-                            this.jobSessionState.alreadyAssigned$.next(true);
-                            break;
-                        case AssignmentConflictType.JobFull:
-                            this.jobSessionState.assignmentAvailable$.next(false);
-                            break;
-                    }
-                    this.jobSessionState.employeeToBoot$.next(null);
-                }
-                else {
-                    this.jobSessionState.assignmentAvailable$.next(true);
-                    this.jobSessionState.alreadyAssigned$.next(false);
-                    this.jobSessionState.employeeToBoot$.next(res);
-                }           
-            })
     }
 
     private navigateToTab(tabIndex: number){

@@ -1,50 +1,61 @@
 import { Component, Inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map, startWith, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, map, startWith, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
-import { AssignedEmployee, Employee } from '../../../../models/employee';
+import { AssignedEmployee, Employee, EmployeeType } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
 import { SessionType } from '../../../../models/session.model';
 import { EmployeesService } from '../../../services/employees.service';
-import { TuiTagModule } from '@taiga-ui/kit';
+import { TUI_PROMPT, TuiDataListWrapperModule, TuiPromptModule, TuiSelectModule, TuiTagModule } from '@taiga-ui/kit';
+import { TuiIconModule } from '@taiga-ui/experimental';
+import { TuiButtonModule, TuiDataListModule, TuiDialogModule, TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-job-workers',
     standalone: true,
-    imports: [TuiTableModule, NgIf, NgFor, TuiLetModule, 
-        TuiLetModule, CommonModule, RouterModule, TuiTagModule],
+    imports: [TuiTableModule, NgIf, NgFor, TuiLetModule, TuiIconModule, TuiButtonModule, FormsModule, ReactiveFormsModule,
+         TuiLetModule, CommonModule, RouterModule, TuiTagModule, TuiPromptModule, TuiDialogModule,
+        TuiSvgModule, TuiSelectModule, TuiDataListModule, TuiDataListWrapperModule],
     templateUrl: './job-workers.component.html',
     styleUrl: './job-workers.component.css'
 })
 export class JobWorkersComponent extends BaseComponent {
+    // general state
+    subscriptions: Subscription[] = [];
     jobSessionState = this.session.scheduleSessionState.jobSessionState;
+    jobId: string;
+    isManager$: Observable<boolean>;
+    // state for table
+    readonly columns = ["name", "email", "employeeType", "managerAssigned", "unassign"];
     maxWorkers$ = new BehaviorSubject<string>("0");
     workers$: Observable<AssignedEmployee[]>;
     isFull$ = new BehaviorSubject<boolean>(false);
     displayOverride$: Observable<boolean>;
-    readonly columns = ["name", "email", "employeeType"];
-    subscriptions: Subscription[] = [];
+    // dialog
+    employeeUsernames$ = new BehaviorSubject<string[]>([]); 
+    assignDialogOpen: boolean = false;
+    userNameToAssign = new FormControl("")
+    
 
-    ngOnInit() {        
-        this.displayOverride$ = this.jobSessionState.employeeToBoot$.pipe(
-            map(employeeToBoot => {
-                return !!employeeToBoot;
-            })
-        );
-
+    ngOnInit() {
         this.displayOverride$ = combineLatest([
             this.jobSessionState.employeeToBoot$,
             this.isFull$
         ]).pipe(
             map(([employeeToBoot, isFull]) => !!employeeToBoot && isFull)
         )
+
+        this.isManager$ = this.session.getUser().pipe(
+            map(user => user?.employeeType == EmployeeType.Manager)
+        );
         
-        const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
-        this.workers$ = this.jobsService.getJob(jobId).pipe(
+        this.jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
+        this.workers$ = this.jobsService.getJob(this.jobId).pipe(
             switchMap(job => {
                 const maxWorkers = job?.numberWorkers ?? 0;
                 this.maxWorkers$.next(String(maxWorkers));
@@ -61,15 +72,21 @@ export class JobWorkersComponent extends BaseComponent {
                             }
                         }
                         this.isFull$.next(assignedEmps.length >= maxWorkers);
+
+                        const nonAssignedEmployees = employees.filter(emp => 
+                            !assignedEmployees.some(assignedEmp => assignedEmp.userName == emp.userName)
+                        )
+                        this.employeeUsernames$.next(nonAssignedEmployees.map(emp => emp.userName));
                         return assignedEmps;
                     })
                 );
             })
-        )
+        )        
     }
 
     constructor(
         @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(TuiDialogService) private readonly dialogs: TuiDialogService,
         private route: ActivatedRoute,
         private jobsService: JobsService,
         private employeesService: EmployeesService,
@@ -80,6 +97,35 @@ export class JobWorkersComponent extends BaseComponent {
 
     openEmployee(userName: string = "") {
         this.session.guardWithAuth().subscribe(_ => this.router.navigate([`/dashboard/schedule/job/`, userName]));
+    }
+
+    unassign(employee: AssignedEmployee){
+        this.dialogs.open<boolean>(TUI_PROMPT, {
+            label: 'Warning',
+            data: {
+              content: `Are you sure you want to unassign ${employee.firstName} ${employee.lastName}?`,
+              yes: 'Yes',
+              no: 'No',
+            },
+        }).subscribe(yes => {
+            if (yes){
+                this.jobsService.unassign(employee.userName, this.jobId).pipe(take(1)).subscribe(_ => 
+                    this.session.refreshJobSessionState())
+            }
+        });
+    }
+
+    toggleAssignDialog() {
+        this.assignDialogOpen = true;
+    }
+    
+    assign(){
+        const userName = this.userNameToAssign.value;
+        if (userName){
+            this.jobsService.assign(userName, this.jobId).pipe(take(1)).subscribe(_ =>
+                this.session.refreshJobSessionState());
+            this.userNameToAssign.patchValue("");
+        }
     }
 
     ngOnDestroy() {

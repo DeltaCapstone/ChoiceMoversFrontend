@@ -12,6 +12,7 @@ import { SessionServiceConfig, SessionType } from "./models/session.model";
 import { EmployeesService } from "./shared/services/employees.service";
 import { SessionService } from "./shared/services/session.service";
 import { FeatureService } from "./shared/services/feature.service";
+import { JobsService } from "./shared/services/jobs.service";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -30,15 +31,15 @@ export const appConfig: ApplicationConfig = {
         )), provideAnimationsAsync(),
         {
             provide: SessionType.Employee,
-            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService) => {
+            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService, jobsService: JobsService) => {
                 const config = new SessionServiceConfig(
                     () => employeesService.getProfile(), 
                     'portal/login',
                     SessionType.Employee
                 );
-                return new SessionService<Employee>(http, featureService, router, config);
+                return new SessionService<Employee>(http, featureService, router, jobsService, config);
             },
-            deps: [HttpClient, FeatureService, Router, EmployeesService]
+            deps: [HttpClient, FeatureService, Router, EmployeesService, JobsService]
         },
     ]
 };

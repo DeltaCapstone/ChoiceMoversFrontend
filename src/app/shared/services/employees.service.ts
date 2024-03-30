@@ -54,6 +54,7 @@ export class EmployeesService {
         return this.cacheLookupWithFallback(
             cache => of(cache.has(userName) ? [cache.get(userName)!] : []),
             () => this.http.get<Employee>(`${this.apiUrl}/manager/employee/${userName}`).pipe(
+                tap(employee => console.log(employee)),
                 tap(employee => this.cacheUpsert([employee])),
                 switchMap(() => this.cache$.pipe(
                     take(1),
@@ -66,7 +67,7 @@ export class EmployeesService {
     getEmployees(): Observable<Employee[]> {
         return this.cacheLookupWithFallback(
             cache => of(Array.from(cache.values())),
-            () => this.http.get<Employee[]>(`${this.apiUrl}/manager/employee`).pipe(
+            () => this.http.get<Employee[]>(`${this.apiUrl}/employee/employee`).pipe(
                       tap(employees => this.cacheUpsert(employees)),
                       switchMap(_ => this.cache$.pipe(
                           map(cache => Array.from(cache.values())),
