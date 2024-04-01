@@ -34,7 +34,8 @@
                     *ngIf="alreadyAssigned" (click)="selfRemove()">
                     Unassign yourself
                 </button>
-                <p class="text-[red] opacity-50" *ngIf="!alreadyAssigned && !assignmentAvailable">This job is full</p>
+                <p class="text-center text-[red] opacity-50" *ngIf="!alreadyAssigned && !assignmentAvailable">This job
+                    is full</p>
             </div>
         </ng-container>
     </ng-container>

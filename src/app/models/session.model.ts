@@ -2,6 +2,8 @@ import { Observable, ReplaySubject, Subject } from "rxjs";
 import { AssignedEmployee } from "./employee";
 import { Inject } from "@angular/core";
 import { JobsService } from "../shared/services/jobs.service";
+import { CreateJobEstimate } from "./create-job-estimate.model";
+import { Customer } from "./customer.model";
 
 export interface ISessionState {
     clear(): void;
@@ -12,6 +14,24 @@ export interface IJobSessionState {
     employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
     alreadyAssigned$: ReplaySubject<boolean>;
     assignmentAvailable$: ReplaySubject<boolean>;
+}
+
+export interface ICreateEstimateSessionState {
+    currentJob: CreateJobEstimate;
+    currentCustomer: Customer;
+    activeStepIndex: number;
+}
+
+export class CreateEstimateSessionState implements ICreateEstimateSessionState, ISessionState {
+    currentJob = new CreateJobEstimate();
+    currentCustomer = new Customer();
+    activeStepIndex = 0;
+
+    clear(): void {
+        this.currentJob = new CreateJobEstimate();
+        this.currentCustomer = new Customer();
+        this.activeStepIndex = 0;
+    }
 }
 
 export interface IScheduleSessionState {
@@ -73,7 +93,7 @@ export class SessionServiceConfig<T> implements ISessionServiceConfig<T> {
     type: SessionType;
     getUser: () => Observable<T | undefined>;
     loginRoute: string;
-    constructor(getUser: () => Observable<T | undefined>, loginRoute: string, type: SessionType){
+    constructor(getUser: () => Observable<T | undefined>, loginRoute: string, type: SessionType) {
         this.type = type;
         this.getUser = getUser;
         this.loginRoute = loginRoute;

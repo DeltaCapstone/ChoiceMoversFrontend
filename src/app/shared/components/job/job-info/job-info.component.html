@@ -118,10 +118,13 @@
             </form>
         </div>
 
-        <div class="tui-container w-1/2">
-            <div>
-                <img src="/assets/map.jpg" class="mx-auto max-w-full h-[500px]" />
-            </div>
+        <div class="tui-container w-3/4 flex justify-center items-center">
+            <google-map [center]="center" [zoom]="zoom">
+                @if (directionsResults$ | async; as directionsResults) {
+                <map-directions-renderer [directions]="directionsResults" />
+                }
+                <map-info-window>test</map-info-window>
+            </google-map>
         </div>
     </div>
 </div>

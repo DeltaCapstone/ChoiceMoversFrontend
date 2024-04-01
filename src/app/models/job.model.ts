@@ -44,7 +44,6 @@ export interface IEstimate {
     load: boolean;
     unload: boolean;
 
-    clean: boolean;
 
     needTruck: boolean;
     numberWorkers: number;
@@ -77,8 +76,6 @@ export class Estimate implements IEstimate {
     unpack: boolean;
     load: boolean;
     unload: boolean;
-
-    clean: boolean;
 
     needTruck: boolean;
     numberWorkers: number;
@@ -135,7 +132,6 @@ export class Estimate implements IEstimate {
         this.unpack = unpack;
         this.load = load;
         this.unload = unload;
-        this.clean = clean;
         this.needTruck = needTruck;
         this.numberWorkers = numberWorkers;
         this.distToJob = distToJob;

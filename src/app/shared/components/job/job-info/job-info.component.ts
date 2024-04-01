@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, map, switchMap } from 'rxjs';
 import { Job } from '../../../../models/job.model';
 import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { TuiErrorModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
@@ -10,13 +10,16 @@ import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
 import { TuiChipModule, TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
 import { JobsService } from '../../../services/jobs.service';
 import { ActivatedRoute } from '@angular/router';
+import { GoogleMap, MapDirectionsRenderer, MapDirectionsService, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
 
 @Component({
     selector: 'app-job-info',
     standalone: true,
     imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule, TuiTextareaModule,
         TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule, TuiCheckboxModule, TuiChipModule, FormsModule,
-        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule],
+        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule,
+        GoogleMap, MapDirectionsRenderer, MapInfoWindow],
     templateUrl: './job-info.component.html',
     styleUrl: './job-info.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +44,11 @@ export class JobInfoComponent extends BaseComponent {
     });
     checked: Array<Array<String | boolean>> = [];
     status = "Pending";
+    // map state
+    center: google.maps.LatLngLiteral = {lat: 24, lng: 12};
+    zoom = 4;
+    directionsResults$: Observable<google.maps.DirectionsResult|undefined>;
+    @ViewChild(MapInfoWindow) info!: MapInfoWindow;
 
     ngOnInit() {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
@@ -73,12 +81,26 @@ export class JobInfoComponent extends BaseComponent {
             });
         });
         this.subscriptions.push(jobSub);
+
+        this.directionsResults$ = this.job$.pipe(
+            switchMap(job => {
+                const request: google.maps.DirectionsRequest = {
+                    destination: {lat: 12, lng: 4},
+                    origin: {lat: 14, lng: 8},
+                    travelMode: google.maps.TravelMode.DRIVING,
+                };
+                return this.mapDirectionsService.route(request).pipe(map(res => res.result));
+            })
+        )
     }
 
-    constructor(private jobsService: JobsService, private route: ActivatedRoute) {
+    constructor(
+        private mapsService: GoogleMapsLoaderService,
+        private mapDirectionsService: MapDirectionsService,
+        private jobsService: JobsService, 
+        private route: ActivatedRoute) {
         super();
     }
-
 
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());

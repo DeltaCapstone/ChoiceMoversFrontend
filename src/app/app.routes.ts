@@ -24,6 +24,7 @@ import { jobGuard } from './shared/guards/job.guard';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { inject } from '@angular/core';
 import { JobContactComponent } from './shared/components/job/job-contact/job-contact.component';
+import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -38,7 +39,8 @@ export const routes: Routes = [
             { path: 'move-planner', component: MovePlannerComponent },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
-            { path: 'storage', component: StorageComponent }
+            { path: 'storage', component: StorageComponent },
+            { path: 'customer-summary', component: CustomerSummaryComponent },
         ]
     },
     {
