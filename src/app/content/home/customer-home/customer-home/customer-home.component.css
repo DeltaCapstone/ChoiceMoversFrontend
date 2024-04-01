@@ -1,0 +1,98 @@
+  .reviews-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .review {
+    width:600px; /* Fixed width */
+    padding: 1rem;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    position: relative;
+  }
+  
+  .review-author,
+  .review-rating,
+  .review-text {
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+ 
+  .review-author {
+    font-weight: bold;
+    margin-bottom: 8px; /* Space between author name and review text */
+ 
+  }
+
+  .review-rating {
+    position: absolute;
+    top: 1rem; 
+    right: 1.5rem; 
+    display: flex;
+    align-items: center;
+  }
+
+  .review-wrapper {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .star-icon {
+    color: #f39c12;
+    margin: 0 0.25rem;
+    scale: 1.5;
+  }
+
+  .maps-container {
+    display: flex;
+    position: absolute;
+    top: 23%;
+    left: 46.7%;
+    transform: translate(-50%, -50%);
+    padding: 8px;
+    z-index: 1000;
+    scale: .75;
+  }
+  
+  app-google-maps-component {
+    margin-left: 20px; 
+    pointer-events: auto;
+  }
+
+  .button-container {
+    display: flex;
+    align-items: center;
+    scale: .65;
+  }
+
+  app-move-button {
+    position: absolute;
+    left: 40%; 
+    bottom: -25px;
+    transform: translateX(-50%);
+    z-index: 1001;
+    pointer-events: auto;
+  }
+
+  .paragraph {
+    max-width: 56rem;
+    text-align: center;
+    position: absolute;
+    top: 62%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+  }

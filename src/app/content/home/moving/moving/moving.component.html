@@ -6,39 +6,6 @@
             </div>
         </div>
         <div class="flex justify-center items-center p-8">
-            <app-google-maps-component></app-google-maps-component>
-        </div>
-        <div class="flex justify-center items-center">
-            <div class="max-w-xl">
-                <p class="text-lg text-center text-neutral pt-4">Welcome to Choice Movers, where we make your relocation
-                    experience stress-free and seamless. Whether
-                    you're moving across town or across the country, our team of dedicated professionals is here to
-                    assist
-                    you every step of the way. With our commitment to exceptional customer service and attention to
-                    detail,
-                    you can trust us to handle your belongings with care and precision. From packing and loading to
-                    transportation and unpacking, we've got you covered. Make the smart choice for your next move with
-                    Choice Movers</p>
-            </div>
-        </div>
-        <div class="flex justify-center items-center p-8 bg-secondary">
-            <ng-container *ngIf="googleReviews$ | async as googleReviews; else loading">
-                <ng-container *ngIf="googleReviews.reviews; else noReviews">
-                    <div *ngFor="let review of googleReviews.reviews">
-                        <!-- Display individual review details -->
-                        <div>{{ review.authorAttribution.displayName }}</div>
-                        <div>{{ review.text.text }}</div>
-                        <div>Rating: {{ review.rating }}</div>
-                        <!-- Add more fields as needed -->
-                    </div>
-                </ng-container>
-                <ng-template #noReviews>
-                    <p>No reviews available</p>
-                </ng-template>
-            </ng-container>
-            <ng-template #loading>Loading Reviews...</ng-template>
-        </div>
-        <div class="flex justify-center items-center p-8">
             <div class="flex justify-center items-stretch p-4 space-x-2">
                 <div
                     class="flex flex-col justify-center items-center text-neutral border-secondary border-4 rounded-lg w-full max-w-md">

@@ -39,7 +39,7 @@ export class MovingComponent extends PageComponent {
   }
 
   getReviews() {
-    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
+    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=AIzaSyBYJbCFhGVBBe7lLW8amGRXZR61gfxol_Y';
 
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
       console.log(response);
