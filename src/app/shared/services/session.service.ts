@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LoginRequest } from '../../models/employee';
+import { Employee, LoginRequest } from '../../models/employee';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -11,52 +11,27 @@ import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../m
     providedIn: 'root'
 })
 export class SessionService<T> {
-    private config: SessionServiceConfig<T>;
     user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
 
-    constructor(private http: HttpClient, private feature: FeatureService, private router: Router, config: SessionServiceConfig<T>) {
+    constructor(private http: HttpClient, private feature: FeatureService, private router: Router) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
-        this.config = config;
-        this.guardWithAuth().subscribe(_ => {
-            this.user$ = this.config.getUser();
+
+        const sessionType = sessionStorage.getItem('sessionType') as SessionType;
+
+        this.guardWithAuth().subscribe(success => {
+            if (success) {
+                this.user$ = this.getUser();
+            } else {
+                this.router.navigate(['/login', sessionType]);
+            }
         });
     }
 
-    getType(): SessionType {
-        return this.config.type;
-    }
-
-    login(userName: string, passwordPlain: string): Observable<boolean> {
-        const loginRequest: LoginRequest = {
-            userName: userName,
-            passwordPlain: passwordPlain
-        };
-        return this.http.post<LoginRequest>(`${this.apiUrl}/${this.config.loginRoute}`, loginRequest).pipe(
-            switchMap((res: any) => {
-                const accessToken = res["accessToken"];
-                this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
-                if (accessToken) {
-                    return this.config.getUser().pipe(
-                        tap(profile => {
-                            this.user$ = of(profile);
-                        }),
-                        map(_ => true),
-                        catchError(err => {
-                            console.error(err);
-                            this.logout();
-                            return of(false)
-                        })
-                    );
-                }
-                else {
-                    return of(false);
-                }
-            }),
-            // Catch any error that occurs during the requestLogin or if switchMap fails
-            catchError(() => of(false))
-        );
+    setUser(user: Observable<T>, type: SessionType) {
+        this.user$ = user;
+        sessionStorage.setItem('sessionType', type);
     }
 
     logout() {
@@ -64,6 +39,7 @@ export class SessionService<T> {
         sessionStorage.clear();
         this.scheduleSessionState.clear();
         this.user$ = of(undefined);
+        sessionStorage.setItem('sessionType', '');
     }
 
     getUser(): Observable<T | undefined> {
@@ -83,7 +59,6 @@ export class SessionService<T> {
                         return true;
                     }
                     else {
-                        this.router.navigate(["login"]);
                         return false;
                     }
                 })
@@ -117,7 +92,7 @@ export class SessionService<T> {
         )
     }
 
-    private setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
+    setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";

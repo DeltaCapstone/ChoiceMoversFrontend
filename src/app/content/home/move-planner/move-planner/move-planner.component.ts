@@ -4,7 +4,7 @@ import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
 import { TuiStepperModule, TuiCheckboxBlockModule, TuiInputDateModule, TuiInputTimeModule, TuiInputModule, TuiAccordionModule, TuiSelectModule, TuiInputNumberModule, tuiInputNumberOptionsProvider, TUI_DATE_TIME_VALUE_TRANSFORMER, TuiInputDateTimeModule, tuiInputTimeOptionsProvider, TuiToggleModule, TuiRadioBlockModule } from '@taiga-ui/kit';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, FormArray, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK, TuiHostedDropdownModule, TuiDataListModule } from '@taiga-ui/core';
+import { TUI_BUTTON_OPTIONS, TuiButtonModule, TuiSvgModule, TuiTextfieldControllerModule, TUI_FIRST_DAY_OF_WEEK } from '@taiga-ui/core';
 import { Router } from '@angular/router';
 import { Room } from '../../../../models/room.model';
 import { TuiDay, TuiDayOfWeek, TuiTime, TuiValidatorModule } from '@taiga-ui/cdk';
@@ -14,6 +14,7 @@ import { ValueTransformerService } from '../../../../shared/services/value-trans
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 import { SessionService } from '../../../../shared/services/session.service';
 import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -112,6 +113,8 @@ export class MovePlannerComponent extends PageComponent {
 
   jobSessionState: CreateEstimateSessionState = new CreateEstimateSessionState();
 
+  subscriptions: Subscription[] = [];
+
   /**
    * Constructor method that injects dependencies needed in the MovePlannerComponent
    * @param pageService A service that handles basic page-related behavior such as setting the title and interacting with the window
@@ -138,6 +141,8 @@ export class MovePlannerComponent extends PageComponent {
     this.initSpecialtyItems();
 
     this.buildForm();
+
+    this.subscibeAllFormGroupsToValueChanges();
 
   }
 
@@ -267,6 +272,90 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
+   * Subscribes to value changes of each FormGroup and calls saveMovePlannerState to set session state of session object.
+   * Used for refreshing if needed when customer navigates away from and back to the move planner in the middle of a move 
+   */
+  subscibeAllFormGroupsToValueChanges(): void {
+    this.subscriptions.push(
+      this.servicesGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.needTruckGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.moveDateGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.fromAddressResType.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.fromAddressFlights.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.fromAddressGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.toAddressResType.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.toAddressFlights.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.toAddressGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.roomsGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.boxesGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.moveDateGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+    this.subscriptions.push(
+      this.specialtyGroup.valueChanges.subscribe(_ => {
+        this.saveMovePlannerState()
+      })
+    );
+
+  }
+  /**
    * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.
    */
@@ -282,6 +371,14 @@ export class MovePlannerComponent extends PageComponent {
       this._googleMapsLoaderService.initToAutoComplete();
     }
 
+    if (this.activeStepIndex === 9) {
+      this.writeFromAddressValuesToForm(this._googleMapsLoaderService.fromAutocomplete);
+      this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
+      this.extractDistanceToJobMileage();
+      this.extractDistanceBetweenAddressesMileage();
+      this.totalJobDistanceCalculation();
+    }
+
     if (this.activeStepIndex === 10) {
       this.populateRoomItems();
     }
@@ -295,9 +392,8 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): void {
-
     //ServicesGroup
-    this.jobSessionState.currentJob.pack = this.servicesGroup.get('pack')?.value;
+    this.jobSessionState.currentJob.pack = this.servicesGroup.get('packing')?.value;
     this.jobSessionState.currentJob.unpack = this.servicesGroup.get('unpack')?.value;
     this.jobSessionState.currentJob.load = this.servicesGroup.get('load')?.value;
     this.jobSessionState.currentJob.unload = this.servicesGroup.get('unload')?.value;
@@ -344,7 +440,6 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
 
     //TODO:Need to add special requests group once it is created on the backend
-
   }
 
   /**
@@ -633,6 +728,7 @@ export class MovePlannerComponent extends PageComponent {
       console.log('Distance To Job Mileage value is:', distance)
 
       this.newJob.distanceToJob = distance !== undefined ? distance : 0;
+      this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? distance : 0;
 
       return distance;
     } catch (error) {
@@ -674,6 +770,7 @@ export class MovePlannerComponent extends PageComponent {
 
       totalJobDistance !== undefined ? this.newJob.distanceTotal += totalJobDistance : 0;
       console.log('Total Job distance second assignment', totalJobDistance);
+      this.jobSessionState.currentJob.distanceTotal = totalJobDistance !== undefined ? totalJobDistance : 0;
 
     } catch (error) {
       console.error('Error:', error);
@@ -685,13 +782,9 @@ export class MovePlannerComponent extends PageComponent {
    */
   submitForm(): void {
     this.boolToString(this.roomsGroup);
-    this.writeFromAddressValuesToForm(this._googleMapsLoaderService.fromAutocomplete);
-    this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
-    this.extractDistanceToJobMileage();
-    this.extractDistanceBetweenAddressesMileage();
-    this.totalJobDistanceCalculation();
 
-    this.newJob.customer = new Customer('janeDoe', '', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '330-123-4567');
+    this.newJob.customer = new Customer('janeDoe', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', []);
+
     this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
     this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
     this.newJob.loadAddr.state = this.fromAddressGroup.get('fromState')?.value;
@@ -699,6 +792,7 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.loadAddr.aptNum = this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value ?? '';
     this.newJob.loadAddr.resType = this.fromAddressResType.value;
     this.newJob.loadAddr.flights = this.fromAddressFlights.value;
+
     this.newJob.unloadAddr.street = this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value;
     this.newJob.unloadAddr.city = this.toAddressGroup.get('toCity')?.value;
     this.newJob.unloadAddr.state = this.toAddressGroup.get('toState')?.value;
@@ -706,6 +800,7 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.unloadAddr.aptNum = this.toAddressGroup.get('toAptNumUnitOrSuite')?.value ?? '';
     this.newJob.unloadAddr.resType = this.toAddressResType.value;
     this.newJob.unloadAddr.flights = this.toAddressFlights.value;
+
     this.newJob.startTime = this.moveDateGroup.value.dateTime + ' ' + this.postfix;
     this.newJob.endTime = '';
 
@@ -724,11 +819,13 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.needTruck = this.needTruckGroup.value;
 
-    console.log(this.newJob);
+    console.log('New Job object value:', this.newJob);
+
+    console.log('Job session state value:', this.jobSessionState)
   }
 
   ngOnDestroy() {
-
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }
 

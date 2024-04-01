@@ -12,6 +12,8 @@ import { SessionServiceConfig, SessionType } from "./models/session.model";
 import { EmployeesService } from "./shared/services/employees.service";
 import { SessionService } from "./shared/services/session.service";
 import { FeatureService } from "./shared/services/feature.service";
+import { CustomersService } from "./shared/services/customers.service";
+import { Customer } from "./models/customer.model";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -27,18 +29,30 @@ export const appConfig: ApplicationConfig = {
                     allowedDomains: ["localhost:8080"],
                 },
             },
-        )), provideAnimationsAsync(),
+            )), provideAnimationsAsync(),
         {
             provide: SessionType.Employee,
             useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService) => {
                 const config = new SessionServiceConfig(
-                    () => employeesService.getProfile(), 
+                    () => employeesService.getProfile(),
                     'portal/login',
                     SessionType.Employee
                 );
-                return new SessionService<Employee>(http, featureService, router, config);
+                return new SessionService<Employee>(http, featureService, router);
             },
             deps: [HttpClient, FeatureService, Router, EmployeesService]
+        },
+        {
+            provide: SessionType.Customer,
+            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, customerService: CustomersService) => {
+                const config = new SessionServiceConfig(
+                    () => customerService.getCustomerProfile(),
+                    '/login',
+                    SessionType.Customer
+                );
+                return new SessionService<Customer>(http, featureService, router);
+            },
+            deps: [HttpClient, FeatureService, Router, CustomersService]
         },
     ]
 };

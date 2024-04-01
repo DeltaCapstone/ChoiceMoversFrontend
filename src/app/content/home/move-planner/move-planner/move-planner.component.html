@@ -32,7 +32,7 @@
         <ng-container *ngIf="activeStepIndex === 2">
             <div class="absolute inset-x-0 top-full mt-4">
                 <form class="b-form" [formGroup]="moveDateGroup" [tuiTextfieldCleaner]="true">
-                    <tui-input-date-time class="b-form w-64" formControlName="dateTime"
+                    <tui-input-date-time [min]="this.currentDay" class="b-form w-64" formControlName="dateTime"
                         [tuiTextfieldPostfix]="postfix">Choose Date and
                         Time</tui-input-date-time>
                     <p class="text-sm">Toggle Switch Below For AM/PM</p>
