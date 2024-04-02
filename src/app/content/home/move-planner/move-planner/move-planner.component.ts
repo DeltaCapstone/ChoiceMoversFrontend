@@ -14,7 +14,9 @@ import { ValueTransformerService } from '../../../../shared/services/value-trans
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 import { SessionService } from '../../../../shared/services/session.service';
 import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { CustomerSessionServiceToken } from '../../../../app.config';
+import { JobsService } from '../../../../shared/services/jobs.service';
 
 
 @Component({
@@ -52,6 +54,10 @@ import { Subscription } from 'rxjs';
 })
 
 export class MovePlannerComponent extends PageComponent {
+
+  activeUser$: Observable<Customer | undefined>;
+
+  currentCustomer: Customer = new Customer();
 
   currentFormGroup: FormGroup;
 
@@ -126,8 +132,13 @@ export class MovePlannerComponent extends PageComponent {
     private _router: Router,
     private _valueTransformerService: ValueTransformerService,
     private _googleMapsLoaderService: GoogleMapsLoaderService,
-    private _elementRef: ElementRef,) {
+    private _elementRef: ElementRef,
+    @Inject(CustomerSessionServiceToken) private _customerSession: SessionService<Customer>,
+    private _jobsService: JobsService,
+  ) {
     super(pageService);
+
+    this.activeUser$ = new Observable<Customer | undefined>;
 
     // Initialize the itemsGroup FormGroup
     this.itemsGroup = this._formBuilder.group({});
@@ -144,6 +155,25 @@ export class MovePlannerComponent extends PageComponent {
 
     this.subscibeAllFormGroupsToValueChanges();
 
+    this.activeUser$ = this._customerSession.getUser();
+    console.log('Active user is:', this.activeUser$);
+    const userSubscription = this.activeUser$.subscribe();
+
+    this.subscriptions.push(userSubscription);
+
+    this.activeUser$.subscribe({
+      next: (customer) => {
+        console.log(customer);
+        if (customer) {
+          this.currentCustomer = customer;
+        } else {
+          this.currentCustomer = new Customer();
+        }
+      },
+      error: (error) => {
+        console.error('An error occurred in creating active user:', error);
+      }
+    });
   }
 
   /**
@@ -355,6 +385,7 @@ export class MovePlannerComponent extends PageComponent {
     );
 
   }
+
   /**
    * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.
@@ -500,7 +531,6 @@ export class MovePlannerComponent extends PageComponent {
     //TODO:Need to add special requests group once it is created on the backend
 
   }
-
 
   /**
    * Populates the room items stepper accordion section based on the rooms selected in the Rooms stepper step
@@ -783,7 +813,7 @@ export class MovePlannerComponent extends PageComponent {
   submitForm(): void {
     this.boolToString(this.roomsGroup);
 
-    this.newJob.customer = new Customer('janeDoe', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '', '');
+    this.newJob.customer = this.currentCustomer;
 
     this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
     this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
@@ -822,6 +852,15 @@ export class MovePlannerComponent extends PageComponent {
     console.log('New Job object value:', this.newJob);
 
     console.log('Job session state value:', this.jobSessionState)
+
+    this._jobsService.createCustomerEstimate(this.newJob).subscribe({
+      next: (response) => {
+        console.log('Customer estimate created successfully', response);
+      },
+      error: (error) => {
+        console.error('Error creating customer estimate', error);
+      }
+    });
   }
 
   ngOnDestroy() {

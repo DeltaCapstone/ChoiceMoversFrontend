@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { AssignmentConflictType, Job } from '../../models/job.model';
 import { AssignedEmployee } from '../../models/employee';
+import { CreateJobEstimate, ICreateJobEstimate } from '../../models/create-job-estimate.model';
 
 /**
  * Service that provides an interface for creating and updating jobs from the customer facing Moving page.
@@ -26,6 +27,10 @@ export class JobsService {
     // CUSTOMER REQUESTS
     // -----------------------
 
+    createCustomerEstimate(newJob: CreateJobEstimate): Observable<CreateJobEstimate> {
+        return this.http.post<CreateJobEstimate>(`${this.apiUrl}/estimate`, newJob);
+    }
+
     // TODO: needs implemented on the backend
     createCustomerJob(newJob: Job): Observable<Job> {
         return this.http.post<Job>(`${this.apiUrl}/customer/job`, newJob);
@@ -46,7 +51,7 @@ export class JobsService {
             catchError(err => {
                 let errorType: AssignmentConflictType | null = null;
 
-                switch(err.error) {
+                switch (err.error) {
                     case AssignmentConflictType.JobFull:
                         errorType = AssignmentConflictType.JobFull;
                         break;
@@ -66,10 +71,10 @@ export class JobsService {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfAssign?jobID=${jobId}`, {}).pipe(
             tap(assignedEmployees => {
                 const partialJob: Partial<Job> = {
-                    jobId: jobId,  
-                    assignedEmployees: assignedEmployees 
+                    jobId: jobId,
+                    assignedEmployees: assignedEmployees
                 };
-                this.cacheUpsert([partialJob]);  
+                this.cacheUpsert([partialJob]);
             })
         );
     }
@@ -78,10 +83,10 @@ export class JobsService {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/employee/jobs/selfRemove?jobID=${jobId}`, {}).pipe(
             tap(assignedEmployees => {
                 const partialJob: Partial<Job> = {
-                    jobId: jobId,  
-                    assignedEmployees: assignedEmployees 
+                    jobId: jobId,
+                    assignedEmployees: assignedEmployees
                 };
-                this.cacheUpsert([partialJob]);  
+                this.cacheUpsert([partialJob]);
             })
         );
     }
@@ -90,10 +95,10 @@ export class JobsService {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/manager/job/assign?jobID=${jobId}&toRemove=${userName}`, {}).pipe(
             tap(assignedEmployees => {
                 const partialJob: Partial<Job> = {
-                    jobId: jobId,  
-                    assignedEmployees: assignedEmployees 
+                    jobId: jobId,
+                    assignedEmployees: assignedEmployees
                 };
-                this.cacheUpsert([partialJob]);  
+                this.cacheUpsert([partialJob]);
             })
         );
     }
@@ -102,10 +107,10 @@ export class JobsService {
         return this.http.post<AssignedEmployee[]>(`${this.apiUrl}/manager/job/assign?jobID=${jobId}&toAdd=${userName}`, {}).pipe(
             tap(assignedEmployees => {
                 const partialJob: Partial<Job> = {
-                    jobId: jobId,  
-                    assignedEmployees: assignedEmployees 
+                    jobId: jobId,
+                    assignedEmployees: assignedEmployees
                 };
-                this.cacheUpsert([partialJob]);  
+                this.cacheUpsert([partialJob]);
             })
         );
     }

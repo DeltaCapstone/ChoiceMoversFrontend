@@ -26,6 +26,7 @@ import { inject } from '@angular/core';
 import { JobContactComponent } from './shared/components/job/job-contact/job-contact.component';
 import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
 import { CustomerInfoComponent } from './shared/components/customer-info/customer-info.component';
+import { movePlannerGuard } from './shared/guards/move-planner.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -37,11 +38,11 @@ export const routes: Routes = [
             { path: 'clean-out', component: CleanOutComponent },
             { path: 'contact', component: ContactComponent },
             { path: 'moving', component: MovingComponent },
-            { path: 'move-planner', component: MovePlannerComponent },
+            { path: 'move-planner', component: MovePlannerComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
             { path: 'storage', component: StorageComponent },
-            { path: 'customer-summary', component: CustomerSummaryComponent },
+            { path: 'customer-summary', component: CustomerSummaryComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
             { path: 'customer-signup', component: CustomerInfoComponent },
         ]
     },
