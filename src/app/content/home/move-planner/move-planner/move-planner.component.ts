@@ -783,7 +783,7 @@ export class MovePlannerComponent extends PageComponent {
   submitForm(): void {
     this.boolToString(this.roomsGroup);
 
-    this.newJob.customer = new Customer('janeDoe', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', []);
+    this.newJob.customer = new Customer('janeDoe', 'Jane', 'Doe', 'janeDoe@jandDoe.com', '330-330-3300', '', '');
 
     this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
     this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
