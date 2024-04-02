@@ -43,69 +43,6 @@
                                     </div>
                                 </div>
 
-                                <ng-container *ngIf="checked[1][1]">
-                                    <div class="m-3 ml-0" tuiHeader="xxs">
-                                        <h1 tuiTitle>Load address</h1>
-                                    </div>
-                                    <div class="tui-form__row">
-                                        <tui-input tuiTextfieldSize="m" formControlName="loadAddrStreet">
-                                            Street
-                                        </tui-input>
-                                    </div>
-
-                                    <div class="tui-form__row tui-form__row_multi-fields">
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="loadAddrState"
-                                                [readOnly]=true>
-                                                State
-                                            </tui-input>
-                                        </div>
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="loadAddrCity"
-                                                [readOnly]=true>
-                                                City
-                                            </tui-input>
-                                        </div>
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="loadAddrZip"
-                                                [readOnly]=true>
-                                                Zip
-                                            </tui-input>
-                                        </div>
-                                    </div>
-                                </ng-container>
-
-                                <ng-container *ngIf="checked[2][1]">
-                                    <div class="m-3 ml-0" tuiHeader="xxs">
-                                        <h1 tuiTitle>Unload address</h1>
-                                    </div>
-                                    <div class="tui-form__row">
-                                        <tui-input tuiTextfieldSize="m" formControlName="unloadAddrStreet">
-                                            Street
-                                        </tui-input>
-                                    </div>
-
-                                    <div class="tui-form__row tui-form__row_multi-fields">
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="unloadAddrState"
-                                                [readOnly]=true>
-                                                State
-                                            </tui-input>
-                                        </div>
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="unloadAddrCity"
-                                                [readOnly]=true>
-                                                City
-                                            </tui-input>
-                                        </div>
-                                        <div class="tui-form__multi-field">
-                                            <tui-input tuiTextfieldSize="m" formControlName="unloadAddrZip"
-                                                [readOnly]=true>
-                                                Zip
-                                            </tui-input>
-                                        </div>
-                                    </div>
-                                </ng-container>
                                 <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
                                         <tui-textarea tuiTextfieldSize="m" formControlName="notes">
@@ -131,19 +68,22 @@
             </div>
         </div>
 
-        <div class="max-w-lg tui-container flex flex-col justify-center items-center">
-            <div class="flex flex-col items-center justify-center p-2 bg-[white] w-[550px] h-min">
-                <label>
-                    <span>Load addr</span>
-                    <input id="loadAddr" #loadAddr>
-                </label>
+        <tui-loader class="h-min max-w-lg tui-container" [showLoader]="(mapLoading | async) ?? false" [overlay]="true">
+            <div class="max-w-lg h-min tui-container flex flex-col justify-center items-center">
+                <div class="flex flex-col items-center justify-center p-2 bg-[white] w-[550px] h-min">
+                    <form [formGroup]="form">
+                        <label>
+                            <span class="mr-2">Load address</span>
+                            <input formControlName="loadAddr" id="loadAddr" #loadAddr>
+                        </label>
+                    </form>
+                </div>
+                <google-map id="map" [options]="mapOptions" width="550px" height="500px">
+                    @if (directionsResults$ | async; as directionsResults) {
+                    <map-directions-renderer [directions]="directionsResults" />
+                    }
+                </google-map>
             </div>
-            <google-map [center]="center" [zoom]="zoom" width="550px" height="400px">
-                @if (directionsResults$ | async; as directionsResults) {
-                <map-directions-renderer [directions]="directionsResults" />
-                }
-                <map-info-window>test</map-info-window>
-            </google-map>
-        </div>
+        </tui-loader>
     </div>
 </div>

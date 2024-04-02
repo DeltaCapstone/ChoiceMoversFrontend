@@ -33,7 +33,9 @@ export class GoogleMapsLoaderService {
     this.map = new Map(
       document.getElementById("map") as HTMLElement, {
       zoom: 14,
+      streetViewControl: false,
       center: position,
+      mapTypeControl: false,
       mapId: "e953adf38f76874e"
     }
     );
