@@ -12,6 +12,7 @@ import { BehaviorSubject, Observable, Subject, map, of, switchMap, take } from '
 import { AssignmentConflictType, Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-job',
@@ -28,7 +29,7 @@ export class JobComponent extends BaseComponent {
     employeeToBoot$ = new Subject<AssignedEmployee | null>();
 
     constructor(
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private jobsService: JobsService,
         private route: ActivatedRoute,
         private router: Router) {
@@ -112,7 +113,7 @@ export class JobComponent extends BaseComponent {
 
     back() {
         this.session.scheduleSessionState.tabIndex = 0;
-        this.session.scheduleSessionState.jobId = "";
+        this.session.scheduleSessionState.jobSessionState.jobId = "";
         this.router.navigate(["/dashboard/schedule"]);
     }
 }

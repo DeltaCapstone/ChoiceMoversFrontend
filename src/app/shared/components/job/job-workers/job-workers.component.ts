@@ -11,6 +11,7 @@ import { JobsService } from '../../../services/jobs.service';
 import { SessionType } from '../../../../models/session.model';
 import { EmployeesService } from '../../../services/employees.service';
 import { TuiTagModule } from '@taiga-ui/kit';
+import { EmployeeSessionServiceToken } from '../../../../app.config';
 
 @Component({
     selector: 'app-job-workers',
@@ -51,7 +52,7 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     constructor(
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private route: ActivatedRoute,
         private jobsService: JobsService,
         private employeesService: EmployeesService,
@@ -61,7 +62,14 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth().subscribe(_ => this.router.navigate([`/dashboard/schedule/job/`, userName]));
+        this.session.isUserAuthorized().subscribe(isAuthorized => { 
+            if (isAuthorized){       
+                this.router.navigate([`/dashboard/schedule/job/`, userName])
+            }
+            else {
+                this.session.redirectToLogin();
+            }
+        });
     }
 
     ngOnDestroy() {

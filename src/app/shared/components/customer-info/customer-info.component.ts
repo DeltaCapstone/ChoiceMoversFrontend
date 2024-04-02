@@ -10,6 +10,7 @@ import { SessionType } from '../../../models/session.model';
 import { SessionService } from '../../services/session.service';
 import { TuiTextfieldControllerModule, TuiDataListModule, TuiErrorModule, TuiSvgModule, TuiButtonModule } from '@taiga-ui/core';
 import { TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiTextareaModule, TuiInputPasswordModule } from '@taiga-ui/kit';
+import { CustomerSessionServiceToken } from '../../../app.config';
 
 @Component({
   selector: 'app-customer-info',
@@ -30,7 +31,8 @@ export class CustomerInfoComponent extends BaseComponent {
 
   user$: Observable<Customer | undefined>;
 
-  constructor(private _formBuilder: FormBuilder, private _route: ActivatedRoute, private _customerService: CustomersService, private _location: Location, private _router: Router, @Inject(SessionType.Customer) private _session: SessionService<Customer>) {
+  constructor(private _formBuilder: FormBuilder, private _route: ActivatedRoute, private _customerService: CustomersService, 
+    private _location: Location, private _router: Router, @Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>) {
     super();
 
     this.customerSignUpGroup = this._formBuilder.group({

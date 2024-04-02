@@ -1,6 +1,6 @@
 import { provideAnimations } from "@angular/platform-browser/animations";
-import { TuiRootModule } from "@taiga-ui/core";
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { TuiDialogModule, TuiRootModule } from "@taiga-ui/core";
+import { ApplicationConfig, InjectionToken, importProvidersFrom } from '@angular/core';
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Router, provideRouter } from "@angular/router";
 import { routes } from "./app.routes";
@@ -12,8 +12,12 @@ import { SessionServiceConfig, SessionType } from "./models/session.model";
 import { EmployeesService } from "./shared/services/employees.service";
 import { SessionService } from "./shared/services/session.service";
 import { FeatureService } from "./shared/services/feature.service";
+import { JobsService } from "./shared/services/jobs.service";
 import { CustomersService } from "./shared/services/customers.service";
 import { Customer } from "./models/customer.model";
+
+export const EmployeeSessionServiceToken = new InjectionToken<SessionService<Employee>>('EmployeeSessionService');
+export const CustomerSessionServiceToken = new InjectionToken<SessionService<Customer>>('CustomerSessionService');
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -22,37 +26,38 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(
             withInterceptorsFromDi()
         ),
-        importProvidersFrom(HttpClientModule, TuiRootModule,
+        importProvidersFrom(HttpClientModule, TuiRootModule, TuiDialogModule,
             JwtModule.forRoot({
                 config: {
                     tokenGetter: () => sessionStorage.getItem("accessToken"),
                     allowedDomains: ["localhost:8080"],
                 },
             },
-            )), provideAnimationsAsync(),
+        )), provideAnimationsAsync(),
         {
-            provide: SessionType.Employee,
-            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService) => {
+            provide: EmployeeSessionServiceToken,
+            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, employeesService: EmployeesService, jobsService: JobsService) => {
                 const config = new SessionServiceConfig(
-                    () => employeesService.getProfile(),
+                    () => employeesService.getProfile(), 
                     'portal/login',
                     SessionType.Employee
                 );
-                return new SessionService<Employee>(http, featureService, router);
+                return new SessionService<Employee>(http, featureService, router, jobsService, config);
             },
-            deps: [HttpClient, FeatureService, Router, EmployeesService]
+            deps: [HttpClient, FeatureService, Router, EmployeesService, JobsService]
         },
         {
-            provide: SessionType.Customer,
-            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, customerService: CustomersService) => {
+            provide: CustomerSessionServiceToken,
+            useFactory: (http: HttpClient, featureService: FeatureService, router: Router, customersService: CustomersService, jobsService: JobsService) => {
                 const config = new SessionServiceConfig(
-                    () => customerService.getCustomerProfile(),
-                    '/login',
+                    () => customersService.getCustomerProfile(), 
+                    'login',
                     SessionType.Customer
                 );
-                return new SessionService<Customer>(http, featureService, router);
+                console.log("customer factory");
+                return new SessionService<Customer>(http, featureService, router, jobsService, config);
             },
-            deps: [HttpClient, FeatureService, Router, CustomersService]
+            deps: [HttpClient, FeatureService, Router, CustomersService, JobsService]
         },
     ]
 };

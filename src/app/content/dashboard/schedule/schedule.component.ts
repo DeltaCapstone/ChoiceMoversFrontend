@@ -4,13 +4,13 @@ import { Calendar, CalendarOptions, EventClickArg, EventInput } from '@fullcalen
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
-import { Observable, map, switchMap, take } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
-import { SessionType } from '../../../models/session.model';
 import { Employee } from '../../../models/employee';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-schedule',
@@ -48,17 +48,21 @@ export class ScheduleComponent extends PageComponent {
             eventClick: this.eventClick.bind(this),
             datesSet: dateInfo => {
                 // update calendar
-                this.session.guardWithAuth().pipe(
-                    switchMap(_ => this.getJobEvents(dateInfo.startStr, dateInfo.endStr)),
-                    take(1)
-                ).subscribe(events => {
-                    // update session cache
-                    const [earliestDate, latestDate] = this.getBoundaryDates(events);
-                    this.session.scheduleSessionState.jobsStartDate = earliestDate;
-                    this.session.scheduleSessionState.jobsEndDate = latestDate;
+                this.session.isUserAuthorized().subscribe(isAuthorized => {
+                    if (!isAuthorized) {
+                        this.session.redirectToLogin();
+                        return;
+                    };
 
-                    // update calendar
-                    this.setEvents(events)
+                    this.getJobEvents(dateInfo.startStr, dateInfo.endStr).pipe(take(1)).subscribe(events => {
+                        // update session cache
+                        const [earliestDate, latestDate] = this.getBoundaryDates(events);
+                        this.session.scheduleSessionState.jobsStartDate = earliestDate;
+                        this.session.scheduleSessionState.jobsEndDate = latestDate;
+
+                        // update calendar
+                        this.setEvents(events)
+                    })
                 });
             }
         }
@@ -71,14 +75,14 @@ export class ScheduleComponent extends PageComponent {
             date.setUTCDate(date.getUTCDate() + 5);
             this.calendarOptions.initialDate = date.toISOString();
         }
-        const cachedJobId = this.session.scheduleSessionState.jobId;
+        const cachedJobId = this.session.scheduleSessionState.jobSessionState.jobId;
         if (cachedJobId) {
             this.router.navigate(["dashboard/schedule/job/", cachedJobId]);
         }
     }
 
     constructor(pageService: PageService,
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private router: Router,
         private jobsService: JobsService) {
         super(pageService);
@@ -116,10 +120,15 @@ export class ScheduleComponent extends PageComponent {
     }
 
     eventClick(info: EventClickArg) {
-        this.session.guardWithAuth().subscribe(_ => {
-            const jobId: string = info.event.extendedProps.jobId;
-            this.session.scheduleSessionState.jobId = jobId;
-            this.router.navigate(["dashboard/schedule/job/", jobId]);
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                const jobId: string = info.event.extendedProps.jobId;
+                this.session.scheduleSessionState.jobSessionState.jobId = jobId;
+                this.router.navigate(["dashboard/schedule/job/", jobId]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
         });
     }
 }

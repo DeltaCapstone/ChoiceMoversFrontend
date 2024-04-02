@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
 import { SearchComponent } from '../../../shared/components/search/search.component';
 import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-employees',
@@ -46,14 +47,19 @@ export class EmployeesComponent extends PageComponent {
 
     constructor(pageService: PageService, private employeesService: EmployeesService, 
         private router: Router, 
-        @Inject(SessionType.Employee) private session: SessionService<Employee>) {
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>) {
         super(pageService);
     }
 
     /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth().subscribe(_ => {
-            this.router.navigate(["/dashboard/employees/employee", userName]);
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                this.router.navigate(["/dashboard/employees/employee", userName]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
         });
     }
 

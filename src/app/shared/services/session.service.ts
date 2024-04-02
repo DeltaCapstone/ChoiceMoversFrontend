@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Employee, LoginRequest } from '../../models/employee';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { Router } from '@angular/router';
 import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
+import { Router } from '@angular/router';
+import { JobsService } from './jobs.service';
+import { LoginRequest } from '../../models/employee';
 
 
 @Injectable({
@@ -14,24 +15,51 @@ export class SessionService<T> {
     user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
+    config: SessionServiceConfig<T>;
 
-    constructor(private http: HttpClient, private feature: FeatureService, private router: Router) {
+    constructor(private http: HttpClient, private feature: FeatureService, private router: Router, jobsService: JobsService, config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
-
-        const sessionType = sessionStorage.getItem('sessionType') as SessionType;
-
-        this.guardWithAuth().subscribe(success => {
-            if (success) {
-                this.user$ = this.getUser();
-            } else {
-                this.router.navigate(['/login', sessionType]);
-            }
+        this.config = config;
+        this.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized)
+                this.redirectToLogin();
+            this.user$ = this.config.getUser();
         });
     }
 
-    setUser(user: Observable<T>, type: SessionType) {
-        this.user$ = user;
-        sessionStorage.setItem('sessionType', type);
+    login(userName: string, passwordPlain: string): Observable<boolean> {
+        const loginRequest: LoginRequest = {
+            userName: userName,
+            passwordPlain: passwordPlain
+        };
+        return this.http.post<LoginRequest>(`${this.apiUrl}/${this.config.loginRoute}`, loginRequest).pipe(
+            switchMap((res: any) => {
+                const accessToken = res["accessToken"];
+                this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
+                if (accessToken) {
+                    return this.config.getUser().pipe(
+                        tap(profile => {
+                            this.user$ = of(profile);
+                        }),
+                        map(_ => true),
+                        catchError(err => {
+                            console.error(err);
+                            this.logout();
+                            return of(false)
+                        })
+                    );
+                }
+                else {
+                    return of(false);
+                }
+            }),
+            // Catch any error that occurs during the requestLogin or if switchMap fails
+            catchError(() => of(false))
+        );
+    }
+
+    getType(): SessionType {
+        return this.config.type;
     }
 
     logout() {
@@ -39,30 +67,22 @@ export class SessionService<T> {
         sessionStorage.clear();
         this.scheduleSessionState.clear();
         this.user$ = of(undefined);
-        sessionStorage.setItem('sessionType', '');
     }
 
     getUser(): Observable<T | undefined> {
         return this.user$;
     }
 
-    guardWithAuth(): Observable<boolean> {
+    redirectToLogin() {
+        this.router.navigate(["login", this.config.type]);
+    }
+
+    isUserAuthorized(): Observable<boolean> {
         if (this.isActive()) {
             return of(true).pipe(take(1));
         }
         else { // attempt a refresh
-            return this.refresh().pipe(
-                take(1),
-                map(success => {
-                    console.log(success);
-                    if (success) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                })
-            )
+            return this.refresh();
         }
     }
 

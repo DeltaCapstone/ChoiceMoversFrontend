@@ -1,29 +1,19 @@
 import { Inject, Injectable } from '@angular/core';
-import { SessionType } from '../../models/session.model';
 import { Employee } from '../../models/employee';
 import { SessionService } from '../services/session.service';
-import { Router } from '@angular/router';
-import { map, of } from 'rxjs';
+import { EmployeeSessionServiceToken } from '../../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardGuard {
-  constructor(@Inject(SessionType.Employee) private sessionService: SessionService<Employee>, private _router: Router) { }
+  constructor(@Inject(EmployeeSessionServiceToken) private sessionService: SessionService<Employee>) {}
 
-  canActivate() {
-    console.log('In canActivate()');
-    this.sessionService.guardWithAuth().pipe(
-      map(success => {
-        console.log('Success');
-        if (success) {
-          return true;
-        } else {
-          this._router.navigate(['login', SessionType.Employee]);
-          return false;
-        }
+  canActivate(){
+      this.sessionService.isUserAuthorized().subscribe(isAuthorized => {
+          if (!isAuthorized){
+             this.sessionService.redirectToLogin();               
+          }  
       })
-    ).subscribe()
-    return of(true);
   }
 }

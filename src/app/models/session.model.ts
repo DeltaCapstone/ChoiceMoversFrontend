@@ -1,9 +1,19 @@
-import { Observable } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
+import { AssignedEmployee } from "./employee";
+import { Inject } from "@angular/core";
+import { JobsService } from "../shared/services/jobs.service";
 import { CreateJobEstimate } from "./create-job-estimate.model";
 import { Customer } from "./customer.model";
 
 export interface ISessionState {
     clear(): void;
+}
+
+export interface IJobSessionState {
+    jobId: string;
+    employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
+    alreadyAssigned$: ReplaySubject<boolean>;
+    assignmentAvailable$: ReplaySubject<boolean>;
 }
 
 export interface ICreateEstimateSessionState {
@@ -25,29 +35,52 @@ export class CreateEstimateSessionState implements ICreateEstimateSessionState, 
 }
 
 export interface IScheduleSessionState {
+    jobSessionState: JobSessionState | null;
     jobsStartDate: string;
     jobsEndDate: string;
-    jobId: string;
     tabIndex: number;
+}
+
+export class JobSessionState implements IJobSessionState, ISessionState {
+    jobsService: JobsService;
+    jobId = "";
+    employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
+    alreadyAssigned$ = new ReplaySubject<boolean>(1);
+    assignmentAvailable$ = new ReplaySubject<boolean>(1);
+
+    constructor(jobId: string=""){
+        this.jobId = jobId;
+        this.employeeToBoot$.next(null);
+        this.alreadyAssigned$.next(false);
+        this.assignmentAvailable$.next(false);
+        this.jobsService = Inject(JobsService);
+    }
+
+    clear(): void {
+        this.jobId = "";
+        this.employeeToBoot$.next(null);
+        this.alreadyAssigned$.next(false);
+        this.assignmentAvailable$.next(false);
+    }
 }
 
 export class ScheduleSessionState implements IScheduleSessionState, ISessionState {
     jobsStartDate = "";
     jobsEndDate = "";
-    jobId = "";
     tabIndex = 0;
+    jobSessionState = new JobSessionState();
 
     clear(): void {
         this.jobsStartDate = "";
         this.jobsEndDate = "";
-        this.jobId = "";
         this.tabIndex = 0;
+        this.jobSessionState.clear();
     }
 }
 
 export enum SessionType {
-    Employee = "EmployeeSessionService",
-    Customer = "CustomerSessionService",
+    Employee = "employee",
+    Customer = "customer",
 }
 
 export interface ISessionServiceConfig<T> {
