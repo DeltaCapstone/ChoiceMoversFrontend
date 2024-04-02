@@ -13,8 +13,7 @@ h1 {
 }
 
 .active {
-    background-color: #ffb0b0;
-    border-radius: 10px;
+    color: white;
 }
 
 li {
