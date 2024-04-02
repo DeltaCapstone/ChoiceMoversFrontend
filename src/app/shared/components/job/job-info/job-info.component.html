@@ -68,8 +68,8 @@
             </div>
         </div>
 
-        <tui-loader [showLoader]="(mapLoading | async) ?? false" [overlay]="true">
-            <div class="max-w-lg tui-container flex flex-col justify-center items-center">
+        <tui-loader class="h-min max-w-lg tui-container" [showLoader]="(mapLoading | async) ?? false" [overlay]="true">
+            <div class="max-w-lg h-min tui-container flex flex-col justify-center items-center">
                 <div class="flex flex-col items-center justify-center p-2 bg-[white] w-[550px] h-min">
                     <form [formGroup]="form">
                         <label>
@@ -78,7 +78,7 @@
                         </label>
                     </form>
                 </div>
-                <google-map [options]="mapOptions" width="550px" height="500px">
+                <google-map id="map" [options]="mapOptions" width="550px" height="500px">
                     @if (directionsResults$ | async; as directionsResults) {
                     <map-directions-renderer [directions]="directionsResults" />
                     }

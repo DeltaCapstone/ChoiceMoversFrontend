@@ -1,18 +1,21 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, map, of, switchMap, tap } from 'rxjs';
 import { Job } from '../../../../models/job.model';
 import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { TuiDataListModule, TuiErrorModule, TuiLoaderModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
-import { TuiDay, TuiLetModule, TuiRepeatTimesModule } from '@taiga-ui/cdk';
+import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
 import { TuiChipModule, TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
 import { JobsService } from '../../../services/jobs.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap, MapDirectionsRenderer, MapDirectionsService, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
 import { Address } from '../../../../models/address.model';
+import { SessionService } from '../../../services/session.service';
+import { EmployeeSessionServiceToken } from '../../../../app.config';
+import { Employee } from '../../../../models/employee';
 
 @Component({
     selector: 'app-job-info',
@@ -27,6 +30,7 @@ import { Address } from '../../../../models/address.model';
 })
 export class JobInfoComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
+    directionsResults$: Observable<google.maps.DirectionsResult | undefined>;
     subscriptions: Subscription[] = [];
  
     form = new FormGroup({
@@ -40,11 +44,11 @@ export class JobInfoComponent extends BaseComponent {
     checked: Array<Array<String | boolean>> = [];
     status = "Pending";
     // map state
-    directionsResults$: Observable<google.maps.DirectionsResult|undefined>;
     mapOptions: google.maps.MapOptions = {    
         center: {lat: 41.066078186035156, lng: -81.46630096435547},
         streetViewControl: false,
-        zoom: 14
+        zoom: 14,
+        mapTypeControl: false
     }
     mapLoading = new BehaviorSubject(true);
 
@@ -75,7 +79,32 @@ export class JobInfoComponent extends BaseComponent {
         });
         this.subscriptions.push(jobSub);
 
-        this.directionsResults$ = this.job$.pipe(
+        this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(
+            switchMap(cachedDirectionsResults => {
+                console.log("first");
+                console.log(cachedDirectionsResults);
+                if (cachedDirectionsResults){
+                    return of(cachedDirectionsResults);
+                }
+                else {
+                    return this.getDirectionsResults();
+                }
+            }),
+            tap(_ => this.mapLoading.next(false)),
+        )
+    }
+
+    constructor(
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
+        private mapsService: GoogleMapsLoaderService,
+        private mapDirectionsService: MapDirectionsService,
+        private jobsService: JobsService, 
+        private route: ActivatedRoute) {
+        super();
+    }
+
+    getDirectionsResults(): Observable<google.maps.DirectionsResult | undefined> {
+        return this.job$.pipe(
             switchMap(job => {
                 return combineLatest([
                     this.mapsService.geocodeAddress(job?.loadAddr ? this.makeStringFromAddress(job.loadAddr) : ""),
@@ -89,18 +118,10 @@ export class JobInfoComponent extends BaseComponent {
                     travelMode: google.maps.TravelMode.DRIVING,
                 };
                 return this.mapDirectionsService.route(request).pipe(
-                    tap(_ => this.mapLoading.next(false)),
+                    tap(res => this.session.scheduleSessionState.jobSessionState.directionsResults$.next(res.result)),
                     map(res => res.result));
             }),
-        )
-    }
-
-    constructor(
-        private mapsService: GoogleMapsLoaderService,
-        private mapDirectionsService: MapDirectionsService,
-        private jobsService: JobsService, 
-        private route: ActivatedRoute) {
-        super();
+        )  
     }
 
     makeStringFromAddress(addr: Address): string {
