@@ -10,6 +10,7 @@ import { Observable, Subscription, map, of } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
 import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-employee-info',
@@ -75,13 +76,17 @@ export class EmployeeInfoComponent extends BaseComponent {
 
     constructor(private location: Location,
         private route: ActivatedRoute,
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }
 
     save() {
-        this.session.guardWithAuth().subscribe(_ => {
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+            }
+
             const formValues = this.form.value;
             const saveSub = this.user$.pipe(
                 map(user => ({
@@ -141,7 +146,12 @@ export class EmployeeInfoComponent extends BaseComponent {
     }
 
     delete() {
-        this.session.guardWithAuth().subscribe(_ => {
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+                return;
+            }
+            
             const userName: string | null = this.route.snapshot.paramMap.get('userName');
             if (!userName)
                 return;

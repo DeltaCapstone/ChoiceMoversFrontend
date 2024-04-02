@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
-import { LoginRequest } from '../../models/employee';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { Router } from '@angular/router';
 import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 import { JobsService } from "../../shared/services/jobs.service";
 import { AssignmentConflictType } from "../../models/job.model";
+import { Router } from '@angular/router';
+import { LoginRequest } from '../../models/employee';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SessionService<T> {
-    private config: SessionServiceConfig<T>;
     user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
+    config: SessionServiceConfig<T>;
 
     constructor(
         private http: HttpClient, 
@@ -25,13 +25,11 @@ export class SessionService<T> {
         config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
-        this.guardWithAuth().subscribe(_ => {
+        this.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized)
+                this.redirectToLogin();
             this.user$ = this.config.getUser();
         });
-    }
-
-    getType(): SessionType {
-        return this.config.type;
     }
 
     login(userName: string, passwordPlain: string): Observable<boolean> {
@@ -65,6 +63,10 @@ export class SessionService<T> {
         );
     }
 
+    getType(): SessionType {
+        return this.config.type;
+    }
+
     logout() {
         localStorage.clear();
         sessionStorage.clear();
@@ -76,23 +78,16 @@ export class SessionService<T> {
         return this.user$;
     }
 
-    guardWithAuth(): Observable<boolean> {
+    redirectToLogin() {
+        this.router.navigate(["login", this.config.type]);
+    }
+
+    isUserAuthorized(): Observable<boolean> {
         if (this.isActive()) {
             return of(true).pipe(take(1));
         }
         else { // attempt a refresh
-            return this.refresh().pipe(
-                take(1),
-                map(success => {
-                    if (success) {
-                        return true;
-                    }
-                    else {
-                        this.router.navigate(["login"]);
-                        return false;
-                    }
-                })
-            )
+            return this.refresh();
         }
     }
 
@@ -146,7 +141,7 @@ export class SessionService<T> {
         )
     }
 
-    private setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
+    setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";

@@ -25,6 +25,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 import { inject } from '@angular/core';
 import { JobContactComponent } from './shared/components/job/job-contact/job-contact.component';
 import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
+import { CustomerInfoComponent } from './shared/components/customer-info/customer-info.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -41,6 +42,7 @@ export const routes: Routes = [
             { path: 'quote', component: QuoteComponent },
             { path: 'storage', component: StorageComponent },
             { path: 'customer-summary', component: CustomerSummaryComponent },
+            { path: 'customer-signup', component: CustomerInfoComponent },
         ]
     },
     {
@@ -62,6 +64,6 @@ export const routes: Routes = [
             { path: 'profile', component: ProfileComponent },
         ]
     },
-    { path: 'login', pathMatch: 'full', component: LoginComponent },
+    { path: 'login/:type', pathMatch: 'full', component: LoginComponent },
     { path: '**', component: NotFoundComponent }
 ];

@@ -9,7 +9,7 @@ import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { Employee, EmployeeType } from '../../../models/employee';
-import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 type SidebarItem = {
     readonly name: string
@@ -61,20 +61,25 @@ export class SidebarComponent extends BaseComponent {
     }
 
     constructor(private router: Router, 
-        @Inject(SessionType.Employee) private session: SessionService<Employee>) {
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>) {
         super();
     }
 
     openProfile() {
         this.dropdownOpen = false;
-        this.session.guardWithAuth().subscribe(_ => {
-            this.router.navigate([`dashboard/profile/`]);
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                this.router.navigate([`dashboard/profile/`]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
         });
     }
 
     logout() {
         this.session.logout();
-        this.router.navigate([`/login`]);
+        this.session.redirectToLogin();
     }
 
     ngOnDestroy() {

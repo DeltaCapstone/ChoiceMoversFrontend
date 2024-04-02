@@ -3,31 +3,60 @@
  */
 export interface ICustomer {
     userName: string;
-    passwordHash: string;
     firstName: string;
     lastName: string;
     email: string;
     phonePrimary: string;
-    phoneOther: string;
+    phoneOther: string[];
 }
 
 /**
+ * Interface that describes the CustomerCreateRequest type
+ */
+export interface CustomerCreateRequest extends ICustomer {
+    passwordPlain: string;
+}
+
+/**
+ * Interface that describes the LoginRequest type
+ */
+export interface LoginRequest {
+    userName: string;
+    passwordPlain: string;
+}
+
+
+export interface CustomerProfileUpdateRequest {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phonePrimary: string;
+    phoneOther: string[];
+    userName: string;
+}
+/**
+ * Interface that describes the CustomerUpdatePasswordRequest type
+ */
+export interface CustomerUpdatePasswordRequest {
+    userName: string;
+    passwordOld: string;
+    passwordNew: string;
+}
+/**
  * Class that defines a Customer object and its properties and methods
  */
-export class Customer {
-    userName: string = "";
-    passwordHash: string = "";
-    firstName: string = "";
-    lastName: string = "";
-    email: string = "";
-    phonePrimary: string = "";
-    phoneOther: string = "";
+export class Customer implements ICustomer {
+    userName: string = '';
+    firstName: string = '';
+    lastName: string = '';
+    email: string = '';
+    phonePrimary: string = '';
+    phoneOther: string[] = [];
 
-    constructor(userName: string = "", passwordHash: string = "", firstName: string = "", lastName: string = "", 
-        email: string = "", phonePrimary: string = "", phoneOther: string = "") {
+    constructor(username: string = '', firstName: string = '', lastName: string = '',
+        email: string = '', phonePrimary: string = '', phoneOther: string[] = []) {
 
-        this.userName = userName;
-        this.passwordHash = passwordHash;
+        this.userName = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -41,14 +70,6 @@ export class Customer {
 
     setUsername(userName: string): void {
         this.userName = userName;
-    }
-
-    getPasswordHash(): string {
-        return this.passwordHash;
-    }
-
-    setPasswordHash(passwordHash: string): void {
-        this.passwordHash = passwordHash;
     }
 
     getFirstName(): string {
@@ -83,11 +104,11 @@ export class Customer {
         this.phonePrimary = phonePrimary;
     }
 
-    getPhoneOther(): string {
+    getPhoneOther(): string[] {
         return this.phoneOther;
     }
 
-    setPhoneOther(phoneOther: string): void {
+    setPhoneOther(phoneOther: string[]): void {
         this.phoneOther = phoneOther;
     }
 }

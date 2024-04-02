@@ -1,15 +1,19 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Injector } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TUI_VALIDATION_ERRORS, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPasswordModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TuiErrorModule, TuiLoaderModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiValidationError } from '@taiga-ui/cdk';
-import { BehaviorSubject, Observable, Subscription, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, map, take } from 'rxjs';
 import { Employee } from '../../../models/employee';
 import { SessionType } from '../../../models/session.model';
+import { Customer } from '../../../models/customer.model';
+import { FeatureService } from '../../services/feature.service';
+import { CustomerSessionServiceToken, EmployeeSessionServiceToken } from '../../../app.config';
+
 
 @Component({
     selector: 'app-login',
@@ -28,11 +32,14 @@ import { SessionType } from '../../../models/session.model';
     ],
 })
 export class LoginComponent extends BaseComponent {
+    apiUrl: string;
     subscriptions: Subscription[] = [];
+    session: SessionService<Employee | Customer>;
+
     constructor(
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
-        private router: Router) {
+        private router: Router, private _route: ActivatedRoute, private _feature: FeatureService, private _injector: Injector) {
         super();
+        this.apiUrl = this._feature.getFeatureValue("api").url
     }
 
     invalidCredentials = new BehaviorSubject(false);
@@ -42,6 +49,16 @@ export class LoginComponent extends BaseComponent {
         userName: new FormControl("", [Validators.required]),
         passwordPlain: new FormControl("", [Validators.required]),
     });
+
+    ngOnInit() {
+        const sessionType = this._route.snapshot.paramMap.get("type") as SessionType ?? "";
+        if (sessionType === SessionType.Customer) {
+            this.session = this._injector.get(CustomerSessionServiceToken);
+        } 
+        else {
+            this.session = this._injector.get(EmployeeSessionServiceToken);
+        }
+    }
 
     login() {
         // validate
@@ -61,16 +78,16 @@ export class LoginComponent extends BaseComponent {
         // attempt login
         const userName = this.form.value.userName ?? "";
         const password = this.form.value.passwordPlain ?? "";
-
-        const loginSub = this.session.login(userName, password).subscribe(success => {
-            if (success) {
-                this.router.navigate(["dashboard"]);
-            }
-            else {
-                this.invalidCredentials.next(true);
+        this.session.login(userName, password).pipe(take(1)).subscribe(success => {
+            if (success){
+                if (this.session.getType() == SessionType.Employee){
+                    this.router.navigate(["dashboard"]);
+                }
+                else {
+                    this.router.navigate(["home/customer-home"]);
+                }
             }
         });
-        this.subscriptions.push(loginSub);
     }
 
     get computedCredentialsError(): Observable<TuiValidationError | null> {

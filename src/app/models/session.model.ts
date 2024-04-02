@@ -79,8 +79,8 @@ export class ScheduleSessionState implements IScheduleSessionState, ISessionStat
 }
 
 export enum SessionType {
-    Employee = "EmployeeSessionService",
-    Customer = "CustomerSessionService",
+    Employee = "employee",
+    Customer = "customer",
 }
 
 export interface ISessionServiceConfig<T> {

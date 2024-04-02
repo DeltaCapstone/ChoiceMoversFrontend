@@ -5,13 +5,13 @@ import { BaseComponent } from '../base-component';
 import { TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
 import { TUI_PROMPT, TuiPromptModule, TuiTabsModule } from '@taiga-ui/kit';
 import { SessionService } from '../../services/session.service';
-import { SessionType } from '../../../models/session.model';
 import { AssignedEmployee, Employee } from '../../../models/employee';
 import { JobsService } from '../../services/jobs.service';
 import { BehaviorSubject, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Job } from '../../../models/job.model';
 import { CommonModule, NgClass } from '@angular/common';
 import { TuiLetModule } from '@taiga-ui/cdk';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-job',
@@ -33,8 +33,8 @@ export class JobComponent extends BaseComponent {
     warningDialogOpen = false;
 
     constructor(
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         @Inject(TuiDialogService) private readonly dialogs: TuiDialogService,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private jobsService: JobsService,
         private route: ActivatedRoute,
         private router: Router) {

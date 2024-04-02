@@ -14,6 +14,7 @@ import { TUI_PROMPT, TuiDataListWrapperModule, TuiPromptModule, TuiSelectModule,
 import { TuiIconModule } from '@taiga-ui/experimental';
 import { TuiButtonModule, TuiDataListModule, TuiDialogModule, TuiDialogService, TuiSvgModule } from '@taiga-ui/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EmployeeSessionServiceToken } from '../../../../app.config';
 
 @Component({
     selector: 'app-job-workers',
@@ -92,8 +93,8 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     constructor(
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
         @Inject(TuiDialogService) private readonly dialogs: TuiDialogService,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private route: ActivatedRoute,
         private jobsService: JobsService,
         private employeesService: EmployeesService,
@@ -103,7 +104,14 @@ export class JobWorkersComponent extends BaseComponent {
     }
 
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth().subscribe(_ => this.router.navigate([`/dashboard/schedule/job/`, userName]));
+        this.session.isUserAuthorized().subscribe(isAuthorized => { 
+            if (isAuthorized){       
+                this.router.navigate([`/dashboard/schedule/job/`, userName])
+            }
+            else {
+                this.session.redirectToLogin();
+            }
+        });
     }
 
     unassign(employee: AssignedEmployee){

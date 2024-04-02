@@ -9,6 +9,7 @@ import { Observable, Subscription, map, finalize } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
 import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-profile',
@@ -53,13 +54,17 @@ export class ProfileComponent extends BaseComponent {
     }
 
     constructor(private location: Location, 
-        @Inject(SessionType.Employee) private session: SessionService<Employee>,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }
 
     update() {
-        this.session.guardWithAuth().subscribe(_ => {
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+            }
+            
             const formValues = this.form.value;
             this.user$.pipe(
                 finalize(() => this.back()),
