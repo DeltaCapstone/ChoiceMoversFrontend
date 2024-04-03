@@ -5,7 +5,7 @@ import { FeatureService } from './feature.service';
 import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 import { JobsService } from "../../shared/services/jobs.service";
 import { AssignmentConflictType } from "../../models/job.model";
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoginRequest } from '../../models/employee';
 
 @Injectable({
@@ -25,10 +25,11 @@ export class SessionService<T> {
         config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
+
         this.isUserAuthorized().subscribe(isAuthorized => {
-            if (!isAuthorized)
-                this.redirectToLogin();
-            this.user$ = this.config.getUser();
+            if (isAuthorized){
+                this.user$ = this.config.getUser();
+            }
         });
     }
 
@@ -87,7 +88,12 @@ export class SessionService<T> {
             return of(true).pipe(take(1));
         }
         else { // attempt a refresh
-            return this.refresh();
+            return this.refresh().pipe(
+                tap(isAuthorized => {
+                    if (!isAuthorized)
+                        this.logout();
+                })
+            );
         }
     }
 
