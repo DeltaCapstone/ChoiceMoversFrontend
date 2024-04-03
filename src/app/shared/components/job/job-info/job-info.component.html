@@ -71,10 +71,14 @@
         <tui-loader class="h-min max-w-lg tui-container" [showLoader]="(mapLoading | async) ?? false" [overlay]="true">
             <div class="max-w-lg h-min tui-container flex flex-col justify-center items-center">
                 <div class="flex flex-col items-center justify-center p-2 bg-[white] w-[550px] h-min">
-                    <form [formGroup]="form">
-                        <label>
+                    <form class="w-full flex flex-col" [formGroup]="form">
+                        <label class="mb-2">
                             <span class="mr-2">Load address</span>
-                            <input formControlName="loadAddr" id="loadAddr" #loadAddr>
+                            <input class="w-full" formControlName="loadAddr" id="loadAddr" #loadAddr>
+                        </label>
+                        <label>
+                            <span class="mr-2">Unload address</span>
+                            <input class="w-full" formControlName="unloadAddr" id="unloadAddr" #unloadAddr>
                         </label>
                     </form>
                 </div>

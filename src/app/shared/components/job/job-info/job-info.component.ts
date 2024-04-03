@@ -81,8 +81,6 @@ export class JobInfoComponent extends BaseComponent {
 
         this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(
             switchMap(cachedDirectionsResults => {
-                console.log("first");
-                console.log(cachedDirectionsResults);
                 if (cachedDirectionsResults){
                     return of(cachedDirectionsResults);
                 }
@@ -91,7 +89,26 @@ export class JobInfoComponent extends BaseComponent {
                 }
             }),
             tap(_ => this.mapLoading.next(false)),
-        )
+        );
+
+        this.form.valueChanges.pipe(
+            switchMap(_ => {
+                return combineLatest([
+                    this.mapsService.geocodeAddress(this.form.value.loadAddr ?? ""),
+                    this.mapsService.geocodeAddress(this.form.value.unloadAddr ?? ""),
+                ]);
+            }),
+        ).subscribe(([origin, dest]) => {
+            const request: google.maps.DirectionsRequest = {
+                origin: origin,
+                destination: dest,
+                travelMode: google.maps.TravelMode.DRIVING,
+            };
+
+            return this.mapDirectionsService.route(request).pipe(
+                tap(res => this.session.scheduleSessionState.jobSessionState.directionsResults$.next(res.result)),
+                map(res => res.result));
+        });
     }
 
     constructor(
@@ -128,19 +145,32 @@ export class JobInfoComponent extends BaseComponent {
         return `${addr.street} ${addr.city} ${addr.state} ${addr.zip}`;
     }
 
-    ngAfterViewInit() {
-        this.getPlaceAutocomplete();
+    async ngAfterViewInit() {
+        await this.getPlaceAutocomplete();
     }
 
     private async getPlaceAutocomplete() {
-        const loadAddrElem = document.querySelector("#loadAddr") as HTMLInputElement;
-
         const { Autocomplete } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
-        new Autocomplete(loadAddrElem,
+
+        const loadAddrElem = document.querySelector("#loadAddr") as HTMLInputElement;
+        const loadAutocomplete = new Autocomplete(loadAddrElem,
             {
                 componentRestrictions: { country: 'US' },
                 types: ["address"],
             });
+
+        const unloadAddrElem = document.querySelector("#unloadAddr") as HTMLInputElement;
+        const unloadAutoComplete = new Autocomplete(unloadAddrElem,
+            {
+                componentRestrictions: { country: 'US' },
+                types: ["address"],
+            });
+
+        google.maps.event.addListener(loadAutocomplete, "place_changed", () => {
+        });
+
+        google.maps.event.addListener(unloadAutoComplete, "place_changed", () => {
+        });
     }
 
     updateAddressWithString(addr: Address, addrString: String): Address {

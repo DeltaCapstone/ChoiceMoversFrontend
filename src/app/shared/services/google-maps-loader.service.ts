@@ -23,13 +23,13 @@ export class GoogleMapsLoaderService {
   map: google.maps.Map;
 
   async initMap(): Promise<void> {
-    //Choice Movers Location
+    // Choice Movers Location
     const position = { lat: 41.066078186035156, lng: -81.46630096435547 };
 
-    //Request Libraries
+    // Request Libraries
     const { Map } = await google.maps.importLibrary("maps") as google.maps.MapsLibrary;
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
-    //Map
+    // Map
     this.map = new Map(
       document.getElementById("map") as HTMLElement, {
       zoom: 14,
