@@ -37,7 +37,9 @@ export class CustomerNavBarComponent {
 
   subscriptions: Subscription[] = [];
 
-  constructor(@Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>) { }
+  @Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>;
+
+  constructor() { }
 
   ngOnInit() {
     this.activeUser$ = this._session.getUser();

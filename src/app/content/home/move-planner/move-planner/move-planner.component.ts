@@ -237,7 +237,7 @@ export class MovePlannerComponent extends PageComponent {
       fromState: new FormControl('', Validators.required),
       fromZip: new FormControl('', Validators.required),
       fromResidenceType: new FormControl(''),
-      fromFlights: new FormControl(''),
+      fromFlights: new FormControl(0),
       fromAptNumUnitOrSuite: new FormControl('', Validators.required),
     });
 
@@ -256,7 +256,7 @@ export class MovePlannerComponent extends PageComponent {
       toState: new FormControl('', Validators.required),
       toZip: new FormControl('', Validators.required),
       toResidenceType: new FormControl(''),
-      toFlights: new FormControl(''),
+      toFlights: new FormControl(0),
       toAptNumUnitOrSuite: new FormControl('', Validators.required)
     });
 
@@ -423,6 +423,10 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): void {
+
+    //Customer
+    this.jobSessionState.currentCustomer = this.currentCustomer;
+
     //ServicesGroup
     this.jobSessionState.currentJob.pack = this.servicesGroup.get('packing')?.value;
     this.jobSessionState.currentJob.unpack = this.servicesGroup.get('unpack')?.value;
@@ -471,6 +475,9 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
 
     //TODO:Need to add special requests group once it is created on the backend
+
+    //ActiveStepIndex
+    this.jobSessionState.activeStepIndex = this.activeStepIndex;
   }
 
   /**
@@ -478,6 +485,9 @@ export class MovePlannerComponent extends PageComponent {
    * @param sessionStateObject The session object that holds the current move planner session values
    */
   refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
+
+    //Customer
+    this.currentCustomer = sessionStateObject.currentCustomer;
 
     //ServicesGroup
     this.servicesGroup.get('pack')?.value !== null ? sessionStateObject.currentJob.pack : false;
@@ -529,6 +539,9 @@ export class MovePlannerComponent extends PageComponent {
     this.specialtyGroup.setValue(sessionStateObject.currentJob.special);
 
     //TODO:Need to add special requests group once it is created on the backend
+
+    //ActiveStepIndex
+    this.activeStepIndex = sessionStateObject.activeStepIndex;
 
   }
 
@@ -820,16 +833,16 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.loadAddr.state = this.fromAddressGroup.get('fromState')?.value;
     this.newJob.loadAddr.zip = this.fromAddressGroup.get('fromZip')?.value;
     this.newJob.loadAddr.aptNum = this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value ?? '';
-    this.newJob.loadAddr.resType = this.fromAddressResType.value;
-    this.newJob.loadAddr.flights = this.fromAddressFlights.value;
+    this.newJob.loadAddr.resType = this.fromAddressResType.get('fromResType')?.value;
+    this.newJob.loadAddr.flights = this.fromAddressFlights.get('fromNumberOfFlights')?.value;
 
     this.newJob.unloadAddr.street = this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value;
     this.newJob.unloadAddr.city = this.toAddressGroup.get('toCity')?.value;
     this.newJob.unloadAddr.state = this.toAddressGroup.get('toState')?.value;
     this.newJob.unloadAddr.zip = this.toAddressGroup.get('toZip')?.value;
     this.newJob.unloadAddr.aptNum = this.toAddressGroup.get('toAptNumUnitOrSuite')?.value ?? '';
-    this.newJob.unloadAddr.resType = this.toAddressResType.value;
-    this.newJob.unloadAddr.flights = this.toAddressFlights.value;
+    this.newJob.unloadAddr.resType = this.toAddressResType.get('toResType')?.value;
+    this.newJob.unloadAddr.flights = this.toAddressFlights.get('toNumberOfFlights')?.value;
 
     this.newJob.startTime = this.moveDateGroup.value.dateTime + ' ' + this.postfix;
     this.newJob.endTime = '';
@@ -847,7 +860,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.clean = false;
 
-    this.newJob.needTruck = this.needTruckGroup.value;
+    this.newJob.needTruck = this.needTruckGroup.value.needTruck;
 
     console.log('New Job object value:', this.newJob);
 
@@ -861,6 +874,8 @@ export class MovePlannerComponent extends PageComponent {
         console.error('Error creating customer estimate', error);
       }
     });
+
+    this._router.navigate(['customer-summary']);
   }
 
   ngOnDestroy() {
