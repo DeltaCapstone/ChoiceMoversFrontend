@@ -1,21 +1,44 @@
-<div class="flex">
-    <button (click)="back()" class="m-2 icons">
-        <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
-    </button>
-    <tui-tabs [underline]=false>
-        <button [routerLink]="'info'" tuiTab>
-            <tui-svg src="tuiIconBriefcaseLarge" class="tui-space_right-2"></tui-svg>
-            Info
+<div *tuiLet="employeeToBoot$ | async as employeeToBoot" class="flex justify-between">
+    <div class="flex items-center">
+        <button (click)="back()" class="m-2 icons">
+            <tui-svg src="tuiIconArrowLeftLarge" class="tui-space_right-2"></tui-svg>
         </button>
-        <button [routerLink]="'workers'" tuiTab>
-            <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
-            Workers
-        </button>
-        <button tuiTab>
-            <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
-            Contacts
-        </button>
-    </tui-tabs>
+        <tui-tabs [underline]=false>
+            <a (click)="setTabIndex(0)" routerLinkActive [routerLink]="'info'" tuiTab>
+                <tui-svg src="tuiIconBriefcaseLarge" class="tui-space_right-2"></tui-svg>
+                Info
+            </a>
+            <a (click)="setTabIndex(1)" routerLinkActive [routerLink]="'workers'" tuiTab>
+                <tui-svg src="tuiIconUsersLarge" class="tui-space_right-2"></tui-svg>
+                Workers
+            </a>
+            <a (click)="setTabIndex(2)" [routerLink]="'contact'" routerLinkActive tuiTab>
+                <tui-svg src="tuiIconBookLarge" class="tui-space_right-2"></tui-svg>
+                Contact
+            </a>
+        </tui-tabs>
+    </div>
+
+    <ng-container *tuiLet="isFull$ | async as isFull">
+        <ng-container *tuiLet="alreadyAssigned$ | async as alreadyAssigned">
+            <div class="flex flex-col" *tuiLet="assignmentAvailable$ | async as assignmentAvailable">
+                <button *ngIf="!alreadyAssigned"
+                    (click)="(isFull && employeeToBoot) ? openWarningDialog(employeeToBoot) : selfAssign()" tuiButton
+                    type="submit" [disabled]="!assignmentAvailable"
+                    class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
+                    [ngClass]="{'opacity-50': !assignmentAvailable}">
+                    Assign yourself
+                </button>
+                <button tuiButton type="submit"
+                    class=" bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold"
+                    *ngIf="alreadyAssigned" (click)="selfRemove()">
+                    Unassign yourself
+                </button>
+                <p class="text-center text-[red] opacity-50" *ngIf="!alreadyAssigned && !assignmentAvailable">This job
+                    is full</p>
+            </div>
+        </ng-container>
+    </ng-container>
 </div>
 
 <router-outlet></router-outlet>

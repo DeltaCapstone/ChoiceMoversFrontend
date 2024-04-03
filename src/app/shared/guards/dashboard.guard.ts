@@ -1,13 +1,19 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { Inject, Injectable } from '@angular/core';
+import { Employee } from '../../models/employee';
 import { SessionService } from '../services/session.service';
+import { EmployeeSessionServiceToken } from '../../app.config';
 
-export const dashboardGuard: CanActivateFn = (route, state) => {
-    const router = inject(Router);
-    const session = inject(SessionService);
+@Injectable({
+  providedIn: 'root'
+})
+export class DashboardGuard {
+  constructor(@Inject(EmployeeSessionServiceToken) private sessionService: SessionService<Employee>) {}
 
-    return session.guardWithAuth(
-        () => true,
-        () => router.parseUrl("/login")
-    );   
- };
+  canActivate(){
+      this.sessionService.isUserAuthorized().subscribe(isAuthorized => {
+          if (!isAuthorized){
+             this.sessionService.redirectToLogin();               
+          }  
+      })
+  }
+}

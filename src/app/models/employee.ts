@@ -5,7 +5,7 @@ export enum EmployeeType {
     FullTime = "Full-time",
     PartTime = "Part-time",
     Manager = "Manager",
-    Admin= "Admin"
+    Admin = "Admin"
 }
 
 export interface IEmployee {
@@ -53,4 +53,8 @@ export class Employee implements IEmployee {
     userName: string = "";
     employeeType: EmployeeType = EmployeeType.FullTime;
     employeePriority: number = 3;
+}
+
+export class AssignedEmployee extends Employee {
+    managerAssigned: boolean = false;
 }

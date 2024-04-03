@@ -1,9 +1,4 @@
 <div class="h-full w-full flex justify-item-center">
-  <full-calendar
-    class="bg-[white] w-full p-5"
-    [options]="calendarOptions"
-    [deepChangeDetection]="true"
-    [events]="events$ | async">
-  </full-calendar>
+    <full-calendar #calendar class="bg-[white] w-full p-5" [options]="calendarOptions" [deepChangeDetection]="true">
+    </full-calendar>
 </div>
-

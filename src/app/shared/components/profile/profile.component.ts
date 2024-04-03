@@ -1,13 +1,15 @@
-import { Component, Input, } from '@angular/core';
+import { Component, Inject, Input, } from '@angular/core';
 import { BaseComponent } from '../base-component';
 import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiSelectModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
 import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../models/employee';
-import { Observable, Subscription, map, finalize, take } from 'rxjs';
+import { Observable, Subscription, map, finalize } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
+import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-profile',
@@ -51,13 +53,18 @@ export class ProfileComponent extends BaseComponent {
         this.subscriptions.push(userSub);
     }
 
-    constructor(private location: Location, private session: SessionService,
+    constructor(private location: Location, 
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
     }
 
     update() {
-        this.session.guardWithAuth(() => {
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+            }
+            
             const formValues = this.form.value;
             this.user$.pipe(
                 finalize(() => this.back()),
@@ -80,7 +87,7 @@ export class ProfileComponent extends BaseComponent {
                     }
                 });
             });
-        }).pipe((take(1))).subscribe();
+        });
     }
 
     back() {
