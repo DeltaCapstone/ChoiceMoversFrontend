@@ -18,9 +18,9 @@ export class SessionService<T> {
     config: SessionServiceConfig<T>;
 
     constructor(
-        private http: HttpClient, 
-        private feature: FeatureService, 
-        private router: Router, 
+        private http: HttpClient,
+        private feature: FeatureService,
+        private router: Router,
         private jobsService: JobsService,
         config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
@@ -91,7 +91,7 @@ export class SessionService<T> {
         }
     }
 
-    refreshJobSessionState() {        
+    refreshJobSessionState() {
         const jobSessionState = this.scheduleSessionState.jobSessionState;
         this.jobsService.checkAssignmentAvailability(jobSessionState.jobId)
             .subscribe(res => {
@@ -111,7 +111,7 @@ export class SessionService<T> {
                     jobSessionState.assignmentAvailable$.next(true);
                     jobSessionState.alreadyAssigned$.next(false);
                     jobSessionState.employeeToBoot$.next(res);
-                }           
+                }
             })
     }
 
