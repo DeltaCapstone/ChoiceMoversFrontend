@@ -117,7 +117,7 @@ export class MovePlannerComponent extends PageComponent {
 
   newJob: CreateJobEstimate = new CreateJobEstimate();
 
-  jobSessionState: CreateEstimateSessionState = new CreateEstimateSessionState();
+  jobSessionState = this._customerSession.movePlannerSessionState;
 
   subscriptions: Subscription[] = [];
 
@@ -875,7 +875,7 @@ export class MovePlannerComponent extends PageComponent {
       }
     });
 
-    this._router.navigate(['customer-summary']);
+    this._router.navigate(['home/customer-summary']);
   }
 
   ngOnDestroy() {

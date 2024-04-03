@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
+import { CreateEstimateSessionState, ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 import { JobsService } from "../../shared/services/jobs.service";
 import { AssignmentConflictType } from "../../models/job.model";
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,7 @@ export class SessionService<T> {
     user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
+    movePlannerSessionState = new CreateEstimateSessionState;
     config: SessionServiceConfig<T>;
 
     constructor(
@@ -27,7 +28,7 @@ export class SessionService<T> {
         this.config = config;
 
         this.isUserAuthorized().subscribe(isAuthorized => {
-            if (isAuthorized){
+            if (isAuthorized) {
                 this.user$ = this.config.getUser();
             }
         });

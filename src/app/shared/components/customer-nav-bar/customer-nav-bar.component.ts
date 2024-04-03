@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TuiSvgModule } from '@taiga-ui/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { SessionService } from '../../services/session.service';
 import { Observable, Subscription } from 'rxjs';
 import { CustomersService } from '../../services/customers.service';
@@ -37,9 +37,7 @@ export class CustomerNavBarComponent {
 
   subscriptions: Subscription[] = [];
 
-  @Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>;
-
-  constructor() { }
+  constructor(@Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>, private _router: Router) { }
 
   ngOnInit() {
     this.activeUser$ = this._session.getUser();
@@ -62,9 +60,12 @@ export class CustomerNavBarComponent {
 
   }
 
+  navToLogin() {
+    this._router.navigate(['login/customer']);
+  }
+
   logout() {
     this._session.logout();
-    this._session.redirectToLogin();
   }
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
