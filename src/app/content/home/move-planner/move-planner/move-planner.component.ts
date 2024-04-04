@@ -302,91 +302,6 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Subscribes to value changes of each FormGroup and calls saveMovePlannerState to set session state of session object.
-   * Used for refreshing if needed when customer navigates away from and back to the move planner in the middle of a move 
-   */
-  subscibeAllFormGroupsToValueChanges(): void {
-    this.subscriptions.push(
-      this.servicesGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.needTruckGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.moveDateGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.fromAddressResType.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.fromAddressFlights.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.fromAddressGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.toAddressResType.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.toAddressFlights.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.toAddressGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.roomsGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.boxesGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.moveDateGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-    this.subscriptions.push(
-      this.specialtyGroup.valueChanges.subscribe(_ => {
-        this.saveMovePlannerState()
-      })
-    );
-
-  }
-
-  /**
    * Changes the activeStepIndex based on which stepper step the user is on currently
    * @param index The current index to which the activeStepIndex will be set.
    */
@@ -419,10 +334,39 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
+  * Subscribes to value changes of each FormGroup and calls saveMovePlannerState to set session state of session object.
+  * Used for refreshing if needed when customer navigates away from and back to the move planner in the middle of a move 
+  */
+  subscibeAllFormGroupsToValueChanges(): void {
+    const allFormGroups = [
+      this.servicesGroup,
+      this.needTruckGroup,
+      this.moveDateGroup,
+      this.fromAddressResType,
+      this.fromAddressFlights,
+      this.fromAddressGroup,
+      this.toAddressResType,
+      this.toAddressFlights,
+      this.toAddressGroup,
+      this.roomsGroup,
+      this.boxesGroup,
+      this.specialtyGroup
+    ];
+
+    allFormGroups.forEach(formGroup => {
+      this.subscriptions.push(
+        formGroup.valueChanges.subscribe(_ => {
+          this._customerSession.saveMovePlannerValues(this.saveMovePlannerState());
+        })
+      )
+    });
+  }
+
+  /**
    * Saves the current state of the move for to a session variable in case the customer navigates away from the move planner
    * in the middle of the move planning process
    */
-  saveMovePlannerState(): void {
+  saveMovePlannerState(): CreateEstimateSessionState {
 
     //Customer
     this.jobSessionState.currentCustomer = this.currentCustomer;
@@ -478,6 +422,8 @@ export class MovePlannerComponent extends PageComponent {
 
     //ActiveStepIndex
     this.jobSessionState.activeStepIndex = this.activeStepIndex;
+
+    return this.jobSessionState;
   }
 
   /**
