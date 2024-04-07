@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 import pkg from '../../package.json';
 
-const mapsApiKey = "AIzaSyBYJbCFhGVBBe7lLW8amGRXZR61gfxol_Y";
+const mapsApiKey = "API_KEY_HERE";
 
 export const environment = {
     enableSystemMessages: false,
