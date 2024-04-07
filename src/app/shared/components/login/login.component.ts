@@ -53,10 +53,10 @@ export class LoginComponent extends BaseComponent {
     ngOnInit() {
         const sessionType = this._route.snapshot.paramMap.get("type") as SessionType ?? "";
         if (sessionType === SessionType.Customer) {
-            this.session = this._injector.get(CustomerSessionServiceToken);
-        } 
+            this.session = this._injector.get(CustomerSessionServiceToken) as SessionService<Customer | Employee>;
+        }
         else {
-            this.session = this._injector.get(EmployeeSessionServiceToken);
+            this.session = this._injector.get(EmployeeSessionServiceToken) as SessionService<Customer | Employee>;
         }
     }
 
@@ -79,8 +79,8 @@ export class LoginComponent extends BaseComponent {
         const userName = this.form.value.userName ?? "";
         const password = this.form.value.passwordPlain ?? "";
         this.session.login(userName, password).pipe(take(1)).subscribe(success => {
-            if (success){
-                if (this.session.getType() == SessionType.Employee){
+            if (success) {
+                if (this.session.getType() == SessionType.Employee) {
                     this.router.navigate(["dashboard"]);
                 }
                 else {

@@ -20,7 +20,7 @@
 
 body,
 html {
-    background-color: rgba(24, 35, 50, 1);
+    background-color: primary;
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
+import { CreateEstimateSessionState, ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 import { JobsService } from "../../shared/services/jobs.service";
 import { AssignmentConflictType } from "../../models/job.model";
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,23 +12,28 @@ import { LoginRequest } from '../../models/employee';
     providedIn: 'root'
 })
 export class SessionService<T> {
-    user$: Observable<T | undefined> = of(undefined);
+    user$: BehaviorSubject<T | undefined>;
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
+    movePlannerSessionState = new CreateEstimateSessionState;
     config: SessionServiceConfig<T>;
 
     constructor(
-        private http: HttpClient, 
-        private feature: FeatureService, 
-        private router: Router, 
+        private http: HttpClient,
+        private feature: FeatureService,
+        private router: Router,
         private jobsService: JobsService,
         config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
 
+        this.user$ = new BehaviorSubject<T | undefined>(undefined)
+
         this.isUserAuthorized().subscribe(isAuthorized => {
-            if (isAuthorized){
-                this.user$ = this.config.getUser();
+            if (isAuthorized) {
+                this.config.getUser().subscribe(user => {
+                    this.user$.next(user);
+                });
             }
         });
     }
@@ -45,7 +50,7 @@ export class SessionService<T> {
                 if (accessToken) {
                     return this.config.getUser().pipe(
                         tap(profile => {
-                            this.user$ = of(profile);
+                            this.user$.next(profile);
                         }),
                         map(_ => true),
                         catchError(err => {
@@ -72,7 +77,7 @@ export class SessionService<T> {
         localStorage.clear();
         sessionStorage.clear();
         this.scheduleSessionState.clear();
-        this.user$ = of(undefined);
+        this.user$.next(undefined);
     }
 
     getUser(): Observable<T | undefined> {
@@ -97,7 +102,7 @@ export class SessionService<T> {
         }
     }
 
-    refreshJobSessionState() {        
+    refreshJobSessionState() {
         const jobSessionState = this.scheduleSessionState.jobSessionState;
         this.jobsService.checkAssignmentAvailability(jobSessionState.jobId)
             .subscribe(res => {
@@ -117,7 +122,7 @@ export class SessionService<T> {
                     jobSessionState.assignmentAvailable$.next(true);
                     jobSessionState.alreadyAssigned$.next(false);
                     jobSessionState.employeeToBoot$.next(res);
-                }           
+                }
             })
     }
 
@@ -159,5 +164,29 @@ export class SessionService<T> {
         sessionStorage.setItem("accessTokenExpiresAt", accessTokenExpiresAt)
         localStorage.setItem("refreshToken", refreshToken);
         sessionStorage.setItem("refreshTokenExpiresAt", refreshTokenExpiresAt)
+    }
+
+    /**
+     * Saves the move planner form values to session storage to be refreshed if the user navigates away from the form
+     * @param movePlannerFormData The currently entered user move planner form information
+     */
+    saveMovePlannerValues(movePlannerFormData: CreateEstimateSessionState): void {
+        sessionStorage.setItem('movePlannerFormData', JSON.stringify(movePlannerFormData));
+    }
+
+    /**
+     * Refreshes the form state when the user navigates back to the move planner after navigating away
+     * @returns The CreateEstimateSessionState object that holds the customer's move planner form data 
+     */
+    refreshMovePlannerValues(): CreateEstimateSessionState {
+        const movePlannerFormDataString = sessionStorage.getItem('movePlannerFormData');
+        return movePlannerFormDataString ? JSON.parse(movePlannerFormDataString) : null;
+    }
+
+    /**
+     * Clears the move planner form data from session storage.
+     */
+    clearMovePlannerValues(): void {
+        sessionStorage.removeItem('movePlannerFormData');
     }
 }

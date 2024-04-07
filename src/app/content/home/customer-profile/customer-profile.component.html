@@ -1,0 +1,59 @@
+<div *ngIf="this.customer$ | async as customer">
+    <div class="mt-2 ml-2 text-neutral">
+        <div class="w-64">
+            <div class="bg-secondary rounded-md p-2 text-lg font-bold mb-2">Customer Profile</div>
+            <div class="flex flex-col w-64 mt-2 mb-2 rounded-md text-lg">
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Username</label>
+
+                <ul>
+                    <li>
+                        {{customer.userName}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">First Name</label>
+                <ul>
+                    <li>
+                        {{customer.firstName}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Last Name</label>
+                <ul>
+                    <li>
+                        {{customer.lastName}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Email</label>
+                <ul>
+                    <li>
+                        {{customer.email}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Phone Primary</label>
+                <ul>
+                    <li>
+                        {{customer.phonePrimary}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Phone Other 1</label>
+                <ul>
+                    <li>
+                        {{customer.phoneOther1}}
+                    </li>
+                </ul>
+
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Phone Other 2</label>
+                <ul>
+                    <li>
+                        {{customer.phoneOther2}}
+                    </li>
+                </ul>
+                <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Jobs</label>
+                <ul>
+                    <li>
+                        No Current Jobs
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

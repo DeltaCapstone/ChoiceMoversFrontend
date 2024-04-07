@@ -1,14 +1,19 @@
-nav {
+.nav {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}
+
+.nav2 {
+    background-image: linear-gradient(-180deg, #FC6736, #E62C03); /* Gradient from top to bottom */
 }
 
 h1 {
     font-size: xx-large;
+    margin-left: -150px;
 }
 
 .active {
-    background-color: #ffb0b0;
-    border-radius: 10px;
+    color: white;
 }
 
 li {
@@ -20,17 +25,12 @@ li {
     10%, 23% { opacity: 1; }
 }
 
-.my-translate  {
-    transform: translateY(20px)
-}
-
 .rotating-words {
     position: absolute;
     opacity: 0;
     white-space: nowrap; /* Prevent text from wrapping */
     animation: rotateWords 16s infinite;
-
-
+    text-shadow: -1px -1px 0 #ffb0b0, 1px -1px 0 #ffb0b0, -1px 1px 0 #ffb0b0, 1px 1px 0 #ffb0b0; /* Black outline */
 }
 
 .word-container {
@@ -38,6 +38,5 @@ li {
     display: inline-block; /* Changed from inline to inline-block */
     vertical-align: top; /* Aligns the container with the line of text */
     height: 1em; /* Adjust to fit the height of your text */
-    width: 100px; /* Adjust to fit the width of your longest word */
-    
+    width: 85px; /* Adjust to fit the width of your longest word */
 }
