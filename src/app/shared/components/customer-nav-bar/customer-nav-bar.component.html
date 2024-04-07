@@ -14,13 +14,20 @@
                     </span>
                     Across the Midwest
                 </h1>
+
+            </div>
+            <div class="flex justify-end">
                 <ng-container>
                     <div *ngIf="(activeUser$ | async) as user">
                         Hello, {{user.firstName}}!
+                        <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3"
+                            (click)="navToProfile()">
+                            View Profile
+                        </button>
+                        <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" (click)="logout()">
+                            Logout
+                        </button>
                     </div>
-                    <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" (click)="logout()">
-                        Logout
-                    </button>
                 </ng-container>
                 <ng-container>
                     <div *ngIf="!(activeUser$ | async) as user">
@@ -28,11 +35,9 @@
                             (click)="navToLogin()">
                             Login/Sign Up
                         </button>
-
                     </div>
                 </ng-container>
             </div>
-            <br><br>
             <div class="w-auto">
                 <ul class="flex bg-secondary w-full py-2 px-8">
                     <li class="flex-grow items-center cursor-pointer px-8" *ngFor="let item of items">

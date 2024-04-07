@@ -28,7 +28,7 @@ export class JobsService {
     // -----------------------
 
     createCustomerEstimate(newJob: CreateJobEstimate): Observable<CreateJobEstimate> {
-        return this.http.post<CreateJobEstimate>(`${this.apiUrl}/estimate`, newJob);
+        return this.http.post<CreateJobEstimate>(`${this.apiUrl}/customer/estimate`, newJob);
     }
 
     // TODO: needs implemented on the backend

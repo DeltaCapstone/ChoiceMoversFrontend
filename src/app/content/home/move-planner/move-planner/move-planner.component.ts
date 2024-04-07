@@ -174,8 +174,12 @@ export class MovePlannerComponent extends PageComponent {
         console.error('An error occurred in creating active user:', error);
       }
     });
+
   }
 
+  ngAfterViewInit() {
+    this.refreshMovePlannerState(this.jobSessionState);
+  }
   /**
    * Checks that at least one checkbox of the FormGroup that it is assigned to is checked
    * @returns A function that is used for checking the validation of a checkbox group
@@ -330,6 +334,7 @@ export class MovePlannerComponent extends PageComponent {
     }
 
     this.specialRequestSubmissionSuccess = false;
+    this.saveMovePlannerState();
 
   }
 
@@ -367,7 +372,7 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): CreateEstimateSessionState {
-
+    // console.log('Inside saveMovePlannerState Session Value is:', this.jobSessionState);
     //Customer
     this.jobSessionState.currentCustomer = this.currentCustomer;
 
@@ -377,6 +382,7 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.load = this.servicesGroup.get('load')?.value;
     this.jobSessionState.currentJob.unload = this.servicesGroup.get('unload')?.value;
 
+    console.log('Need truck value:', this.needTruckGroup.get('needTruck')?.value);
     //NeedTruckGroup
     this.jobSessionState.currentJob.needTruck = this.needTruckGroup.get('needTruck')?.value;
 
@@ -426,54 +432,72 @@ export class MovePlannerComponent extends PageComponent {
     return this.jobSessionState;
   }
 
+  //TODO: THIS FUNCTION NEEDS TO BE CALLED SOMEWHERE TO REFRESH MOVE PLANNER STATE WHEN CUSTOMER RETURNS TO MOVE PLANNER
   /**
    * Refreshes move planner state if the customer navigates away from the move planner in the middle of planning the move
    * @param sessionStateObject The session object that holds the current move planner session values
    */
   refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
-
+    console.log('In refreshMovePlanner');
+    console.log('Session state object in function is:', this.jobSessionState);
     //Customer
     this.currentCustomer = sessionStateObject.currentCustomer;
 
-    //ServicesGroup
-    this.servicesGroup.get('pack')?.value !== null ? sessionStateObject.currentJob.pack : false;
-    this.servicesGroup.get('unpack')?.value !== null ? sessionStateObject.currentJob.unpack : false;
-    this.servicesGroup.get('load')?.value !== null ? sessionStateObject.currentJob.load : false;
-    this.servicesGroup.get('unload')?.value !== null ? sessionStateObject.currentJob.unload : false;
+    // ServicesGroup
+    this.servicesGroup.patchValue({
+      'packing': sessionStateObject.currentJob.pack !== null ? sessionStateObject.currentJob.pack : false,
+      'unpack': sessionStateObject.currentJob.unpack !== null ? sessionStateObject.currentJob.unpack : false,
+      'load': sessionStateObject.currentJob.load !== null ? sessionStateObject.currentJob.load : false,
+      'unload': sessionStateObject.currentJob.unload !== null ? sessionStateObject.currentJob.unload : false
+    }, { emitEvent: false });
 
-    //NeedTruckGroup
-    this.needTruckGroup.get('needTruck')?.value !== null ? sessionStateObject.currentJob.needTruck : false;
+    // NeedTruckGroup
+    this.needTruckGroup.patchValue({
+      'needTruck': sessionStateObject.currentJob.needTruck !== null ? sessionStateObject.currentJob.needTruck : false
+    }, { emitEvent: false });
 
-    //MoveDateGroup
-    this.moveDateGroup.get('dateTime')?.value !== null ? sessionStateObject.currentJob.startTime : '';
+    // MoveDateGroup
+    this.moveDateGroup.patchValue({
+      'dateTime': sessionStateObject.currentJob.startTime !== null ? sessionStateObject.currentJob.startTime : ''
+    }, { emitEvent: false });
 
-    //FromAddressResTypeGroup
-    this.fromAddressResType.get('fromResType')?.value !== null ? sessionStateObject.currentJob.loadAddr.resType : 'House';
+    // FromAddressResTypeGroup
+    this.fromAddressResType.patchValue({
+      'fromResType': sessionStateObject.currentJob.loadAddr.resType !== null ? sessionStateObject.currentJob.loadAddr.resType : 'House'
+    }, { emitEvent: false });
 
-    //FromAddressFlightsGroup
-    this.fromAddressFlights.get('fromNumberOfFlights')?.value !== null ? sessionStateObject.currentJob.loadAddr.flights : 0;
+    // FromAddressFlightsGroup
+    this.fromAddressFlights.patchValue({
+      'fromNumberOfFlights': sessionStateObject.currentJob.loadAddr.flights !== null ? sessionStateObject.currentJob.loadAddr.flights : 0
+    }, { emitEvent: false });
 
-    //FromAddressGroup
-    this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value !== null ?
-      sessionStateObject.currentJob.loadAddr.street : '';
-    this.fromAddressGroup.get('fromCity')?.value !== null ? sessionStateObject.currentJob.loadAddr.city : '';
-    this.fromAddressGroup.get('fromState')?.value !== null ? sessionStateObject.currentJob.loadAddr.state : '';
-    this.fromAddressGroup.get('fromZip')?.value !== null ? sessionStateObject.currentJob.loadAddr.zip : '';
-    this.fromAddressGroup.get('fromAptNumUnitOrSuite')?.value !== null ? sessionStateObject.currentJob.loadAddr.aptNum : '';
+    // FromAddressGroup
+    this.fromAddressGroup.patchValue({
+      'fromAddressStreetNumber': sessionStateObject.currentJob.loadAddr.street !== null ? sessionStateObject.currentJob.loadAddr.street : '',
+      'fromCity': sessionStateObject.currentJob.loadAddr.city !== null ? sessionStateObject.currentJob.loadAddr.city : '',
+      'fromState': sessionStateObject.currentJob.loadAddr.state !== null ? sessionStateObject.currentJob.loadAddr.state : '',
+      'fromZip': sessionStateObject.currentJob.loadAddr.zip !== null ? sessionStateObject.currentJob.loadAddr.zip : '',
+      'fromAptNumUnitOrSuite': sessionStateObject.currentJob.loadAddr.aptNum !== null ? sessionStateObject.currentJob.loadAddr.aptNum : ''
+    }, { emitEvent: false });
 
-    //ToAddressResTypeGroup
-    this.toAddressResType.get('toResType')?.value !== null ? sessionStateObject.currentJob.unloadAddr.resType : 'House';
+    // ToAddressResTypeGroup
+    this.toAddressResType.patchValue({
+      'toResType': sessionStateObject.currentJob.unloadAddr.resType !== null ? sessionStateObject.currentJob.unloadAddr.resType : 'House'
+    }, { emitEvent: false });
 
-    //ToAddressFlightsGroup
-    this.toAddressFlights.get('toNumberOfFlights')?.value !== null ? sessionStateObject.currentJob.unloadAddr.flights : 0;
+    // ToAddressFlightsGroup
+    this.toAddressFlights.patchValue({
+      'toNumberOfFlights': sessionStateObject.currentJob.unloadAddr.flights !== null ? sessionStateObject.currentJob.unloadAddr.flights : 0
+    }, { emitEvent: false });
 
-    //ToAddressGroup
-    this.toAddressGroup.get('toAddressStreetNumber')?.value + ' ' + this.toAddressGroup.get('toAddressStreetName')?.value !== null ?
-      sessionStateObject.currentJob.unloadAddr.street : '';
-    this.toAddressGroup.get('toCity')?.value !== null ? sessionStateObject.currentJob.unloadAddr.city : '';
-    this.toAddressGroup.get('toState')?.value !== null ? sessionStateObject.currentJob.unloadAddr.state : '';
-    this.toAddressGroup.get('toZip')?.value !== null ? sessionStateObject.currentJob.unloadAddr.zip : '';
-    this.toAddressGroup.get('toAptNumUnitOrSuite')?.value !== null ? sessionStateObject.currentJob.unloadAddr.aptNum : '';
+    // ToAddressGroup
+    this.toAddressGroup.patchValue({
+      'toAddressStreetNumber': sessionStateObject.currentJob.unloadAddr.street !== null ? sessionStateObject.currentJob.unloadAddr.street : '',
+      'toCity': sessionStateObject.currentJob.unloadAddr.city !== null ? sessionStateObject.currentJob.unloadAddr.city : '',
+      'toState': sessionStateObject.currentJob.unloadAddr.state !== null ? sessionStateObject.currentJob.unloadAddr.state : '',
+      'toZip': sessionStateObject.currentJob.unloadAddr.zip !== null ? sessionStateObject.currentJob.unloadAddr.zip : '',
+      'toAptNumUnitOrSuite': sessionStateObject.currentJob.unloadAddr.aptNum !== null ? sessionStateObject.currentJob.unloadAddr.aptNum : ''
+    }, { emitEvent: false });
 
     //RoomsGroup
     this.populateFormItems(this.jobSessionState.currentJob.rooms) !== null ? this.populateFormItems(sessionStateObject.currentJob.rooms) : [];
@@ -716,8 +740,8 @@ export class MovePlannerComponent extends PageComponent {
       );
       console.log('Distance To Job Mileage value is:', distance)
 
-      this.newJob.distanceToJob = distance !== undefined ? distance : 0;
-      this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? distance : 0;
+      this.newJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
+      this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
 
       return distance;
     } catch (error) {
@@ -757,9 +781,9 @@ export class MovePlannerComponent extends PageComponent {
       totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
       console.log('Total Job distance first assignment', totalJobDistance);
 
-      totalJobDistance !== undefined ? this.newJob.distanceTotal += totalJobDistance : 0;
+      totalJobDistance !== undefined ? this.newJob.distanceTotal += Math.floor(totalJobDistance) : 0;
       console.log('Total Job distance second assignment', totalJobDistance);
-      this.jobSessionState.currentJob.distanceTotal = totalJobDistance !== undefined ? totalJobDistance : 0;
+      this.jobSessionState.currentJob.distanceTotal = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
 
     } catch (error) {
       console.error('Error:', error);

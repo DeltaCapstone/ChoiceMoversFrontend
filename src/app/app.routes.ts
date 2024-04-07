@@ -27,6 +27,7 @@ import { JobContactComponent } from './shared/components/job/job-contact/job-con
 import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
 import { CustomerInfoComponent } from './shared/components/customer-info/customer-info.component';
 import { movePlannerGuard } from './shared/guards/move-planner.guard';
+import { CustomerProfileComponent } from './content/home/customer-profile/customer-profile.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -44,6 +45,7 @@ export const routes: Routes = [
             { path: 'storage', component: StorageComponent },
             { path: 'customer-summary', component: CustomerSummaryComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
             { path: 'customer-signup', component: CustomerInfoComponent },
+            { path: 'customer-profile', component: CustomerProfileComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
         ]
     },
     {

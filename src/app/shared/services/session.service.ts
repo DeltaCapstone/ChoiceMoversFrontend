@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
 import { CreateEstimateSessionState, ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
@@ -12,7 +12,7 @@ import { LoginRequest } from '../../models/employee';
     providedIn: 'root'
 })
 export class SessionService<T> {
-    user$: Observable<T | undefined> = of(undefined);
+    user$: BehaviorSubject<T | undefined>;
     apiUrl: string;
     scheduleSessionState = new ScheduleSessionState;
     movePlannerSessionState = new CreateEstimateSessionState;
@@ -27,9 +27,13 @@ export class SessionService<T> {
         this.apiUrl = this.feature.getFeatureValue("api").url;
         this.config = config;
 
+        this.user$ = new BehaviorSubject<T | undefined>(undefined)
+
         this.isUserAuthorized().subscribe(isAuthorized => {
             if (isAuthorized) {
-                this.user$ = this.config.getUser();
+                this.config.getUser().subscribe(user => {
+                    this.user$.next(user);
+                });
             }
         });
     }
@@ -46,7 +50,7 @@ export class SessionService<T> {
                 if (accessToken) {
                     return this.config.getUser().pipe(
                         tap(profile => {
-                            this.user$ = of(profile);
+                            this.user$.next(profile);
                         }),
                         map(_ => true),
                         catchError(err => {
@@ -73,7 +77,7 @@ export class SessionService<T> {
         localStorage.clear();
         sessionStorage.clear();
         this.scheduleSessionState.clear();
-        this.user$ = of(undefined);
+        this.user$.next(undefined);
     }
 
     getUser(): Observable<T | undefined> {

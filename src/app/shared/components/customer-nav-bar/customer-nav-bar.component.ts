@@ -41,10 +41,6 @@ export class CustomerNavBarComponent {
 
   ngOnInit() {
     this.activeUser$ = this._session.getUser();
-
-    const userSubscription = this.activeUser$.subscribe();
-
-    this.subscriptions.push(userSubscription);
   }
 
   items: MenuBarItem[] = [
@@ -55,18 +51,18 @@ export class CustomerNavBarComponent {
     { title: "Contact", route: "contact" },
   ]
 
-  //TODO: IMPLEMENT CUSTOMER PROFILE NAVIGATION FUNCTION
-  openCustomerProfile() {
-
-  }
-
   navToLogin() {
     this._router.navigate(['login/customer']);
+  }
+
+  navToProfile() {
+    this._router.navigate(['home/customer-profile']);
   }
 
   logout() {
     this._session.logout();
   }
+
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
