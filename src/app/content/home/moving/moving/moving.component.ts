@@ -41,6 +41,7 @@ export class MovingComponent extends PageComponent {
   }
 
   getReviews() {
+
     const url = this.featureService.getFeatureValue("mapsApi").placesUrl;
 
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {

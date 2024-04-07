@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
 import { Job } from '../../../../models/job.model';
 import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { TuiDataListModule, TuiErrorModule, TuiLoaderModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
@@ -78,78 +78,57 @@ export class JobInfoComponent extends BaseComponent {
             });
         });
         this.subscriptions.push(jobSub);
+    }
 
+    async ngAfterViewInit() {
+        await this.initPlaceAutocomplete();
         this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(
             switchMap(cachedDirectionsResults => {
                 if (cachedDirectionsResults){
                     return of(cachedDirectionsResults);
                 }
                 else {
-                    return this.getDirectionsResults();
+                    return this.job$.pipe(
+                        switchMap(job => {
+                            if (job){
+                                return this.updateDirectionsResults(this.makeStringFromAddress(job.loadAddr), this.makeStringFromAddress(job.unloadAddr));
+                            }
+                            else {
+                                return of(undefined);
+                            }
+                        }),
+                    )
                 }
             }),
             tap(_ => this.mapLoading.next(false)),
         );
 
-        this.form.valueChanges.pipe(
-            switchMap(_ => {
-                return combineLatest([
-                    this.mapsService.geocodeAddress(this.form.value.loadAddr ?? ""),
-                    this.mapsService.geocodeAddress(this.form.value.unloadAddr ?? ""),
-                ]);
-            }),
-        ).subscribe(([origin, dest]) => {
-            const request: google.maps.DirectionsRequest = {
-                origin: origin,
-                destination: dest,
-                travelMode: google.maps.TravelMode.DRIVING,
-            };
-
-            return this.mapDirectionsService.route(request).pipe(
-                tap(res => this.session.scheduleSessionState.jobSessionState.directionsResults$.next(res.result)),
-                map(res => res.result));
-        });
+        const formSub = this.form.valueChanges.subscribe(_ => {
+            this.updateDirectionsResults(this.form.value.loadAddr ?? "", this.form.value.unloadAddr ?? "");
+        });        
+        this.subscriptions.push(formSub);
     }
 
     constructor(
         @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
-        private mapsService: GoogleMapsLoaderService,
         private mapDirectionsService: MapDirectionsService,
         private jobsService: JobsService, 
         private route: ActivatedRoute) {
         super();
     }
 
-    getDirectionsResults(): Observable<google.maps.DirectionsResult | undefined> {
-        return this.job$.pipe(
-            switchMap(job => {
-                return combineLatest([
-                    this.mapsService.geocodeAddress(job?.loadAddr ? this.makeStringFromAddress(job.loadAddr) : ""),
-                    this.mapsService.geocodeAddress(job?.unloadAddr ? this.makeStringFromAddress(job.unloadAddr) : ""),
-                ]);
-            }),
-            switchMap(([origin, dest]) => {
-                const request: google.maps.DirectionsRequest = {
-                    origin: origin,
-                    destination: dest,
-                    travelMode: google.maps.TravelMode.DRIVING,
-                };
-                return this.mapDirectionsService.route(request).pipe(
-                    tap(res => this.session.scheduleSessionState.jobSessionState.directionsResults$.next(res.result)),
-                    map(res => res.result));
-            }),
-        )  
+    updateDirectionsResults(origin: google.maps.LatLng | string, dest: google.maps.LatLng | string): Observable<google.maps.DirectionsResult | undefined> {
+        const request: google.maps.DirectionsRequest = {
+            origin: origin,
+            destination: dest,
+            travelMode: google.maps.TravelMode.DRIVING,
+        };
+        return this.mapDirectionsService.route(request).pipe(
+            tap(res => this.session.scheduleSessionState.jobSessionState.directionsResults$.next(res.result)),
+            map(res => res.result));
     }
 
-    makeStringFromAddress(addr: Address): string {
-        return `${addr.street} ${addr.city} ${addr.state} ${addr.zip}`;
-    }
-
-    async ngAfterViewInit() {
-        await this.getPlaceAutocomplete();
-    }
-
-    private async getPlaceAutocomplete() {
+    private async initPlaceAutocomplete() {
         const { Autocomplete } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
 
         const loadAddrElem = document.querySelector("#loadAddr") as HTMLInputElement;
@@ -157,6 +136,7 @@ export class JobInfoComponent extends BaseComponent {
             {
                 componentRestrictions: { country: 'US' },
                 types: ["address"],
+                fields: ["formatted_address"] 
             });
 
         const unloadAddrElem = document.querySelector("#unloadAddr") as HTMLInputElement;
@@ -164,21 +144,37 @@ export class JobInfoComponent extends BaseComponent {
             {
                 componentRestrictions: { country: 'US' },
                 types: ["address"],
+                fields: ["formatted_address"] 
             });
 
         google.maps.event.addListener(loadAutocomplete, "place_changed", () => {
+            const place = loadAutocomplete.getPlace();
+            this.form.patchValue({
+                loadAddr: place.formatted_address
+            });
+            this.updateDirectionsResults(place.formatted_address ?? "", this.form.value.unloadAddr ?? "").pipe(take(1)).subscribe();
         });
 
         google.maps.event.addListener(unloadAutoComplete, "place_changed", () => {
+            const place = unloadAutoComplete.getPlace();
+            this.form.patchValue({
+                unloadAddr: place.formatted_address
+            });
+            this.updateDirectionsResults(this.form.value.loadAddr ?? "", place.formatted_address ?? "").pipe(take(1)).subscribe();
         });
     }
 
+    
+    makeStringFromAddress(addr: Address): string {
+        return `${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}, USA`;
+    }
+
     updateAddressWithString(addr: Address, addrString: String): Address {
-        const [street, city, state, zip] = addrString.split(" ");
-        addr.street = street;
-        addr.city = city;
-        addr.state = state;
-        addr.zip = zip;
+        const [street, city, stateAndZip] = addrString.split(",");
+        addr.street = street.trim();
+        addr.city = city.trim();
+        addr.state = stateAndZip.split(' ')[0].trim();
+        addr.zip = stateAndZip.split(' ')[1].trim();
         return addr;
     }
 
