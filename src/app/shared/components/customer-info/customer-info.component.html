@@ -48,12 +48,16 @@
                     <tui-error formControlName="phonePrimary" [error]="[] | tuiFieldError | async"></tui-error>
                 </div>
                 <div class="tui-form__row">
-                    <tui-input formControlName="phoneOther">
-                        Secondary Phone Number
-                        <input placeholder="Other phone number" tuiTextfield />
-                        <span class="tui-required"></span>
+                    <tui-input formControlName="phoneOther1">
+                        Secondary Phone Number 1
+                        <input placeholder="Not Required" tuiTextfield />
                     </tui-input>
-                    <tui-error formControlName="phoneOther" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="phoneOther2">
+                        Secondary Phone Number 2
+                        <input placeholder="Not Required" tuiTextfield />
+                    </tui-input>
                 </div>
                 <div class="tui-form__row">
                     <tui-input-password formControlName="passwordPlain">

@@ -7,7 +7,8 @@ export interface ICustomer {
     lastName: string;
     email: string;
     phonePrimary: string;
-    phoneOther: string[];
+    phoneOther1: string;
+    phoneOther2: string;
 }
 
 /**
@@ -31,7 +32,8 @@ export interface CustomerProfileUpdateRequest {
     firstName: string;
     lastName: string;
     phonePrimary: string;
-    phoneOther: string[];
+    phoneOther1: string;
+    phoneOther2: string;
     userName: string;
 }
 /**
@@ -51,17 +53,19 @@ export class Customer implements ICustomer {
     lastName: string = '';
     email: string = '';
     phonePrimary: string = '';
-    phoneOther: string[] = [];
+    phoneOther1: string = '';
+    phoneOther2: string = '';
 
     constructor(username: string = '', firstName: string = '', lastName: string = '',
-        email: string = '', phonePrimary: string = '', phoneOther: string[] = []) {
+        email: string = '', phonePrimary: string = '', phoneOther1: string = '', phoneOther2: string = '') {
 
         this.userName = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phonePrimary = phonePrimary;
-        this.phoneOther = phoneOther;
+        this.phoneOther1 = phoneOther1;
+        this.phoneOther2 = phoneOther2;
     }
 
     getUsername(): string {
@@ -104,12 +108,20 @@ export class Customer implements ICustomer {
         this.phonePrimary = phonePrimary;
     }
 
-    getPhoneOther(): string[] {
-        return this.phoneOther;
+    getPhoneOther1(): string {
+        return this.phoneOther1;
     }
 
-    setPhoneOther(phoneOther: string[]): void {
-        this.phoneOther = phoneOther;
+    setPhoneOther1(phoneOther1: string): void {
+        this.phoneOther1 = phoneOther1;
+    }
+
+    getPhoneOther2(): string {
+        return this.phoneOther2;
+    }
+
+    setPhoneOther2(phoneOther2: string): void {
+        this.phoneOther2 = phoneOther2;
     }
 }
 

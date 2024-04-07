@@ -6,7 +6,7 @@ import { AbstractTuiValueTransformer, TuiDay, TuiTime } from '@taiga-ui/cdk';
 })
 export class ValueTransformerService extends AbstractTuiValueTransformer<[TuiDay | null, TuiTime | null], string> {
 
-  private readonly separator = ', ';
+  private readonly separator = ' ';
 
   /**
    * Transforms a string to a TuiDay and TuiTime

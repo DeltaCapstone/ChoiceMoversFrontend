@@ -30,8 +30,8 @@ export class CustomerInfoComponent extends BaseComponent {
 
   user$: Observable<Customer | undefined>;
 
-  constructor(private _formBuilder: FormBuilder, private _route: ActivatedRoute, private _customerService: CustomersService, 
-    private _location: Location, private _router: Router, @Inject(CustomerSessionServiceToken) private _session: SessionService<Customer>) {
+  constructor(private _formBuilder: FormBuilder, private _route: ActivatedRoute, private _customerService: CustomersService,
+    private _location: Location, private _router: Router) {
     super();
 
     this.customerSignUpGroup = this._formBuilder.group({
@@ -40,7 +40,8 @@ export class CustomerInfoComponent extends BaseComponent {
       lastName: new FormControl('', Validators.required),
       email: new FormControl('', Validators.required),
       phonePrimary: new FormControl('', Validators.required),
-      phoneOther: new FormControl([]),
+      phoneOther1: new FormControl(''),
+      phoneOther2: new FormControl(''),
       passwordPlain: new FormControl('', Validators.required),
     });
   }
@@ -58,7 +59,8 @@ export class CustomerInfoComponent extends BaseComponent {
           lastName: user?.lastName ?? '',
           email: user?.email ?? '',
           phonePrimary: user?.phonePrimary ?? '',
-          phoneOther: user?.phoneOther ?? [],
+          phoneOther1: user?.phoneOther1 ?? '',
+          phoneOther2: user?.phoneOther2 ?? '',
         });
       });
       this.subscriptions.push(customerSubscription);
@@ -78,7 +80,8 @@ export class CustomerInfoComponent extends BaseComponent {
         lastName: customerSignUpFormValues.lastName ?? user?.lastName ?? '',
         email: customerSignUpFormValues.email ?? user?.email ?? '',
         phonePrimary: customerSignUpFormValues.phonePrimary ?? user?.phonePrimary ?? '',
-        phoneOther: [customerSignUpFormValues.phoneOther],
+        phoneOther1: customerSignUpFormValues.phoneOther ?? user?.phoneOther1 ?? '',
+        phoneOther2: customerSignUpFormValues.phoneOther ?? user?.phoneOther2 ?? '',
       }))
     ).subscribe(newUser => {
       //create new customer
