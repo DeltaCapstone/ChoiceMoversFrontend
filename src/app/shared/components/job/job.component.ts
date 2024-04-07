@@ -110,8 +110,7 @@ export class JobComponent extends BaseComponent {
                 tabRoute += "/workers";
                 break;
             case 2:
-                // TODO
-                tabRoute += "/workers";
+                tabRoute += "/contact";
                 break;
         }
         this.router.navigate([tabRoute]);

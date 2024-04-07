@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
@@ -11,7 +11,6 @@ import { TuiChipModule, TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experi
 import { JobsService } from '../../../services/jobs.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap, MapDirectionsRenderer, MapDirectionsService, MapInfoWindow } from '@angular/google-maps';
-import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
 import { Address } from '../../../../models/address.model';
 import { SessionService } from '../../../services/session.service';
 import { EmployeeSessionServiceToken } from '../../../../app.config';
@@ -85,9 +84,11 @@ export class JobInfoComponent extends BaseComponent {
         this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(
             switchMap(cachedDirectionsResults => {
                 if (cachedDirectionsResults){
+                    console.log("hit directions cache");
                     return of(cachedDirectionsResults);
                 }
                 else {
+                    console.log("missed directions cache");
                     return this.job$.pipe(
                         switchMap(job => {
                             if (job){
@@ -102,6 +103,7 @@ export class JobInfoComponent extends BaseComponent {
             }),
             tap(_ => this.mapLoading.next(false)),
         );
+        this.changeDetector.detectChanges();
 
         const formSub = this.form.valueChanges.subscribe(_ => {
             this.updateDirectionsResults(this.form.value.loadAddr ?? "", this.form.value.unloadAddr ?? "");
@@ -111,6 +113,7 @@ export class JobInfoComponent extends BaseComponent {
 
     constructor(
         @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
+        private changeDetector: ChangeDetectorRef,
         private mapDirectionsService: MapDirectionsService,
         private jobsService: JobsService, 
         private route: ActivatedRoute) {
