@@ -36,3 +36,57 @@ button:hover {
     box-shadow: none;
     outline: none;
 }
+
+.text-neutral {
+    color: #2d3748; 
+}
+
+.text-blue-500 {
+    color: #4299e1; 
+}
+
+.hover\:text-blue-700:hover {
+    color: #2b6cb0; 
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.signup-text {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    padding-top: 8px; /* Adjust as needed for vertical alignment */
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.mr-1 {
+    margin-right: 4px; /* Adjust as needed for spacing between texts */
+}
+
+.text-blue-500 {
+    color: #4299e1;
+}
+
+.hover\:text-blue-700:hover {
+    color: #2b6cb0;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+.tui-form__buttons {
+    margin-top: 16px; /* Adjust as needed to shift down */
+}
+
+.welcome-text {
+    font-size: 2rem; 
+    font-weight: bold;
+}
+
