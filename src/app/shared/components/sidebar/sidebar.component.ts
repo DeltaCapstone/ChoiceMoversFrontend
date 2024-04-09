@@ -1,6 +1,6 @@
 import { NgFor, NgClass, NgIf, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { TuiDataListModule, TuiHostedDropdownComponent, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { TuiDataListModule, TuiHostedDropdownModule, TuiSvgModule } from '@taiga-ui/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TuiAvatarModule } from '@taiga-ui/kit';
 import { TuiSurfaceModule } from '@taiga-ui/experimental';
@@ -9,6 +9,7 @@ import { filter, map } from 'rxjs/operators';
 import { Observable, Subscription, of } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { Employee, EmployeeType } from '../../../models/employee';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 type SidebarItem = {
     readonly name: string
@@ -45,6 +46,7 @@ export class SidebarComponent extends BaseComponent {
 
         this.sidebarItems$ = this.user$.pipe(
             map(user => {
+                console.log(user);
                 let sidebarItems = [];
                 sidebarItems.push({ name: "Schedule", icon: "tuiIconCalendarLarge", route: "schedule" });
                 if (user?.employeeType == EmployeeType.Manager) {
@@ -58,18 +60,26 @@ export class SidebarComponent extends BaseComponent {
             }));
     }
 
-    constructor(private router: Router, private session: SessionService) {
+    constructor(private router: Router, 
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>) {
         super();
     }
 
     openProfile() {
         this.dropdownOpen = false;
-        this.session.guardWithAuth(() => this.router.navigate([`dashboard/profile/`])).subscribe();
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                this.router.navigate([`dashboard/profile/`]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
+        });
     }
 
     logout() {
         this.session.logout();
-        this.router.navigate([`/login`]);
+        this.session.redirectToLogin();
     }
 
     ngOnDestroy() {

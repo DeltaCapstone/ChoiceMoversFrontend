@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, ViewChild } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TuiTableFiltersModule, TuiTableModule } from '@taiga-ui/addon-table';
 import { TuiLetModule } from '@taiga-ui/cdk';
@@ -14,6 +14,8 @@ import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
 import { SearchComponent } from '../../../shared/components/search/search.component';
+import { SessionType } from '../../../models/session.model';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-employees',
@@ -34,7 +36,6 @@ export class EmployeesComponent extends PageComponent {
     employees$: Observable<Employee[]>;
     filteredEmployees$: Observable<Employee[]>;
 
-
     ngAfterViewInit() {
         this.filteredEmployees$ = this.searchComponent.filteredItems$;
     }
@@ -44,13 +45,22 @@ export class EmployeesComponent extends PageComponent {
         this.employees$ = this.employeesService.getEmployees();
     }
 
-    constructor(pageService: PageService, private employeesService: EmployeesService, private router: Router, private session: SessionService) {
+    constructor(pageService: PageService, private employeesService: EmployeesService, 
+        private router: Router, 
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>) {
         super(pageService);
     }
 
     /** Opens the profile of the employee with the given username. If empty, it opens new employee view.**/
     openEmployee(userName: string = "") {
-        this.session.guardWithAuth(() => this.router.navigate(["/dashboard/employees/employee", userName])).subscribe();
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                this.router.navigate(["/dashboard/employees/employee", userName]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
+        });
     }
 
     ngOnDestroy() {

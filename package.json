@@ -16,12 +16,8 @@
     "@angular/compiler": "^17.1.0",
     "@angular/core": "^17.1.0",
     "@angular/forms": "^17.1.0",
-
     "@angular/google-maps": "^17.2.1",
-   
-
     "@angular/material": "^17.2.1",
-
     "@angular/platform-browser": "^17.1.0",
     "@angular/platform-browser-dynamic": "^17.1.0",
     "@angular/router": "^17.1.0",
@@ -51,7 +47,7 @@
     "@angular/cli": "^17.1.0",
     "@angular/compiler-cli": "^17.1.0",
     "@types/dompurify": "3.0.5",
-    "@types/google.maps": "^3.55.4",
+    "@types/google.maps": "^3.55.5",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.11.20",
     "autoprefixer": "^10.4.17",

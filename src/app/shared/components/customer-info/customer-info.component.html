@@ -1,0 +1,74 @@
+<div class="tui-container">
+    <form [formGroup]="customerSignUpGroup">
+        <div class="flex justify-center tui-row tui-row_sme">
+            <div class="tui_col_8">
+                <h3
+                    class="tui-form__header tui-form__header_margin-top_none bg-secondary rounded-md mt-4 text-center p-4">
+                    Customer Sign
+                    Up
+                    Form</h3>
+                <div class="tui-form__row">
+                    <tui-input formControlName="userName">
+                        Username
+                        <input placeholder="Username" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="userName" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="firstName">
+                        FirstName
+                        <input placeholder="First name" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="firstName" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="lastName">
+                        Last Name
+                        <input placeholder="Last name" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="lastName" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="email">
+                        Email
+                        <input placeholder="Email" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="email" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="phonePrimary">
+                        Primary Phone Number
+                        <input placeholder="Primary phone number" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="phonePrimary" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input formControlName="phoneOther">
+                        Secondary Phone Number
+                        <input placeholder="Other phone number" tuiTextfield />
+                        <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error formControlName="phoneOther" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input-password formControlName="passwordPlain">
+                        Password
+                        <input tuiTextfield />
+                    </tui-input-password>
+                    <tui-error formControlName="passwordPlain" [error]="[] | tuiFieldError | async"></tui-error>
+                </div>
+            </div>
+        </div>
+        <div class=" flex justify-center tui-form__row">
+            <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" (click)="save()"
+                [disabled]="!customerSignUpGroup.valid">
+                Create Account
+            </button>
+        </div>
+    </form>
+</div>

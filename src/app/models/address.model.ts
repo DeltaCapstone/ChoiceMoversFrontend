@@ -52,6 +52,10 @@ export class Address {
         this.aptNum = aptNum;
     }
 
+    getAddressString(): string {
+        return `${this.street} ${this.city} ${this.state} ${this.zip}`;
+    }
+
     getAddressId(): number {
         return this.addressId;
     }

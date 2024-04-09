@@ -11,5 +11,5 @@ export const environment = {
     buildNumber: pkg.version + '-d',
     api: {
         url: 'http://localhost:8080',
-    }
+    },
 };

@@ -1,6 +1,6 @@
 import { Address } from "./address.model";
 import { Customer } from "./customer.model";
-import { Employee } from "./employee";
+import { AssignedEmployee, Employee } from "./employee";
 import { Room } from "./room.model";
 
 /**
@@ -15,7 +15,7 @@ export interface IJob {
     actualManHours: number;
     finalCost: number;
     amountPaid: number;
-    assignedEmp: Employee[];
+    assignedEmployees: AssignedEmployee[];
     notes: string;
 }
 
@@ -44,7 +44,6 @@ export interface IEstimate {
     load: boolean;
     unload: boolean;
 
-    clean: boolean;
 
     needTruck: boolean;
     numberWorkers: number;
@@ -77,8 +76,6 @@ export class Estimate implements IEstimate {
     unpack: boolean;
     load: boolean;
     unload: boolean;
-
-    clean: boolean;
 
     needTruck: boolean;
     numberWorkers: number;
@@ -135,7 +132,6 @@ export class Estimate implements IEstimate {
         this.unpack = unpack;
         this.load = load;
         this.unload = unload;
-        this.clean = clean;
         this.needTruck = needTruck;
         this.numberWorkers = numberWorkers;
         this.distToJob = distToJob;
@@ -158,11 +154,11 @@ export class Job extends Estimate implements IJob, IEstimate {
     actualManHours: number;
     finalCost: number;
     amountPaid: number;
-    assignedEmp: Employee[];
+    assignedEmployees: AssignedEmployee[];
     notes: string;
 
     constructor(jobId: string = "", manHours: number = 0, rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: number = 0,
-        finalCost: number = 0, amountPaid: number = 0, assignedEmp: Employee[] = [], notes: string = "") {
+        finalCost: number = 0, amountPaid: number = 0, assignedEmployees: AssignedEmployee[] = [], notes: string = "") {
         super();
         this.jobId = jobId;
         this.manHours = manHours;
@@ -172,9 +168,14 @@ export class Job extends Estimate implements IJob, IEstimate {
         this.actualManHours = actualManHours;
         this.finalCost = finalCost;
         this.amountPaid = amountPaid;
-        this.assignedEmp = assignedEmp;
+        this.assignedEmployees = assignedEmployees;
         this.notes = notes;
     }
 
     //Getters and setters
+}
+
+export enum AssignmentConflictType {
+    JobFull = "JOB_FULL",
+    AlreadyAssigned = "ALREADY_ASSIGNED"
 }

@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
+import { Component, Inject, ViewChild } from '@angular/core';
+import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
+import { Calendar, CalendarOptions, EventClickArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
-import { BehaviorSubject, Observable, map, of, take } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
+import { Employee } from '../../../models/employee';
+import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
     selector: 'app-schedule',
@@ -18,50 +20,8 @@ import { SessionService } from '../../../shared/services/session.service';
     styleUrl: './schedule.component.css',
 })
 export class ScheduleComponent extends PageComponent {
-    ngOnInit() {
-        this.setTitle("Schedule");
-    }
-
-    events$ = new BehaviorSubject<EventInput>([]);
+    @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     calendarOptions: CalendarOptions;
-
-    constructor(pageService: PageService,
-        private session: SessionService,
-        private router: Router,
-        private jobsService: JobsService) {
-        super(pageService);
-
-        this.calendarOptions = {
-            initialView: 'dayGridMonth',
-            plugins: [dayGridPlugin],
-            eventClick: this.eventClick.bind(this),
-            viewDidMount: viewInfo => {
-                console.log("mount");
-                this.session.guardWithAuth(() => {
-                    const start = viewInfo.view.activeStart.toISOString();
-                    const end = viewInfo.view.activeEnd.toISOString();
-                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
-                }).subscribe();
-            },
-            datesSet: dateInfo => {
-                this.session.guardWithAuth(() => {
-                    const start = dateInfo.startStr;
-                    const end = dateInfo.endStr;
-
-                    this.getJobEvents(start, end).subscribe(events => this.events$.next(events))
-                }).subscribe();
-            },
-        }
-
-        // restore state
-        const calendarStart = this.jobsService.cacheStartDate;
-        // TODO: figure out better solution
-        if (calendarStart) {
-            const date = new Date(calendarStart);
-            date.setUTCDate(date.getUTCDate() + 5);
-            this.calendarOptions.initialDate = date.toISOString();
-        }
-    }
 
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
         return this.jobsService.getEmployeeJobs(start, end).pipe(
@@ -75,15 +35,100 @@ export class ScheduleComponent extends PageComponent {
                     }
                 };
                 return eventInput;
-            })),
-            take(1)
+            }))
         );
     }
 
+    ngOnInit() {
+        this.setTitle("Schedule");
+
+        this.calendarOptions = {
+            initialView: 'dayGridMonth',
+            plugins: [dayGridPlugin],
+            eventClick: this.eventClick.bind(this),
+            datesSet: dateInfo => {
+                // update calendar
+                this.session.isUserAuthorized().subscribe(isAuthorized => {
+                    if (!isAuthorized) {
+                        this.session.redirectToLogin();
+                        return;
+                    };
+
+                    this.getJobEvents(dateInfo.startStr, dateInfo.endStr).pipe(take(1)).subscribe(events => {
+                        // update session cache
+                        const [earliestDate, latestDate] = this.getBoundaryDates(events);
+                        this.session.scheduleSessionState.jobsStartDate = earliestDate;
+                        this.session.scheduleSessionState.jobsEndDate = latestDate;
+
+                        // update calendar
+                        this.setEvents(events)
+                    })
+                });
+            }
+        }
+
+        // restore state
+        const cachedCalendarStart = this.session.scheduleSessionState.jobsStartDate;
+        // TODO: figure out better solution
+        if (cachedCalendarStart) {
+            const date = new Date(cachedCalendarStart);
+            date.setUTCDate(date.getUTCDate() + 5);
+            this.calendarOptions.initialDate = date.toISOString();
+        }
+        const cachedJobId = this.session.scheduleSessionState.jobSessionState.jobId;
+        if (cachedJobId) {
+            this.router.navigate(["dashboard/schedule/job/", cachedJobId]);
+        }
+    }
+
+    constructor(pageService: PageService,
+        @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
+        private router: Router,
+        private jobsService: JobsService) {
+        super(pageService);
+    }
+
+    setEvents(events: EventInput[]) {
+        let calendarApi: Calendar | null = this.calendarComponent.getApi();
+        if (calendarApi) {
+            calendarApi.removeAllEventSources();
+            calendarApi.addEventSource(events);
+        }
+    }
+    private getBoundaryDates(events: EventInput[]): [string, string] {
+        if (events.length === 0) {
+            return ["", ""];
+        }
+
+        const earliestStartDate = events
+            .filter(event => event.start)
+            .reduce((earliest, current) => {
+                const earliestDate = new Date(earliest);
+                const currentDate = new Date(current.start?.toString()!);
+                return currentDate < earliestDate ? current.start?.toString()! : earliest;
+            }, events[0].start?.toString()!);
+
+        const latestEndDate = events
+            .filter(event => event.end)
+            .reduce((latest, current) => {
+                const latestDate = new Date(latest);
+                const currentDate = new Date(current.end?.toString()!);
+                return currentDate > latestDate ? current.end?.toString()! : latest;
+            }, events[0].end?.toString()!);
+
+        return [earliestStartDate, latestEndDate];
+    }
+
     eventClick(info: EventClickArg) {
-        this.session.guardWithAuth(() => {
-            const jobId: string = info.event.extendedProps.jobId;
-            this.router.navigate(["dashboard/schedule/job/", jobId]);
-        }).subscribe();
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                const jobId: string = info.event.extendedProps.jobId;
+                this.session.scheduleSessionState.jobSessionState.jobId = jobId;
+                this.router.navigate(["dashboard/schedule/job/", jobId]);
+            }
+            else {
+                this.session.redirectToLogin();
+            }
+        });
     }
 }

@@ -15,13 +15,17 @@ import { StorageComponent } from './content/home/storage/storage/storage.compone
 import { MovePlannerComponent } from './content/home/move-planner/move-planner/move-planner.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 import { LoginComponent } from './shared/components/login/login.component';
-import { dashboardGuard } from './shared/guards/dashboard.guard';
+import { DashboardGuard } from './shared/guards/dashboard.guard';
 import { EmployeeInfoComponent } from './shared/components/employee-info/employee-info.component';
 import { JobComponent } from './shared/components/job/job.component';
 import { JobInfoComponent } from './shared/components/job/job-info/job-info.component';
 import { JobWorkersComponent } from './shared/components/job/job-workers/job-workers.component';
 import { jobGuard } from './shared/guards/job.guard';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { inject } from '@angular/core';
+import { JobContactComponent } from './shared/components/job/job-contact/job-contact.component';
+import { CustomerSummaryComponent } from './content/home/customer-summary/customer-summary.component';
+import { CustomerInfoComponent } from './shared/components/customer-info/customer-info.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -36,11 +40,13 @@ export const routes: Routes = [
             { path: 'move-planner', component: MovePlannerComponent },
             { path: 'packing', component: PackingComponent },
             { path: 'quote', component: QuoteComponent },
-            { path: 'storage', component: StorageComponent }
+            { path: 'storage', component: StorageComponent },
+            { path: 'customer-summary', component: CustomerSummaryComponent },
+            { path: 'customer-signup', component: CustomerInfoComponent },
         ]
     },
     {
-        path: 'dashboard', component: DashboardComponent, canActivate: [dashboardGuard], children: [
+        path: 'dashboard', component: DashboardComponent, canActivate: [() => inject(DashboardGuard).canActivate()], children: [
             { path: 'schedule', component: ScheduleComponent },
             {
                 path: 'schedule/job/:jobId', component: JobComponent, canActivate: [jobGuard], children: [
@@ -48,6 +54,7 @@ export const routes: Routes = [
                     { path: 'info', component: JobInfoComponent },
                     { path: 'workers', component: JobWorkersComponent },
                     { path: 'workers/:userName', component: EmployeeInfoComponent },
+                    { path: 'contact', component: JobContactComponent },
                 ]
             },
             { path: 'employees', component: EmployeesComponent },
@@ -57,6 +64,6 @@ export const routes: Routes = [
             { path: 'profile', component: ProfileComponent },
         ]
     },
-    { path: 'login', pathMatch: 'full', component: LoginComponent },
+    { path: 'login/:type', pathMatch: 'full', component: LoginComponent },
     { path: '**', component: NotFoundComponent }
 ];

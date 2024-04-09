@@ -1,32 +1,81 @@
-<table class="w-full mt-4 p-4" tuiTable [columns]="columns">
-    <thead>
-        <tr tuiThGroup>
-            <th *tuiHead="'email'" tuiTh>
-                E-mail
-            </th>
-            <th *tuiHead="'name'" tuiTh>
-                Name
-            </th>
-            <th *tuiHead="'employeeType'" tuiTh>
-                Employee Type
-            </th>
-        </tr>
-    </thead>
-    <ng-container *ngIf="workers$ | async as employees">
-        <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
-            <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
-                <td [routerLink]="item.userName" class="cursor-pointer" *tuiCell="'name'" tuiTd>
-                    {{ item.firstName + ' ' + item.lastName }}
-                </td>
-                <td *tuiCell="'email'" tuiTd>
-                    <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
-                        {{ item.email }}
-                    </a>
-                </td>
-                <td *tuiCell="'employeeType'" tuiTd>
-                    {{ item.employeeType }}
-                </td>
-            </tr>
-        </tbody>
+<div class="mt-4 p-4 w-full" *ngIf="maxWorkers$ | async as maxWorkers">
+    <ng-container *tuiLet="isManager$ | async as isManager">
+        <ng-container *ngIf="workers$ | async as employees">
+            <div class="flex items-center mb-4">
+                <tui-tag class="h-min" [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
+                <tui-tag class="h-min ml-2" *ngIf="displayOverride$ | async" value="Boot available"></tui-tag>
+                <ng-container *ngIf="isManager">
+                    <div *tuiLet="isFull$ | async as isFull" (click)="!isFull && toggleAssignDialog()"
+                        [ngClass]="{'opacity-65' : isFull, 'cursor-not-allowed' : isFull}"
+                        class="px-[0.65em] py-[0.4em] bg-primary ml-auto text-[white] rounded-[3.25px] flex items-center cursor-pointer">
+                        <tui-svg src="tuiIconPlusCircle"></tui-svg>
+                    </div>
+                </ng-container>
+            </div>
+            <table class="w-full" tuiTable [columns]="(columns$ | async) ?? []">
+                <thead>
+                    <tr tuiThGroup>
+                        <th *tuiHead="'email'" tuiTh>
+                            E-mail
+                        </th>
+                        <th *tuiHead="'name'" tuiTh>
+                            Name
+                        </th>
+                        <th *tuiHead="'employeeType'" tuiTh>
+                            Employee Type
+                        </th>
+                        <th *tuiHead="'managerAssigned'" tuiTh>
+                            Assigned by manager?
+                        </th>
+                        <ng-container *ngIf="isManager">
+                            <th *tuiHead="'unassign'" tuiTh [sorter]="null"></th>
+                        </ng-container>
+                    </tr>
+                </thead>
+                <tbody *tuiLet="employees | tuiTableSort as sortedEmployees" tuiTbody [data]="sortedEmployees">
+                    <tr *ngFor="let item of sortedEmployees; let i = index" tuiTr>
+                        <td [routerLink]="item.userName" class="cursor-pointer" *tuiCell="'name'" tuiTd>
+                            {{ item.firstName + ' ' + item.lastName }}
+                        </td>
+                        <td *tuiCell="'email'" tuiTd>
+                            <a *ngIf="item.email" tuiLink [href]="'mailto:' + item.email">
+                                {{ item.email }}
+                            </a>
+                        </td>
+                        <td *tuiCell="'employeeType'" tuiTd>
+                            {{ item.employeeType }}
+                        </td>
+                        <td *tuiCell="'managerAssigned'" tuiTd>
+                            {{ item.managerAssigned ? "Yes" : "No" }}
+                        </td>
+                        <ng-container *ngIf="isManager">
+                            <td class="flex justify-center items-center" *tuiCell="'unassign'" tuiTd>
+                                <button appearance="flat" icon="tuiIconClose" shape="rounded" size="s" title="Unassign"
+                                    tuiIconButton type="button" class="remove" (click)="unassign(item)"></button>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </ng-container>
+
+        <ng-template let-observer [tuiDialogOptions]="{label: 'Assign an employee', size: 's'}"
+            [(tuiDialog)]="assignDialogOpen">
+            <form (ngSubmit)="observer.complete()">
+                <tui-select tuiTextfieldSize="m" class="tui-space_vertical-4" [formControl]="userNameToAssign">
+                    Employee
+                    <input tuiTextfield />
+                    <tui-data-list-wrapper *tuiDataList [items]="employeeUsernames$ | async"></tui-data-list-wrapper>
+                </tui-select>
+                <p>
+                    <button tuiButton type="cancel">
+                        Cancel
+                    </button>
+                    <button (click)="assign()" class="ml-1" tuiButton type="submit">
+                        Assign
+                    </button>
+                </p>
+            </form>
+        </ng-template>
     </ng-container>
-</table>
+</div>

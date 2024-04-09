@@ -1,22 +1,36 @@
 import { Injectable } from '@angular/core';
-import { Employee, LoginRequest } from '../../models/employee';
-import { EmployeesService } from './employees.service';
 import { Observable, catchError, map, of, switchMap, take, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { Router } from '@angular/router';
+import { ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
+import { JobsService } from "../../shared/services/jobs.service";
+import { AssignmentConflictType } from "../../models/job.model";
+import { ActivatedRoute, Router } from '@angular/router';
+import { LoginRequest } from '../../models/employee';
 
 @Injectable({
     providedIn: 'root'
 })
-export class SessionService {
-    user$: Observable<Employee | undefined> = of(undefined);
+export class SessionService<T> {
+    user$: Observable<T | undefined> = of(undefined);
     apiUrl: string;
+    scheduleSessionState = new ScheduleSessionState;
+    config: SessionServiceConfig<T>;
 
-    constructor(private employeesService: EmployeesService, private http: HttpClient, private feature: FeatureService, private router: Router) {
+    constructor(
+        private http: HttpClient, 
+        private feature: FeatureService, 
+        private router: Router, 
+        private jobsService: JobsService,
+        config: SessionServiceConfig<T>) {
         this.apiUrl = this.feature.getFeatureValue("api").url;
+        this.config = config;
 
-        this.guardWithAuth(() => this.user$ = this.employeesService.getProfile());
+        this.isUserAuthorized().subscribe(isAuthorized => {
+            if (isAuthorized){
+                this.user$ = this.config.getUser();
+            }
+        });
     }
 
     login(userName: string, passwordPlain: string): Observable<boolean> {
@@ -24,12 +38,12 @@ export class SessionService {
             userName: userName,
             passwordPlain: passwordPlain
         };
-        return this.http.post<LoginRequest>(`${this.apiUrl}/portal/login`, loginRequest).pipe(
+        return this.http.post<LoginRequest>(`${this.apiUrl}/${this.config.loginRoute}`, loginRequest).pipe(
             switchMap((res: any) => {
                 const accessToken = res["accessToken"];
-                this.setSessionValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
+                this.setStorageValues(accessToken, res["accessTokenExpiresAt"], res["refreshToken"], res["refreshTokenExpiresAt"], userName);
                 if (accessToken) {
-                    return this.employeesService.getProfile().pipe(
+                    return this.config.getUser().pipe(
                         tap(profile => {
                             this.user$ = of(profile);
                         }),
@@ -50,33 +64,61 @@ export class SessionService {
         );
     }
 
+    getType(): SessionType {
+        return this.config.type;
+    }
+
     logout() {
         localStorage.clear();
         sessionStorage.clear();
+        this.scheduleSessionState.clear();
         this.user$ = of(undefined);
     }
 
-    getUser(): Observable<Employee | undefined> {
+    getUser(): Observable<T | undefined> {
         return this.user$;
     }
 
-    guardWithAuth(onSuccess: () => any, onFailure: () => any = () => { this.router.navigate(["/login"]) }): Observable<any> {
+    redirectToLogin() {
+        this.router.navigate(["login", this.config.type]);
+    }
+
+    isUserAuthorized(): Observable<boolean> {
         if (this.isActive()) {
-            return of(onSuccess()).pipe(take(1));
+            return of(true).pipe(take(1));
         }
         else { // attempt a refresh
             return this.refresh().pipe(
-                take(1),
-                map(success => {
-                    if (success) {
-                        return onSuccess();
-                    }
-                    else {
-                        return onFailure();
-                    }
+                tap(isAuthorized => {
+                    if (!isAuthorized)
+                        this.logout();
                 })
-            )
+            );
         }
+    }
+
+    refreshJobSessionState() {        
+        const jobSessionState = this.scheduleSessionState.jobSessionState;
+        this.jobsService.checkAssignmentAvailability(jobSessionState.jobId)
+            .subscribe(res => {
+                console.log(res);
+                if (typeof res === 'string') {
+                    switch (res) {
+                        case AssignmentConflictType.AlreadyAssigned:
+                            jobSessionState.alreadyAssigned$.next(true);
+                            break;
+                        case AssignmentConflictType.JobFull:
+                            jobSessionState.assignmentAvailable$.next(false);
+                            break;
+                    }
+                    jobSessionState.employeeToBoot$.next(null);
+                }
+                else {
+                    jobSessionState.assignmentAvailable$.next(true);
+                    jobSessionState.alreadyAssigned$.next(false);
+                    jobSessionState.employeeToBoot$.next(res);
+                }           
+            })
     }
 
     private isActive(): boolean {
@@ -95,7 +137,7 @@ export class SessionService {
         }
 
         return this.http.post(`${this.apiUrl}/renewAccess`, { "refreshToken": refreshToken }).pipe(
-            tap((res: any) => this.setSessionValues(res["accessToken"], res["accessTokenExpiresAt"])),
+            tap((res: any) => this.setStorageValues(res["accessToken"], res["accessTokenExpiresAt"])),
             map(_ => true),
             catchError(err => {
                 console.error(err);
@@ -105,7 +147,7 @@ export class SessionService {
         )
     }
 
-    private setSessionValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
+    setStorageValues(accessToken?: string, accessTokenExpiresAt?: string, refreshToken?: string, refreshTokenExpiresAt?: string, userName?: string) {
         accessToken = accessToken ?? sessionStorage.getItem("accessToken") ?? "";
         accessTokenExpiresAt = accessTokenExpiresAt ?? sessionStorage.getItem("accessTokenExpiresAt") ?? "";
         refreshToken = refreshToken ?? sessionStorage.getItem("refreshToken") ?? "";

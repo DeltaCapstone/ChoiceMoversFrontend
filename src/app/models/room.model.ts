@@ -1,8 +1,19 @@
-export class Room {
+/**
+ * Interface that describes the Room type 
+ */
+export interface IRoom {
     roomName: string;
-    items: string[];
+    items: Map<string, number>;
+}
 
-    constructor(roomName: string, items: string[]) {
+/**
+ * Class that defines a Room object and its properties and methods
+ */
+export class Room implements IRoom {
+    roomName: string;
+    items: Map<string, number>;
+
+    constructor(roomName: string, items: Map<string, number>) {
         this.roomName = roomName;
         this.items = items;
     }
@@ -15,11 +26,12 @@ export class Room {
         this.roomName = roomName;
     }
 
-    getItems(): string[] {
+    getItems(): Map<string, number> {
         return this.items;
     }
 
-    setItems(item: string): void {
-        this.items.push(item);
+    setItems(items: Map<string, number>): void {
+        this.items = items;
     }
+
 }
