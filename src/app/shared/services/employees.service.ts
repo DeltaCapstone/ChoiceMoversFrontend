@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeTypePriorityRequest } from '../../models/employee';
+import { EmployeeCreateRequest, Employee, EmployeeProfileUpdateRequest, EmployeeTypePriorityRequest, EmployeeType } from '../../models/employee';
 import { Observable, switchMap, tap, of, take, map, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
@@ -19,10 +19,12 @@ export class EmployeesService {
         this.cache$.next(new Map);
     }
 
-    // TODO: integrate with the multi-step creation process
-    createEmployee(newEmployee: EmployeeCreateRequest): Observable<EmployeeCreateRequest> {
-        this.cacheUpsert([newEmployee]);
-        return this.http.post<EmployeeCreateRequest>(`${this.apiUrl}/manager/employee`, newEmployee);
+    signUp(employeeCreateRequest: EmployeeCreateRequest, token: string): Observable<EmployeeCreateRequest> {
+        return this.http.post<EmployeeCreateRequest>(`${this.apiUrl}/portal?token=${token}`, employeeCreateRequest);
+    }
+
+    createEmployee(email: string, priority: number, type: EmployeeType) {
+        return this.http.post(`${this.apiUrl}/manager/employee?email=${email}&priority=${priority}&type=${type}`, {});
     }
 
     getProfile(): Observable<Employee | undefined> {

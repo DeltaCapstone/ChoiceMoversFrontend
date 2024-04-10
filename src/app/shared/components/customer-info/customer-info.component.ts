@@ -6,10 +6,8 @@ import { Observable, Subscription, map, of } from 'rxjs';
 import { CustomersService } from '../../services/customers.service';
 import { Customer, CustomerCreateRequest } from '../../../models/customer.model'
 import { ActivatedRoute, Router } from '@angular/router';
-import { SessionService } from '../../services/session.service';
 import { TuiTextfieldControllerModule, TuiDataListModule, TuiErrorModule, TuiSvgModule, TuiButtonModule } from '@taiga-ui/core';
 import { TuiFieldErrorPipeModule, TuiInputModule, TuiInputPhoneModule, TuiTextareaModule, TuiInputPasswordModule } from '@taiga-ui/kit';
-import { CustomerSessionServiceToken } from '../../../app.config';
 
 @Component({
   selector: 'app-customer-info',
