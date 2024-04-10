@@ -81,7 +81,6 @@ export class EmployeeSignupComponent extends BaseComponent {
         phoneOther1: "",
         phoneOther2: ""
     };
-    console.log(employeeCreateRequest);
     this.employeesService.signUp(employeeCreateRequest, this.token).subscribe({
       next: (response: any) => {
           console.log('User created', response);

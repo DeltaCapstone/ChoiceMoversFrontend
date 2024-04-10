@@ -70,6 +70,10 @@ export class JobComponent extends BaseComponent {
         });
 	}
 
+    finalize() {
+        
+    }
+
     selfAssign() {
         this.job$.pipe(
             take(1),

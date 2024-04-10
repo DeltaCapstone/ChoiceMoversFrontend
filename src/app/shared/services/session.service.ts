@@ -5,7 +5,7 @@ import { FeatureService } from './feature.service';
 import { CreateEstimateSessionState, ScheduleSessionState, SessionServiceConfig, SessionType } from '../../models/session.model';
 import { JobsService } from "../../shared/services/jobs.service";
 import { AssignmentConflictType } from "../../models/job.model";
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { LoginRequest } from '../../models/employee';
 
 @Injectable({

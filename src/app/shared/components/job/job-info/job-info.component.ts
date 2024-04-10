@@ -3,7 +3,7 @@ import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
 import { Job } from '../../../../models/job.model';
-import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
+import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiInputNumberModule, TuiStepperModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
 import { TuiDataListModule, TuiErrorModule, TuiLoaderModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
@@ -22,7 +22,7 @@ import { Employee } from '../../../../models/employee';
     imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule, TuiTextareaModule,
         TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule, TuiCheckboxModule, TuiChipModule, FormsModule,
         TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule,
-        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule],
+        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule, TuiInputNumberModule],
     templateUrl: './job-info.component.html',
     styleUrl: './job-info.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,12 +36,15 @@ export class JobInfoComponent extends BaseComponent {
         jobId: new FormControl(""),
         startTime: new FormControl(TuiDay.currentLocal()),
         endTime: new FormControl(TuiDay.currentLocal()),
+        boxes: new FormControl(0),
+        cost: new FormControl(0),
+        manHours: new FormControl(0),
         notes: new FormControl(""),
         loadAddr: new FormControl(""),
         unloadAddr: new FormControl("")
     });
     checked: Array<Array<String | boolean>> = [];
-    status = "Pending";
+    status = "pending";
     // map state
     mapOptions: google.maps.MapOptions = {    
         center: {lat: 41.066078186035156, lng: -81.46630096435547},
@@ -72,6 +75,9 @@ export class JobInfoComponent extends BaseComponent {
                 startTime: TuiDay.fromUtcNativeDate(new Date(job.startTime)),
                 endTime: TuiDay.fromUtcNativeDate(new Date(job.endTime)),
                 notes: job.notes,
+                cost: job.cost,
+                manHours: job.manHours,
+                boxes: job.boxes,
                 loadAddr: this.makeStringFromAddress(job.loadAddr),
                 unloadAddr: this.makeStringFromAddress(job.unloadAddr)
             });

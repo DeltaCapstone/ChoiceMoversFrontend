@@ -43,19 +43,34 @@
                                     </div>
                                 </div>
 
+                                <div class="tui-form__row">
+                                    <tui-input-number tuiTextfieldSize="m" formControlName="manHours">
+                                        Man Hours
+                                    </tui-input-number>
+                                    <tui-error formControlName="manHours"></tui-error>
+                                </div>
+                                <div class="tui-form__row">
+                                    <tui-input-number tuiTextfieldSize="m" formControlName="cost">
+                                        Cost
+                                    </tui-input-number>
+                                    <tui-error formControlName="cost"></tui-error>
+                                </div>
+                                <div class="tui-form__row">
+                                    <tui-input-number [step]=1 tuiTextfieldSize="m" formControlName="boxes">
+                                        Boxes
+                                    </tui-input-number>
+                                    <tui-error formControlName="boxes"></tui-error>
+                                </div>
                                 <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
-                                        <tui-textarea tuiTextfieldSize="m" formControlName="notes">
+                                        <tui-textarea [expandable]="true" [rows]="10" tuiTextfieldSize="m"
+                                            formControlName="notes">
                                             Notes
                                         </tui-textarea>
                                     </div>
                                     <div class="flex flex-col items-center justify-center tui-form__multi-field">
                                         <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
                                             <span>Rooms</span>
-                                            <span class="opacity-45">5</span>
-                                        </div>
-                                        <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
-                                            <span>Boxes</span>
                                             <span class="opacity-45">5</span>
                                         </div>
                                         <a class="opacity-50 py-0.5 text-left text-m w-3/4">More info...</a>
