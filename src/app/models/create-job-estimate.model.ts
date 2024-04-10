@@ -43,7 +43,7 @@ export interface ICreateJobEstimate {
 
     needTruck: boolean;
     distanceToJob: number;
-    distanceTotal: number;
+    distanceMove: number;
 }
 
 /**
@@ -69,7 +69,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 
     needTruck: boolean;
     distanceToJob: number;
-    distanceTotal: number;
+    distanceMove: number;
 
     constructor(
         customer: Customer = new Customer(),
@@ -91,7 +91,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 
         needTruck: boolean = false,
         distanceToJob: number = 0,
-        distanceTotal: number = 0
+        distanceMove: number = 0
     ) {
         this.customer = customer;
         this.loadAddr = loadAddr;
@@ -112,7 +112,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 
         this.needTruck = needTruck;
         this.distanceToJob = distanceToJob;
-        this.distanceTotal = distanceTotal
+        this.distanceMove = distanceMove
 
     }
 }

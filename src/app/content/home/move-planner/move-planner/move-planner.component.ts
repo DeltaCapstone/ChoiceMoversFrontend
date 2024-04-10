@@ -781,9 +781,9 @@ export class MovePlannerComponent extends PageComponent {
       totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
       console.log('Total Job distance first assignment', totalJobDistance);
 
-      totalJobDistance !== undefined ? this.newJob.distanceTotal += Math.floor(totalJobDistance) : 0;
+      totalJobDistance !== undefined ? this.newJob.distanceMove += Math.floor(totalJobDistance) : 0;
       console.log('Total Job distance second assignment', totalJobDistance);
-      this.jobSessionState.currentJob.distanceTotal = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
+      this.jobSessionState.currentJob.distanceMove = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
 
     } catch (error) {
       console.error('Error:', error);
