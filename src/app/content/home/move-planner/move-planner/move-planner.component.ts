@@ -375,6 +375,7 @@ export class MovePlannerComponent extends PageComponent {
     // console.log('Inside saveMovePlannerState Session Value is:', this.jobSessionState);
     //Customer
     this.jobSessionState.currentCustomer = this.currentCustomer;
+    this.jobSessionState.currentJob.customer = this.currentCustomer;
 
     //ServicesGroup
     this.jobSessionState.currentJob.pack = this.servicesGroup.get('packing')?.value;
@@ -424,7 +425,8 @@ export class MovePlannerComponent extends PageComponent {
     //SpecialtyGroup
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
 
-    //TODO:Need to add special requests group once it is created on the backend
+    //SpecialRequestsGroup
+    this.jobSessionState.currentJob.specialRequests = this.specialRequestGroup.value ?? [];
 
     //ActiveStepIndex
     this.jobSessionState.activeStepIndex = this.activeStepIndex;
@@ -508,11 +510,11 @@ export class MovePlannerComponent extends PageComponent {
     //SpecialtyGroup
     this.specialtyGroup.setValue(sessionStateObject.currentJob.special);
 
-    //TODO:Need to add special requests group once it is created on the backend
+    this.specialRequestGroup.patchValue(sessionStateObject.currentJob.specialRequests);
 
+    //TODO: NOT WORKING AS INTENDED
     //ActiveStepIndex
     this.activeStepIndex = sessionStateObject.activeStepIndex;
-
   }
 
   /**
@@ -820,6 +822,8 @@ export class MovePlannerComponent extends PageComponent {
     this.newJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
 
     this.newJob.special = this.specialtyGroup.value ?? [];
+
+    this.newJob.specialRequests = this.specialRequestGroup.value ?? [];
 
     this.newJob.boxes = this.boxesGroup.value ?? new Map();
 

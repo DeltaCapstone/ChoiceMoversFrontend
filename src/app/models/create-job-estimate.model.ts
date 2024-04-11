@@ -71,6 +71,8 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     distanceToJob: number;
     distanceMove: number;
 
+    specialRequests: string[];
+
     constructor(
         customer: Customer = new Customer(),
         loadAddr: Address = new Address(),
@@ -91,7 +93,9 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 
         needTruck: boolean = false,
         distanceToJob: number = 0,
-        distanceMove: number = 0
+        distanceMove: number = 0,
+
+        specialRequests: string[] = []
     ) {
         this.customer = customer;
         this.loadAddr = loadAddr;
@@ -112,8 +116,9 @@ export class CreateJobEstimate implements ICreateJobEstimate {
 
         this.needTruck = needTruck;
         this.distanceToJob = distanceToJob;
-        this.distanceMove = distanceMove
+        this.distanceMove = distanceMove;
 
+        this.specialRequests = specialRequests;
     }
 }
 
