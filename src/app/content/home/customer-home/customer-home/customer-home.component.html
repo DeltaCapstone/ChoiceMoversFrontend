@@ -2,24 +2,27 @@
   <!-- Container for the background image with responsive height -->
   <div class="relative flex-grow overflow-hidden rounded-2xl">
     <!-- Background image with custom styles and reduced opacity -->
-    <img src="../../../../../assets/choiceMovers4.png" alt="Background" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 opacity-20 rounded-2xl" style="opacity: 0.2; width: 50%; height: auto;" />
+    <img src="../../../../../assets/choiceMovers4.png" alt="Background"
+      class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 opacity-20 rounded-2xl"
+      style="opacity: 0.2; width: 50%; height: auto;" />
 
     <!-- Centered content including header, icons, and paragraph -->
     <div class="relative flex flex-col justify-between h-full z-10">
       <header class="text-center p-0">
-        <h1 class="text-3xl font-bold" style="color: white; text-shadow: 3px 3px 0px #000;">Locally owned and operated out of Akron Ohio</h1>
+        <h1 class="text-3xl font-bold" style="color: white; text-shadow: 3px 3px 0px #000;">Locally owned and operated
+          out of Akron Ohio</h1>
         <div class="maps-container">
           <app-google-maps-component></app-google-maps-component>
         </div>
       </header>
-      
+
       <div class="paragraph">
         <p class="text-lg font-bold px-10" style="color: white; text-shadow: 3px 3px 0px #000;">
-          Welcome to Choice Movers, your go-to for a stress-free relocation. We offer top-notch service, 
-          from expert packing to secure transport and efficient unpacking. Trust us to handle your move with 
+          Welcome to Choice Movers, your go-to for a stress-free relocation. We offer top-notch service,
+          from expert packing to secure transport and efficient unpacking. Trust us to handle your move with
           precision and care. Choose smart, choose Choice Movers.</p>
       </div>
-      
+
       <div class="review-wrapper">
         <ng-container *ngIf="googleReviews$ | async as googleReviews; else loading">
           <ng-container *ngIf="googleReviews.reviews; else noReviews">
@@ -41,8 +44,8 @@
         </ng-container>
         <ng-template #loading>Loading Reviews...</ng-template>
       </div>
-      
-    
+
+
 
       <!-- Bottom text area, centered with padding -->
       <div class="absolute bottom-0 left-[18%] right-[10%] p-10">
@@ -50,12 +53,11 @@
         <div class="button-container">
           <app-move-button></app-move-button>
         </div>
-        
+
       </div>
     </div>
   </div>
-  
+
   <!-- Other sections of the page -->
   <!-- ... -->
 </div>
-

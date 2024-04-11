@@ -166,27 +166,4 @@ export class SessionService<T> {
         sessionStorage.setItem("refreshTokenExpiresAt", refreshTokenExpiresAt)
     }
 
-    /**
-     * Saves the move planner form values to session storage to be refreshed if the user navigates away from the form
-     * @param movePlannerFormData The currently entered user move planner form information
-     */
-    saveMovePlannerValues(movePlannerFormData: CreateEstimateSessionState): void {
-        sessionStorage.setItem('movePlannerFormData', JSON.stringify(movePlannerFormData));
-    }
-
-    /**
-     * Refreshes the form state when the user navigates back to the move planner after navigating away
-     * @returns The CreateEstimateSessionState object that holds the customer's move planner form data 
-     */
-    refreshMovePlannerValues(): CreateEstimateSessionState {
-        const movePlannerFormDataString = sessionStorage.getItem('movePlannerFormData');
-        return movePlannerFormDataString ? JSON.parse(movePlannerFormDataString) : null;
-    }
-
-    /**
-     * Clears the move planner form data from session storage.
-     */
-    clearMovePlannerValues(): void {
-        sessionStorage.removeItem('movePlannerFormData');
-    }
 }

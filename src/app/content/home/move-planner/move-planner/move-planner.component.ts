@@ -157,29 +157,30 @@ export class MovePlannerComponent extends PageComponent {
 
     this.activeUser$ = this._customerSession.getUser();
     console.log('Active user is:', this.activeUser$);
-    const userSubscription = this.activeUser$.subscribe();
-
-    this.subscriptions.push(userSubscription);
-
-    this.activeUser$.subscribe({
+    const userSubscription = this.activeUser$.subscribe({
       next: (customer) => {
         console.log(customer);
         if (customer) {
           this.currentCustomer = customer;
         } else {
+          console.log('hitting else block for customer assignment')
           this.currentCustomer = new Customer();
         }
       },
       error: (error) => {
         console.error('An error occurred in creating active user:', error);
       }
-    });
+    });;
+
+    this.subscriptions.push(userSubscription);
+
 
   }
 
   ngAfterViewInit() {
     this.refreshMovePlannerState(this.jobSessionState);
   }
+
   /**
    * Checks that at least one checkbox of the FormGroup that it is assigned to is checked
    * @returns A function that is used for checking the validation of a checkbox group
@@ -331,6 +332,7 @@ export class MovePlannerComponent extends PageComponent {
 
     if (this.activeStepIndex === 10) {
       this.populateRoomItems();
+      console.log('Job Session State at index 11:', this.jobSessionState);
     }
 
     this.specialRequestSubmissionSuccess = false;
@@ -354,6 +356,7 @@ export class MovePlannerComponent extends PageComponent {
       this.toAddressFlights,
       this.toAddressGroup,
       this.roomsGroup,
+      this.itemsGroup,
       this.boxesGroup,
       this.specialtyGroup
     ];
@@ -361,7 +364,7 @@ export class MovePlannerComponent extends PageComponent {
     allFormGroups.forEach(formGroup => {
       this.subscriptions.push(
         formGroup.valueChanges.subscribe(_ => {
-          this._customerSession.saveMovePlannerValues(this.saveMovePlannerState());
+          this.saveMovePlannerState();
         })
       )
     });
@@ -372,7 +375,6 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): CreateEstimateSessionState {
-    // console.log('Inside saveMovePlannerState Session Value is:', this.jobSessionState);
     //Customer
     this.jobSessionState.currentCustomer = this.currentCustomer;
     this.jobSessionState.currentJob.customer = this.currentCustomer;
@@ -383,7 +385,6 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.load = this.servicesGroup.get('load')?.value;
     this.jobSessionState.currentJob.unload = this.servicesGroup.get('unload')?.value;
 
-    console.log('Need truck value:', this.needTruckGroup.get('needTruck')?.value);
     //NeedTruckGroup
     this.jobSessionState.currentJob.needTruck = this.needTruckGroup.get('needTruck')?.value;
 
@@ -419,8 +420,24 @@ export class MovePlannerComponent extends PageComponent {
     //RoomsGroup
     this.jobSessionState.currentJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
 
+    console.log('Current Job.rooms is:', this.jobSessionState.currentJob.rooms);
+
+    //ItemsGroup
+    this.jobSessionState.currentJob.rooms.forEach(room => {
+      const roomFormGroup = this.roomsGroup.get(room.roomName);
+
+      if (roomFormGroup) {
+        room.items.forEach((count, itemName) => {
+          const itemControl = roomFormGroup.get(itemName);
+          if (itemControl) {
+            itemControl.patchValue(count);
+          }
+        });
+      }
+    });
+
     //BoxesGroup
-    this.jobSessionState.currentJob.boxes = this.boxesGroup.value ?? new Map();
+    this.jobSessionState.currentJob.boxes = new Map<string, number>(Object.entries(this.boxesGroup.value)) ?? new Map<string, number>;
 
     //SpecialtyGroup
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
@@ -434,15 +451,15 @@ export class MovePlannerComponent extends PageComponent {
     return this.jobSessionState;
   }
 
-  //TODO: THIS FUNCTION NEEDS TO BE CALLED SOMEWHERE TO REFRESH MOVE PLANNER STATE WHEN CUSTOMER RETURNS TO MOVE PLANNER
   /**
    * Refreshes move planner state if the customer navigates away from the move planner in the middle of planning the move
    * @param sessionStateObject The session object that holds the current move planner session values
    */
   refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
     console.log('In refreshMovePlanner');
-    console.log('Session state object in function is:', this.jobSessionState);
+    console.log('Session state object in function is:', sessionStateObject);
     //Customer
+    console.log('this.currentCustomer in refreshMovePlanner is:', this.currentCustomer)
     this.currentCustomer = sessionStateObject.currentCustomer;
 
     // ServicesGroup
@@ -502,13 +519,41 @@ export class MovePlannerComponent extends PageComponent {
     }, { emitEvent: false });
 
     //RoomsGroup
-    this.populateFormItems(this.jobSessionState.currentJob.rooms) !== null ? this.populateFormItems(sessionStateObject.currentJob.rooms) : [];
+    console.log('Right before refreshing rooms group value is:', sessionStateObject);
+    sessionStateObject.currentJob.rooms.forEach(room => {
+      const roomControls = this.roomsGroup.controls;
+      if (roomControls.hasOwnProperty(room.roomName)) {
+        this.roomsGroup.get(room.roomName)?.patchValue(true, { emitEvent: false });
+      } else {
+        console.log('error patching rooms')
+      }
+    });
+
+    //ItemsGroup
+    sessionStateObject.currentJob.rooms.forEach(room => {
+      room.items.forEach((value, name) => {
+        const itemControl = this.itemsGroup.get(name);
+        console.log('ItemControl in refreshMovePlannerState is:', itemControl);
+        if (itemControl && itemControl instanceof FormControl) {
+          itemControl.patchValue(value, { emitEvent: false });
+        } else {
+          console.log('error patching item values');
+        }
+      });
+    });
 
     //BoxesGroup
-    this.boxesGroup.setValue(sessionStateObject.currentJob.boxes);
+    sessionStateObject.currentJob.boxes.forEach((value, name) => {
+      const boxControl = this.boxesGroup.get(name);
+      if (boxControl && boxControl instanceof FormControl) {
+        boxControl.patchValue(value, { emitEvent: false });
+      } else {
+        console.log('error patching box value');
+      }
+    })
 
     //SpecialtyGroup
-    this.specialtyGroup.setValue(sessionStateObject.currentJob.special);
+    this.specialtyGroup.patchValue(sessionStateObject.currentJob.special);
 
     this.specialRequestGroup.patchValue(sessionStateObject.currentJob.specialRequests);
 
@@ -640,6 +685,7 @@ export class MovePlannerComponent extends PageComponent {
       chosenRooms.push(roomToAdd);
     });
 
+    console.log('checked rooms is:', this.checkedRooms);
     return chosenRooms;
   }
 
@@ -656,12 +702,12 @@ export class MovePlannerComponent extends PageComponent {
         let itemsMap = new Map<string, number>();
 
         //iterate over room's associated items
-        room.items.forEach((value, key) => {
+        room.items.forEach((value, name) => {
           //get user input count for number of items based on FormControl
-          let control = this.itemsGroup.get(key);
+          let control = this.itemsGroup.get(name);
           let itemCount = control ? (control.value as number) : 0;
 
-          itemsMap.set(key, itemCount);
+          itemsMap.set(name, itemCount);
 
         });
         formRoom.setItems(itemsMap);
@@ -740,7 +786,7 @@ export class MovePlannerComponent extends PageComponent {
         this.choiceMoversAddress,
         this.concatenateAddresses(this.fromAddressGroup)
       );
-      console.log('Distance To Job Mileage value is:', distance)
+      //console.log('Distance To Job Mileage value is:', distance)
 
       this.newJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
       this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
@@ -761,7 +807,7 @@ export class MovePlannerComponent extends PageComponent {
         this.concatenateAddresses(this.fromAddressGroup),
         this.concatenateAddresses(this.toAddressGroup)
       );
-      console.log('Distance Between Addresses Mileage value is:', distance)
+      //console.log('Distance Between Addresses Mileage value is:', distance)
 
       return distance;
 
@@ -778,13 +824,13 @@ export class MovePlannerComponent extends PageComponent {
     try {
       let totalJobDistance: number | undefined = await this.extractDistanceBetweenAddressesMileage();
       let distanceToJob: number | undefined = await this.extractDistanceToJobMileage();
-      console.log('Total Job distance after initialization', totalJobDistance);
+      //console.log('Total Job distance after initialization', totalJobDistance);
 
       totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
-      console.log('Total Job distance first assignment', totalJobDistance);
+      //console.log('Total Job distance first assignment', totalJobDistance);
 
       totalJobDistance !== undefined ? this.newJob.distanceMove += Math.floor(totalJobDistance) : 0;
-      console.log('Total Job distance second assignment', totalJobDistance);
+      //console.log('Total Job distance second assignment', totalJobDistance);
       this.jobSessionState.currentJob.distanceMove = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
 
     } catch (error) {
@@ -796,6 +842,7 @@ export class MovePlannerComponent extends PageComponent {
    * Final form submission. Sets the value of the master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
+    console.log('In submit form, customer value is', this.currentCustomer);
     this.boolToString(this.roomsGroup);
 
     this.newJob.customer = this.currentCustomer;
@@ -838,7 +885,7 @@ export class MovePlannerComponent extends PageComponent {
 
     console.log('New Job object value:', this.newJob);
 
-    console.log('Job session state value:', this.jobSessionState)
+    console.log('Job session state value:', this.jobSessionState);
 
     this._jobsService.createCustomerEstimate(this.newJob).subscribe({
       next: (response) => {

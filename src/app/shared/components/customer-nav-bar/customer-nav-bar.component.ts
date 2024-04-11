@@ -61,6 +61,7 @@ export class CustomerNavBarComponent {
 
   logout() {
     this._session.logout();
+    this._router.navigate(['home']);
   }
 
   ngOnDestroy() {
