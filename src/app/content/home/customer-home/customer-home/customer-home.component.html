@@ -6,56 +6,55 @@
 
     <!-- Centered content including header, icons, and paragraph -->
     <div class="relative flex flex-col justify-between h-full z-10">
-      <header class="text-center p-0">
-        <h1 class="text-3xl font-bold" style="color: white; text-shadow: 3px 3px 0px #000;">Locally owned and operated out of Akron Ohio</h1>
+      <!-- Button container at the top -->
+      <div class="flex justify-between items-end p-10 order-[1]">
+        <div class="button-container w-full flex justify-center">
+          <app-move-button></app-move-button>
+        </div>
+      </div>
+
+      <!-- Separate container for the paragraph -->
+      <div class="paragraph-container flex justify-center items-center order-[2]">
+        <div class="paragraph">
+          <p class="text-lg font-bold px-10" style="color: white; text-shadow: 3px 3px 0px #000;">
+            Welcome to Choice Movers, your go-to for a stress-free relocation. We offer top-notch service, 
+            from expert packing to secure transport and efficient unpacking. Trust us to handle your move with 
+            precision and care. Choose smart, choose Choice Movers.
+          </p>
+        </div>
+      </div>
+
+      <!-- Maps container -->
+      <div class="flex justify-center items-center order-[3]">
         <div class="maps-container">
           <app-google-maps-component></app-google-maps-component>
         </div>
-      </header>
-      
-      <div class="paragraph">
-        <p class="text-lg font-bold px-10" style="color: white; text-shadow: 3px 3px 0px #000;">
-          Welcome to Choice Movers, your go-to for a stress-free relocation. We offer top-notch service, 
-          from expert packing to secure transport and efficient unpacking. Trust us to handle your move with 
-          precision and care. Choose smart, choose Choice Movers.</p>
       </div>
-      
-      <div class="review-wrapper">
-        <ng-container *ngIf="googleReviews$ | async as googleReviews; else loading">
-          <ng-container *ngIf="googleReviews.reviews; else noReviews">
-            <div *ngFor="let review of googleReviews.reviews; let i = index; trackBy: trackByIndex">
-              <div class="review" *ngIf="activeReviewIndex === i">
-                <!-- Display individual review details -->
-                <div class="review-author">{{ review.authorAttribution.displayName }}</div>
-                <div class="review-text">{{ review.text.text }}</div>
-                <div class="review-rating">
-                  <span *ngFor="let starIndex of createRange(review.rating)" class="star-icon">★</span>
+
+      <!-- Separate container for the reviews -->
+      <div class="reviews-container flex-grow order-[4]">
+        <div class="review-wrapper">
+          <ng-container *ngIf="googleReviews$ | async as googleReviews; else loading">
+            <ng-container *ngIf="googleReviews.reviews; else noReviews">
+              <div *ngFor="let review of googleReviews.reviews; let i = index; trackBy: trackByIndex">
+                <div class="review" *ngIf="activeReviewIndex === i">
+                  <!-- Display individual review details -->
+                  <div class="review-author">{{ review.authorAttribution.displayName }}</div>
+                  <div class="review-text">{{ review.text.text }}</div>
+                  <div class="review-rating">
+                    <span *ngFor="let starIndex of createRange(review.rating)" class="star-icon">★</span>
+                  </div>
+                  <!-- Add more fields as needed -->
                 </div>
-                <!-- Add more fields as needed -->
               </div>
-            </div>
+            </ng-container>
+            <ng-template #noReviews>
+              <p>No reviews available</p>
+            </ng-template>
           </ng-container>
-          <ng-template #noReviews>
-            <p>No reviews available</p>
-          </ng-template>
-        </ng-container>
-        <ng-template #loading>Loading Reviews...</ng-template>
-      </div>
-      
-    
-
-      <!-- Bottom text area, centered with padding -->
-      <div class="absolute bottom-0 left-[18%] right-[10%] p-10">
-
-        <div class="button-container">
-          <app-move-button></app-move-button>
+          <ng-template #loading>Loading Reviews...</ng-template>
         </div>
-        
       </div>
     </div>
   </div>
-  
-  <!-- Other sections of the page -->
-  <!-- ... -->
 </div>
-

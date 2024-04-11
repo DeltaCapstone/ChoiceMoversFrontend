@@ -6,7 +6,7 @@
   }
 
   .review {
-    width:600px; /* Fixed width */
+    max-width: 600px;
     padding: 1rem;
     border-radius: 8px;
     background: #ffffff;
@@ -15,7 +15,7 @@
     flex-direction: column;
     justify-content: center;
     text-align: left;
-    position: relative;
+    position: relative; /* Ensure .review provides a positioning context for its children */
   }
   
   .review-author,
@@ -27,7 +27,7 @@
  
   .review-author {
     font-weight: bold;
-    margin-bottom: 8px; /* Space between author name and review text */
+    margin-bottom: 1rem; /* Space between author name and review text */
  
   }
 
@@ -40,15 +40,11 @@
   }
 
   .review-wrapper {
-    position: absolute;
-    top: 80%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+
   }
 
   .star-icon {
@@ -59,40 +55,28 @@
 
   .maps-container {
     display: flex;
-    position: absolute;
-    top: 23%;
-    left: 46.7%;
-    transform: translate(-50%, -50%);
-    padding: 8px;
     z-index: 1000;
     scale: .75;
   }
   
   app-google-maps-component {
-    margin-left: 20px; 
     pointer-events: auto;
   }
 
   .button-container {
     display: flex;
-    align-items: center;
-    scale: .65;
+    align-items: center; /* Vertically center */
+    justify-content: center; /* Horizontally center */
+    transform: scale(0.65);
   }
-
+  
   app-move-button {
-    position: absolute;
-    left: 40%; 
-    bottom: -25px;
-    transform: translateX(-50%);
     z-index: 1001;
     pointer-events: auto;
   }
 
   .paragraph {
-    max-width: 56rem;
+    max-width: 52rem;
     text-align: center;
-    position: absolute;
-    top: 62%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
+
   }
