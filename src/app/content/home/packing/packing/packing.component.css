@@ -2,3 +2,23 @@
     transform: scale(4);
     color:  white;
   }
+
+  .icon-left-arrow {
+    margin-left: 100%;
+}
+
+.icon-mover {
+    margin-left: 220%;
+}
+
+.icon-tv {
+    justify-self: center; 
+}
+
+.icon-package {
+    margin-right: 220%; 
+}
+
+.icon-right-arrow {
+    margin-right: 100%;
+}

@@ -1,12 +1,10 @@
 <div class="relative flex flex-col h-dvh">
   <!-- Container for the background image with responsive height -->
   <div class="relative flex-grow overflow-hidden rounded-2xl">
-    <!-- Background image with custom styles and reduced opacity -->
     <img src="../../../../../assets/choiceMovers4.png" alt="Background" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 opacity-20 rounded-2xl" style="opacity: 0.2; width: 50%; height: auto;" />
 
     <!-- Centered content including header, icons, and paragraph -->
     <div class="relative flex flex-col justify-between h-full z-10">
-      <!-- Button container at the top -->
       <div class="flex justify-between items-end p-10 order-[1]">
         <div class="button-container w-full flex justify-center">
           <app-move-button></app-move-button>
@@ -32,7 +30,7 @@
       </div>
 
       <!-- Separate container for the reviews -->
-      <div class="reviews-container flex-grow order-[4]">
+      <div class="reviews-container flex-grow justify-center items-center order-[4]">
         <div class="review-wrapper">
           <ng-container *ngIf="googleReviews$ | async as googleReviews; else loading">
             <ng-container *ngIf="googleReviews.reviews; else noReviews">
