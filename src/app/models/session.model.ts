@@ -1,4 +1,4 @@
-import { Observable, ReplaySubject, Subject, of } from "rxjs";
+import { BehaviorSubject, Observable, ReplaySubject, Subject, of } from "rxjs";
 import { AssignedEmployee } from "./employee";
 import { Inject } from "@angular/core";
 import { JobsService } from "../shared/services/jobs.service";
@@ -14,23 +14,23 @@ export interface IJobSessionState {
     employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
     alreadyAssigned$: ReplaySubject<boolean>;
     assignmentAvailable$: ReplaySubject<boolean>;
-    directionsResults$: ReplaySubject<google.maps.DirectionsResult|undefined>;
+    directionsResults$: ReplaySubject<google.maps.DirectionsResult | undefined>;
 }
 
 export interface ICreateEstimateSessionState {
     currentJob: CreateJobEstimate;
-    currentCustomer: Customer;
+    currentCustomer: BehaviorSubject<Customer | null>;
     activeStepIndex: number;
 }
 
 export class CreateEstimateSessionState implements ICreateEstimateSessionState, ISessionState {
     currentJob = new CreateJobEstimate();
-    currentCustomer = new Customer();
+    currentCustomer = new BehaviorSubject<Customer | null>(null);
     activeStepIndex = 0;
 
     clear(): void {
         this.currentJob = new CreateJobEstimate();
-        this.currentCustomer = new Customer();
+        this.currentCustomer.next(new Customer());
         this.activeStepIndex = 0;
     }
 }
@@ -49,8 +49,8 @@ export class JobSessionState implements IJobSessionState, ISessionState {
     alreadyAssigned$ = new ReplaySubject<boolean>(1);
     assignmentAvailable$ = new ReplaySubject<boolean>(1);
     directionsResults$ = new ReplaySubject<google.maps.DirectionsResult | undefined>(1);
-    
-    constructor(jobId: string=""){
+
+    constructor(jobId: string = "") {
         this.jobId = jobId;
         this.employeeToBoot$.next(null);
         this.alreadyAssigned$.next(false);

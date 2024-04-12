@@ -14,7 +14,7 @@ import { ValueTransformerService } from '../../../../shared/services/value-trans
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 import { SessionService } from '../../../../shared/services/session.service';
 import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { CustomerSessionServiceToken } from '../../../../app.config';
 import { JobsService } from '../../../../shared/services/jobs.service';
 
@@ -57,7 +57,7 @@ export class MovePlannerComponent extends PageComponent {
 
   activeUser$: Observable<Customer | undefined>;
 
-  currentCustomer: Customer = new Customer();
+  currentCustomer: Observable<Customer> = of(new Customer());
 
   currentFormGroup: FormGroup;
 
@@ -155,16 +155,15 @@ export class MovePlannerComponent extends PageComponent {
 
     this.subscibeAllFormGroupsToValueChanges();
 
-    this.activeUser$ = this._customerSession.getUser();
     console.log('Active user is:', this.activeUser$);
-    const userSubscription = this.activeUser$.subscribe({
+    const userSubscription = this._customerSession.getUser().subscribe({
       next: (customer) => {
         console.log(customer);
         if (customer) {
-          this.currentCustomer = customer;
+          this.jobSessionState.currentCustomer.next(customer);
         } else {
           console.log('hitting else block for customer assignment')
-          this.currentCustomer = new Customer();
+          this.jobSessionState.currentCustomer.next(new Customer());
         }
       },
       error: (error) => {
@@ -375,9 +374,6 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): CreateEstimateSessionState {
-    //Customer
-    this.jobSessionState.currentCustomer = this.currentCustomer;
-    this.jobSessionState.currentJob.customer = this.currentCustomer;
 
     //ServicesGroup
     this.jobSessionState.currentJob.pack = this.servicesGroup.get('packing')?.value;
@@ -458,9 +454,6 @@ export class MovePlannerComponent extends PageComponent {
   refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
     console.log('In refreshMovePlanner');
     console.log('Session state object in function is:', sessionStateObject);
-    //Customer
-    console.log('this.currentCustomer in refreshMovePlanner is:', this.currentCustomer)
-    this.currentCustomer = sessionStateObject.currentCustomer;
 
     // ServicesGroup
     this.servicesGroup.patchValue({
@@ -578,7 +571,7 @@ export class MovePlannerComponent extends PageComponent {
       const itemsMap = this.getRoomItems(roomName);
 
       for (const item of itemsMap.keys()) {
-        this.itemsGroup.addControl(item, new FormControl());
+        this.itemsGroup.addControl(item, new FormControl(0));
       }
     });
   }
@@ -845,8 +838,6 @@ export class MovePlannerComponent extends PageComponent {
     console.log('In submit form, customer value is', this.currentCustomer);
     this.boolToString(this.roomsGroup);
 
-    this.newJob.customer = this.currentCustomer;
-
     this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
     this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
     this.newJob.loadAddr.state = this.fromAddressGroup.get('fromState')?.value;
@@ -870,7 +861,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.special = this.specialtyGroup.value ?? [];
 
-    this.newJob.specialRequests = this.specialRequestGroup.value ?? [];
+    this.newJob.specialRequests = this.specialRequestGroup.get('specialTextArea')?.value ?? [];
 
     this.newJob.boxes = this.boxesGroup.value ?? new Map();
 
@@ -887,15 +878,22 @@ export class MovePlannerComponent extends PageComponent {
 
     console.log('Job session state value:', this.jobSessionState);
 
-    this._jobsService.createCustomerEstimate(this.newJob).subscribe({
-      next: (response) => {
-        console.log('Customer estimate created successfully', response);
-      },
-      error: (error) => {
-        console.error('Error creating customer estimate', error);
-      }
-    });
+    this.newJob.rooms.forEach(room => {
+      room.items = Object.fromEntries(room.items) as any;
+    })
 
+    this.jobSessionState.currentCustomer.subscribe(customer => {
+      this.newJob.customer = customer ?? new Customer();
+
+      this._jobsService.createCustomerEstimate(this.newJob).subscribe({
+        next: (response) => {
+          console.log('Customer estimate created successfully', response);
+        },
+        error: (error) => {
+          console.error('Error creating customer estimate', error);
+        }
+      });
+    })
     this._router.navigate(['home/customer-summary']);
   }
 
