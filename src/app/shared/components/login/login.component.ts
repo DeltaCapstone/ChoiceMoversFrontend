@@ -99,4 +99,8 @@ export class LoginComponent extends BaseComponent {
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
+
+    navigateToCustomerSignup() {
+        this.router.navigate(['/home/customer-signup']);
+    }
 }

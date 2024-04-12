@@ -25,7 +25,7 @@ export class MovingComponent extends PageComponent {
 
   constructor(
     private featureService: FeatureService,
-    private googleMapsLoaderService: GoogleMapsLoaderService, 
+    private googleMapsLoaderService: GoogleMapsLoaderService,
     pageService: PageService) {
     super(pageService);
     this.googleReviews$ = new BehaviorSubject<GoogleReviewsResponse | null>(null);
@@ -42,7 +42,7 @@ export class MovingComponent extends PageComponent {
 
   getReviews() {
 
-    const url = this.featureService.getFeatureValue("mapsApi").placesUrl;
+    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
 
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
       this.googleReviews$.next(response);

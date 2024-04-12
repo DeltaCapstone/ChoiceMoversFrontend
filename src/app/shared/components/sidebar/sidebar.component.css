@@ -1,8 +1,13 @@
 .sidebar-item:not(.bg-secondary):hover {
     background: rgba(198, 198, 198, 1);
+
 }
 
 .elevated {
     transform: translateY(-.25rem);
     filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.06));
+}
+
+.sidebar-item.routerLinkActive, .sidebar-item.bg-secondary {
+    background-image: linear-gradient(-180deg, #FC6736, #E62C03);
 }
