@@ -99,6 +99,11 @@
                 </li>
             </ul>
             <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Special Requests</label>
+            <ul>
+                <li *ngFor="let request of this.jobSessionState.currentJob.specialRequests | keyvalue">
+                    {{request.value}}
+                </li>
+            </ul>
         </div>
     </div>
     <div>

@@ -326,7 +326,6 @@ export class MovePlannerComponent extends PageComponent {
       this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
       this.extractDistanceToJobMileage();
       this.extractDistanceBetweenAddressesMileage();
-      this.totalJobDistanceCalculation();
     }
 
     if (this.activeStepIndex === 10) {
@@ -545,10 +544,16 @@ export class MovePlannerComponent extends PageComponent {
       }
     })
 
-    //SpecialtyGroup
+    //SpecialtyGroup TODO: NOT WORKING AS INTENDED
     this.specialtyGroup.patchValue(sessionStateObject.currentJob.special);
 
-    this.specialRequestGroup.patchValue(sessionStateObject.currentJob.specialRequests);
+    const specialRequestFormArray = sessionStateObject.currentJob.specialRequests;
+
+    const formTextArea = this.specialRequestGroup.get('specialTextArea');
+
+    specialRequestFormArray.forEach(request => {
+      formTextArea?.patchValue(request);
+    });
 
     //TODO: NOT WORKING AS INTENDED
     //ActiveStepIndex
@@ -773,61 +778,37 @@ export class MovePlannerComponent extends PageComponent {
   /**
    * Function that extracts the numerical value of the Promise<number> and sets the distanceToJob
    */
-  async extractDistanceToJobMileage(): Promise<number | undefined> {
+  async extractDistanceToJobMileage() {
     try {
       const distance = await this._googleMapsLoaderService.geocodeAndCalculateDistance(
         this.choiceMoversAddress,
         this.concatenateAddresses(this.fromAddressGroup)
       );
-      //console.log('Distance To Job Mileage value is:', distance)
+      console.log('Distance To Job Mileage value is:', distance)
 
       this.newJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
       this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
 
-      return distance;
     } catch (error) {
       console.error('Error', error);
-      return undefined;
     }
   }
 
   /**
   * Function that extracts the numerical value of the Promise<number> and sets the distanceToJob
   */
-  async extractDistanceBetweenAddressesMileage(): Promise<number | undefined> {
+  async extractDistanceBetweenAddressesMileage() {
     try {
       const distance = await this._googleMapsLoaderService.geocodeAndCalculateDistance(
         this.concatenateAddresses(this.fromAddressGroup),
         this.concatenateAddresses(this.toAddressGroup)
       );
-      //console.log('Distance Between Addresses Mileage value is:', distance)
+      console.log('Distance Between Addresses Mileage value is:', distance)
 
-      return distance;
-
+      this.newJob.distanceMove = distance !== undefined ? Math.floor(distance) : 0;
+      this.jobSessionState.currentJob.distanceMove = distance !== undefined ? Math.floor(distance) : 0;
     } catch (error) {
       console.error('Error', error);
-      return undefined;
-    }
-  }
-
-  /**
-   * Calculates total job distance
-   */
-  async totalJobDistanceCalculation() {
-    try {
-      let totalJobDistance: number | undefined = await this.extractDistanceBetweenAddressesMileage();
-      let distanceToJob: number | undefined = await this.extractDistanceToJobMileage();
-      //console.log('Total Job distance after initialization', totalJobDistance);
-
-      totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
-      //console.log('Total Job distance first assignment', totalJobDistance);
-
-      totalJobDistance !== undefined ? this.newJob.distanceMove += Math.floor(totalJobDistance) : 0;
-      //console.log('Total Job distance second assignment', totalJobDistance);
-      this.jobSessionState.currentJob.distanceMove = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
-
-    } catch (error) {
-      console.error('Error:', error);
     }
   }
 
