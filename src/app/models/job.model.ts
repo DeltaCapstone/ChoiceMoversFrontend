@@ -30,7 +30,7 @@ export interface IEstimate {
     startTime: string;
     endTime: string;
 
-    rooms: Map<string, object>
+    rooms: Array<Room>
     special: Map<string, object>
     small: number;
     medium: number;
@@ -63,7 +63,7 @@ export class Estimate implements IEstimate {
     startTime: string;
     endTime: string;
 
-    rooms: Map<string, object>
+    rooms: Array<Room>
     special: Map<string, object>
     small: number;
     medium: number;
@@ -93,7 +93,7 @@ export class Estimate implements IEstimate {
         unloadAddr: Address = new Address(),
         startTime: string = '',
         endTime: string = '',
-        rooms: Map<string, object> = new Map(),
+        rooms: Array<Room> = [],
         special: Map<string, object> = new Map(),
         small: number = 0,
         medium: number = 0,

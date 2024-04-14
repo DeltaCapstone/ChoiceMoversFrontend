@@ -132,6 +132,7 @@ export class JobsService {
                 }
 
                 return this.http.get<Job[]>(`${this.apiUrl}/employee/jobs?start=${start}&end=${end}`).pipe(
+                    tap(jobs => console.log(jobs)),
                     tap(jobs => this.cacheUpsert(jobs)),
                     switchMap(() => this.cache$.pipe(
                         take(1),
