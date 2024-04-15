@@ -1,5 +1,8 @@
 <section class="w-full h-full flex items-center place-content-center">
     <div class="w-3/6 bg-neutral p-10 ">
+        <div class="text-center mb-8">
+            <h2 class="welcome-text">Welcome to Choice Movers</h2>
+        </div>
         <form [formGroup]="form">
             <div class="tui-row tui-row_sme">
                 <div class="tui-col_8 w-5/6 m-auto mt-8">
@@ -19,11 +22,18 @@
                         <tui-error formControlName="passwordPlain" [error]="[] | tuiFieldError | async"></tui-error>
                     </div>
 
-                    <div class="tui-form__buttons">
-                        <button (click)="login()" Button type="submit"
-                            class="bg-secondary p-3 rounded-md text-lg tui-form__button">
+                    <div class="tui-form__buttons flex justify-between">
+                        <button (click)="login()" type="submit"
+                            class="bg-secondary p-3 rounded-md text-lg">
                             Login
                         </button>
+                        <div class="signup-text">
+                            <span class="font-bold mr-1">Don't have an account?</span>
+                            <a (click)="navigateToCustomerSignup()"
+                               class="text-blue-500 hover:text-blue-700 font-bold cursor-pointer">
+                               Sign up
+                            </a>
+                        </div>
                     </div>
                     <tui-error [error]="computedCredentialsError | async">
                     </tui-error>

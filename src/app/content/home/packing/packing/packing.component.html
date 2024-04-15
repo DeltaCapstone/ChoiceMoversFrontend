@@ -1,4 +1,4 @@
-<div class="relative flex flex-col" style="height: 705px;">
+<div class="relative flex flex-col h-dvh">
   <!-- Container for the background image with responsive height -->
   <div class="relative flex-grow overflow-hidden rounded-2xl">
     <!-- Background image with custom styles and reduced opacity -->
@@ -7,7 +7,7 @@
       style="opacity: 0.2; width: 50%; height: auto;" />
 
     <!-- Centered content including header, icons, and paragraph -->
-    <div class="relative flex flex-col justify-between h-full z-10">
+    <div class="relative flex flex-col h-full z-10">
       <header class="text-center p-4">
         <h1 class="text-3xl font-bold" style="color: white; text-shadow: 3px 3px 0px #000;">Effortless Packing Solutions
         </h1>
@@ -17,35 +17,28 @@
       </header>
 
 
-      <!-- Left arrow -->
-      <div class="absolute left-[42%] top-[35%] transform -translate-x-[0%]] -translate-y-[0%]">
-        <tui-svg src="tuiIconArrowRightLarge" class="icons"></tui-svg>
-      </div>
+      <!-- Icons arranged using Grid -->
+      <div class="icons-container grid grid-cols-5 justify-items-center items-center my-16">
+        <!-- Left arrow -->
+        <tui-svg src="tuiIconArrowRightLarge" class="icons col-span-1 order-[2] icon-left-arrow"></tui-svg>
 
-      <!-- Right arrow -->
-      <div class="absolute right-[42%] top-[35%] transform translate-x-[0%] -translate-y-[0%]">
-        <tui-svg src="tuiIconArrowRightLarge" class="icons"></tui-svg>
-      </div>
+        <!-- Mover -->
+        <tui-svg src="tuiIconUserLarge" class="icons col-span-1 order-[1] icon-mover"></tui-svg>
 
-      <!-- Mover -->
-      <div class="absolute left-[35%] top-[35%] transform translate-x-[0%] -translate-y-[0%]">
-        <tui-svg src="tuiIconUserLarge" class="icons"></tui-svg>
-      </div>
+        <!-- TV -->
+        <tui-svg src="tuiIconTvLarge" class="icons col-span-1 order-[3] icon-tv"></tui-svg>
 
-      <!--  -->
-      <div class="absolute right-[50%] top-[35%] transform translate-x-[0%] -translate-y-[0%]">
-        <tui-svg src="tuiIconTvLarge" class="icons"></tui-svg>
-      </div>
+        <!-- Package -->
+        <tui-svg src="tuiIconPackageLarge" class="icons col-span-1 order-[5] icon-package"></tui-svg>
 
-      <!-- Package -->
-      <div class="absolute right-[35%] top-[35%] transform translate-x-[0%] -translate-y-[0%]">
-        <tui-svg src="tuiIconPackageLarge" class="icons"></tui-svg>
+        <!-- Right arrow -->
+        <tui-svg src="tuiIconArrowRightLarge" class="icons col-span-1 order-[4] icon-right-arrow"></tui-svg>
       </div>
 
 
-      <!-- Bottom text area, centered with padding -->
-      <div class="absolute bottom-0 left-0 right-0 p-10">
-        <div class="mx-auto max-w-4xl text-center">
+      <!-- Bottom text area -->
+      <div class="mt-2 p-10 text-center">
+        <div class="mx-auto max-w-4xl">
           <p class="text-lg font-bold px-10" style="color: white; text-shadow: 2px 2px 0px #000;">
             Discover the convenience of our comprehensive packing services at Choice Movers, tailored for both
             residential and business needs.
