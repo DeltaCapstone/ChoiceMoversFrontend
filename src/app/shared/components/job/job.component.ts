@@ -26,6 +26,7 @@ export class JobComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
     jobSessionState = this.session.scheduleSessionState.jobSessionState;
     assignmentAvailable$ = this.jobSessionState.assignmentAvailable$.asObservable(); 
+    managerAssigned$ = this.jobSessionState.managerAssigned$.asObservable();
     alreadyAssigned$ = this.jobSessionState.alreadyAssigned$.asObservable();
     employeeToBoot$ = this.jobSessionState.employeeToBoot$.asObservable();
     isFull$ = new BehaviorSubject<boolean>(false);

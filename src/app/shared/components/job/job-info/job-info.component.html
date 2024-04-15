@@ -1,29 +1,27 @@
 <div class="h-full p-4" *ngIf="(job$ | async) as job">
     <div class="h-full flex justify-center">
-        <div class="max-w-md">
+        <div class="max-w-[50%]">
             <div class="flex items-center">
                 <div class="flex flex-col text-left justify-center">
-                    <p class="text-4xl">{{ job.customer.email }}</p>
+                    <p class="text-3xl">{{ job.customer.email }}</p>
                 </div>
-                <tui-tag class="ml-5" [value]="status"></tui-tag>
+                <tui-tag class="ml-5" [value]="status" [status]="job?.finalized ? 'success' : 'error'"></tui-tag>
             </div>
 
-            <section class="ml-6 mt-6">
+            <form [formGroup]="form" class="ml-6 mt-6">
                 <div class="flex flex-wrap gap-2">
-                    <ng-container *ngFor="let item of checked; index as i">
-                        <label tuiLabel class="flex items-center gap-2">
-                            <input tuiCheckbox type="checkbox" [(ngModel)]="checked[i][1]" class="tui-checkbox" />
-                            <span>{{ checked[i][0] }}</span>
-                        </label>
-                    </ng-container>
+                    <tui-checkbox-labeled formControlName="needTruck" [readOnly]=true>Truck</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="load" [readOnly]=true>load</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="unload" [readOnly]=true>unload</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="unpack" [readOnly]=true>unpack</tui-checkbox-labeled>
                 </div>
-            </section>
+            </form>
 
             <div class="flex w-full">
                 <div class="tui-container">
                     <form [formGroup]="form">
                         <div class="tui-row tui-row_sme">
-                            <div class="tui-col_8 w-5/6 m-auto mt-8">
+                            <div class="tui-col_8 w-full m-auto mt-8">
                                 <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
                                         <tui-input-date tuiTextfieldSize="m" formControlName="startTime"
@@ -71,12 +69,19 @@
                                     <div class="flex flex-col items-center justify-center tui-form__multi-field">
                                         <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
                                             <span>Rooms</span>
-                                            <span class="opacity-45">5</span>
+                                            <span class="opacity-45">{{ job.rooms.length }}</span>
                                         </div>
                                         <a class="opacity-50 py-0.5 text-left text-m w-3/4">More info...</a>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="tui-form__buttons">
+                            <button *ngIf="isEditing" (click)="save()" tuiButton type="submit"
+                                class="gradient-button bg-secondary rounded-md text-lg tui-form__button">
+                                Save
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -84,17 +89,25 @@
         </div>
 
         <tui-loader class="h-min max-w-lg tui-container" [showLoader]="(mapLoading | async) ?? false" [overlay]="true">
-            <div class="max-w-lg h-min tui-container flex flex-col justify-center items-center">
+            <div class="min-w-[25%] max-w-[75%] h-min tui-container flex flex-col justify-center items-center">
                 <div class="flex flex-col items-center justify-center p-2 bg-[white] w-[550px] h-min">
                     <form class="w-full flex flex-col" [formGroup]="form">
-                        <label class="mb-2">
+                        <tui-input [readOnly]=true formControlName="loadAddr" class="mb-2">
+                            Load address
+                            <input tuiTextfield />
+                        </tui-input>
+                        <tui-input [readOnly]=true formControlName="unloadAddr">
+                            Unload address
+                            <input tuiTextfield />
+                        </tui-input>
+                        <!-- <label class="mb-2">
                             <span class="mr-2">Load address</span>
                             <input class="w-full" formControlName="loadAddr" id="loadAddr" #loadAddr>
                         </label>
                         <label>
                             <span class="mr-2">Unload address</span>
                             <input class="w-full" formControlName="unloadAddr" id="unloadAddr" #unloadAddr>
-                        </label>
+                        </label> -->
                     </form>
                 </div>
                 <google-map id="map" [options]="mapOptions" width="550px" height="500px">

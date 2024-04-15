@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, catchError, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FeatureService } from './feature.service';
-import { AssignmentConflictType, Job } from '../../models/job.model';
+import { AssignmentConflictType, IJob, Job } from '../../models/job.model';
 import { AssignedEmployee } from '../../models/employee';
 import { CreateJobEstimate, ICreateJobEstimate } from '../../models/create-job-estimate.model';
 
@@ -31,14 +31,13 @@ export class JobsService {
         return this.http.post<CreateJobEstimate>(`${this.apiUrl}/customer/estimate`, newJob);
     }
 
-    // TODO: needs implemented on the backend
     createCustomerJob(newJobID: number) {
         return this.http.post<Object>(`${this.apiUrl}/customer/estimate/convert`, { estimateId: newJobID });
     }
 
-    // TODO: needs implemented on the backend
-    updateCustomerJob(updatedJob: Job): Observable<Job> {
-        return this.http.put<Job>(`${this.apiUrl}/customer/job/${updatedJob.jobId}`, updatedJob);
+    updateCustomerJob(updatedJob: IJob): Observable<IJob> {
+        console.log(updatedJob);
+        return this.http.post<IJob>(`${this.apiUrl}/manager/job/update`, updatedJob);
     }
 
 
@@ -54,6 +53,9 @@ export class JobsService {
                 switch (err.error) {
                     case AssignmentConflictType.JobFull:
                         errorType = AssignmentConflictType.JobFull;
+                        break;
+                    case AssignmentConflictType.ManagerAssigned:
+                        errorType = AssignmentConflictType.ManagerAssigned;
                         break;
                     case AssignmentConflictType.AlreadyAssigned:
                         errorType = AssignmentConflictType.AlreadyAssigned;

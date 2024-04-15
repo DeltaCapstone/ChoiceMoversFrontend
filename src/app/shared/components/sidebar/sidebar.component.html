@@ -1,45 +1,45 @@
 <section class="h-full bg-neutral text-black font-bold">
-  <div>
-    <img src="/assets/logo.png" />
-  </div>
+    <div>
+        <img src="/assets/logo.png" />
+    </div>
 
-  <div>
+    <div>
 
-  </div>
+    </div>
 
-  <div>
-    <ul>
-      <li *ngIf="user$ | async as user" class="mb-2 mt-2">
-        <tui-hosted-dropdown class="w-full" tuiDropdownAlign="right" [content]="dropdown" [sided]="true" [(open)]="dropdownOpen">
-          <button
-            [ngClass]="{'elevated': dropdownOpen || profileOpen}"
-            class="bg-neutral flex w-full transition-transform transition-all duration-100 ease-in hover:drop-shadow">
-            <div class="flex items-center p-2">
-              <tui-avatar [text]="user.firstName + ' ' + user.lastName"></tui-avatar>
-            </div>
-            <div class="flex flex-col text-left justify-center">
-              <p class="text-xl">{{ user.firstName + ' ' + user.lastName }}</p>
-              <span class="text-base opacity-50">{{ user.employeeType }}</span>
-            </div>
-          </button>
-        </tui-hosted-dropdown>
-        
-        <ng-template #dropdown>
-          <tui-data-list class="bg-neutral">
-            <tui-opt-group>
-              <button *ngIf="!profileOpen" (click)="openProfile()" tuiOption >Edit</button>
-              <button (click)="logout()" tuiOption >Log out</button>
-            </tui-opt-group>
-          </tui-data-list>
-        </ng-template>
-      </li>
+    <div>
+        <ul>
+            <li *ngIf="user$ | async as user" class="mb-2 mt-2">
+                <tui-hosted-dropdown class="w-full" tuiDropdownAlign="right" [content]="dropdown" [sided]="true"
+                    [(open)]="dropdownOpen">
+                    <button [ngClass]="{'elevated': dropdownOpen || profileOpen}"
+                        class="bg-neutral flex w-full transition-transform transition-all duration-100 ease-in hover:drop-shadow">
+                        <div class="flex items-center p-2">
+                            <tui-avatar [text]="user.firstName + ' ' + user.lastName"></tui-avatar>
+                        </div>
+                        <div class="flex flex-col text-left justify-center">
+                            <p class="text-xl">{{ user.firstName + ' ' + user.lastName }}</p>
+                            <span class="text-base opacity-50">{{ user.employeeType }}</span>
+                        </div>
+                    </button>
+                </tui-hosted-dropdown>
 
-      <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of sidebarItems$ | async">
-        <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
-          <tui-svg [src]="item.icon"></tui-svg>
-          <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.name }}</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+                <ng-template #dropdown>
+                    <tui-data-list class="bg-neutral">
+                        <tui-opt-group>
+                            <button *ngIf="!profileOpen" (click)="openProfile()" tuiOption>Edit</button>
+                            <button (click)="logout()" tuiOption>Log out</button>
+                        </tui-opt-group>
+                    </tui-data-list>
+                </ng-template>
+            </li>
+
+            <li class="sidebar-item mb-3" routerLinkActive="bg-secondary" *ngFor="let item of sidebarItems$ | async">
+                <a [routerLink]="item.route" class="flex items-center cursor-pointer block h-full w-full p-4">
+                    <tui-svg [src]="item.icon"></tui-svg>
+                    <span routerLinkActive="text-neutral" class="ml-2 text-lg select-none">{{ item.name }}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 </section>

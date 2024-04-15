@@ -77,10 +77,12 @@ export class SessionService<T> {
         localStorage.clear();
         sessionStorage.clear();
         this.scheduleSessionState.clear();
+        this.movePlannerSessionState.clear();
         this.user$.next(undefined);
     }
 
     getUser(): Observable<T | undefined> {
+        console.log("getting user");
         return this.user$;
     }
 
@@ -109,6 +111,10 @@ export class SessionService<T> {
                 console.log(res);
                 if (typeof res === 'string') {
                     switch (res) {
+                        case AssignmentConflictType.ManagerAssigned:
+                            jobSessionState.alreadyAssigned$.next(true);
+                            jobSessionState.managerAssigned$.next(true);
+                            break;
                         case AssignmentConflictType.AlreadyAssigned:
                             jobSessionState.alreadyAssigned$.next(true);
                             break;

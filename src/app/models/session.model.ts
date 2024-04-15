@@ -12,6 +12,7 @@ export interface ISessionState {
 export interface IJobSessionState {
     jobId: string;
     employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
+    managerAssigned$: ReplaySubject<boolean>;
     alreadyAssigned$: ReplaySubject<boolean>;
     assignmentAvailable$: ReplaySubject<boolean>;
     directionsResults$: ReplaySubject<google.maps.DirectionsResult | undefined>;
@@ -52,6 +53,7 @@ export class JobSessionState implements IJobSessionState, ISessionState {
     jobsService: JobsService;
     jobId = "";
     employeeToBoot$ = new ReplaySubject<AssignedEmployee | null>(1);
+    managerAssigned$ = new ReplaySubject<boolean>(1);
     alreadyAssigned$ = new ReplaySubject<boolean>(1);
     assignmentAvailable$ = new ReplaySubject<boolean>(1);
     directionsResults$ = new ReplaySubject<google.maps.DirectionsResult | undefined>(1);
@@ -59,6 +61,7 @@ export class JobSessionState implements IJobSessionState, ISessionState {
     constructor(jobId: string = "") {
         this.jobId = jobId;
         this.employeeToBoot$.next(null);
+        this.managerAssigned$.next(false);
         this.alreadyAssigned$.next(false);
         this.assignmentAvailable$.next(false);
         this.directionsResults$.next(undefined);
@@ -68,6 +71,7 @@ export class JobSessionState implements IJobSessionState, ISessionState {
     clear(): void {
         this.jobId = "";
         this.employeeToBoot$.next(null);
+        this.managerAssigned$.next(false);
         this.alreadyAssigned$.next(false);
         this.assignmentAvailable$.next(false);
         this.directionsResults$.next(undefined);

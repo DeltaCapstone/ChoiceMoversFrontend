@@ -1,21 +1,21 @@
 import { Address } from "./address.model";
 import { Customer } from "./customer.model";
-import { AssignedEmployee, Employee } from "./employee";
+import { AssignedEmployee } from "./employee";
 import { Room } from "./room.model";
 
 /**
  * Interface that describes the Job type
  */
 export interface IJob {
+    estimateId: number;
     jobId: string;
-    manHours: number;
+    manHours: string;
     rate: number;
     cost: number;
     finalized: boolean;
-    actualManHours: number;
+    actualManHours: string;
     finalCost: number;
     amountPaid: number;
-    assignedEmployees: AssignedEmployee[];
     notes: string;
 }
 
@@ -23,7 +23,7 @@ export interface IJob {
  * Interface that describes the estimate type
  */
 export interface IEstimate {
-    estimateID: number;
+    estimateId: number;
     customer: Customer;
     loadAddr: Address;
     unloadAddr: Address;
@@ -56,7 +56,7 @@ export interface IEstimate {
 }
 
 export class Estimate implements IEstimate {
-    estimateID: number;
+    estimateId: number;
     customer: Customer;
     loadAddr: Address;
     unloadAddr: Address;
@@ -87,7 +87,7 @@ export class Estimate implements IEstimate {
     estimateCost: number;
 
     constructor(
-        estimateID: number = 0,
+        estimateId: number = 0,
         customer: Customer = new Customer(),
         loadAddr: Address = new Address(),
         unloadAddr: Address = new Address(),
@@ -114,7 +114,7 @@ export class Estimate implements IEstimate {
         estimateRate: number = 0,
         estimateCost: number = 0
     ) {
-        this.estimateID = estimateID;
+        this.estimateId = estimateId;
         this.customer = customer;
         this.loadAddr = loadAddr;
         this.unloadAddr = unloadAddr;
@@ -147,17 +147,17 @@ export class Estimate implements IEstimate {
  */
 export class Job extends Estimate implements IJob, IEstimate {
     jobId: string;
-    manHours: number;
+    manHours: string;
     rate: number;
     cost: number;
     finalized: boolean;
-    actualManHours: number;
+    actualManHours: string;
     finalCost: number;
     amountPaid: number;
     assignedEmployees: AssignedEmployee[];
     notes: string;
 
-    constructor(jobId: string = "", manHours: number = 0, rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: number = 0,
+    constructor(jobId: string = "", manHours: string = "P0T0h0m0s", rate: number = 0, cost: number = 0, finalized: boolean = false, actualManHours: string = "P0T0h0m0s",
         finalCost: number = 0, amountPaid: number = 0, assignedEmployees: AssignedEmployee[] = [], notes: string = "") {
         super();
         this.jobId = jobId;
@@ -177,5 +177,6 @@ export class Job extends Estimate implements IJob, IEstimate {
 
 export enum AssignmentConflictType {
     JobFull = "JOB_FULL",
+    ManagerAssigned = "MANAGER_ASSIGNED",
     AlreadyAssigned = "ALREADY_ASSIGNED"
 }
