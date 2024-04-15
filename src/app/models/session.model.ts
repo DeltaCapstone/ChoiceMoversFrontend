@@ -21,17 +21,23 @@ export interface ICreateEstimateSessionState {
     currentJob: CreateJobEstimate;
     currentCustomer: BehaviorSubject<Customer | null>;
     activeStepIndex: number;
+    estimateAmount: BehaviorSubject<number | null>;
+    estimateID: BehaviorSubject<number | null>;
 }
 
 export class CreateEstimateSessionState implements ICreateEstimateSessionState, ISessionState {
     currentJob = new CreateJobEstimate();
     currentCustomer = new BehaviorSubject<Customer | null>(null);
     activeStepIndex = 0;
+    estimateAmount = new BehaviorSubject<number | null>(null);
+    estimateID = new BehaviorSubject<number | null>(null);
 
     clear(): void {
         this.currentJob = new CreateJobEstimate();
         this.currentCustomer.next(new Customer());
         this.activeStepIndex = 0;
+        this.estimateAmount.next(null);
+        this.estimateID.next(null);
     }
 }
 

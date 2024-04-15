@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ElementRef, Inject } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
@@ -13,7 +13,7 @@ import { Customer } from '../../../../models/customer.model';
 import { ValueTransformerService } from '../../../../shared/services/value-transformer.service';
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 import { SessionService } from '../../../../shared/services/session.service';
-import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
+import { CreateEstimateSessionState } from '../../../../models/session.model';
 import { Observable, Subscription, of } from 'rxjs';
 import { CustomerSessionServiceToken } from '../../../../app.config';
 import { JobsService } from '../../../../shared/services/jobs.service';
@@ -117,7 +117,7 @@ export class MovePlannerComponent extends PageComponent {
 
   newJob: CreateJobEstimate = new CreateJobEstimate();
 
-  jobSessionState = this._customerSession.movePlannerSessionState;
+  jobSessionState: CreateEstimateSessionState;
 
   subscriptions: Subscription[] = [];
 
@@ -139,6 +139,8 @@ export class MovePlannerComponent extends PageComponent {
     super(pageService);
 
     this.activeUser$ = new Observable<Customer | undefined>;
+
+    this.jobSessionState = this._customerSession.movePlannerSessionState;
 
     // Initialize the itemsGroup FormGroup
     this.itemsGroup = this._formBuilder.group({});
@@ -177,7 +179,9 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   ngAfterViewInit() {
+    console.log('this.jobSessionState.currentJob.rooms in ngAfterViewInit before calling this.refreshMovePlannerState', this.jobSessionState.currentJob.rooms);
     this.refreshMovePlannerState(this.jobSessionState);
+    console.log('this.jobSessionState.currentJob.rooms in ngAfterViewInit after calling this.refreshMovePlannerState', this.jobSessionState.currentJob.rooms);
   }
 
   /**
@@ -242,7 +246,7 @@ export class MovePlannerComponent extends PageComponent {
       fromZip: new FormControl('', Validators.required),
       fromResidenceType: new FormControl(''),
       fromFlights: new FormControl(0),
-      fromAptNumUnitOrSuite: new FormControl('', Validators.required),
+      fromAptNumUnitOrSuite: new FormControl(''),
     });
 
     this.toAddressResType = this._formBuilder.group({
@@ -261,7 +265,7 @@ export class MovePlannerComponent extends PageComponent {
       toZip: new FormControl('', Validators.required),
       toResidenceType: new FormControl(''),
       toFlights: new FormControl(0),
-      toAptNumUnitOrSuite: new FormControl('', Validators.required)
+      toAptNumUnitOrSuite: new FormControl('')
     });
 
     this.roomsGroup = this._formBuilder.group({
@@ -313,24 +317,13 @@ export class MovePlannerComponent extends PageComponent {
 
     this.activeStepIndex = index;
 
-    if (this.activeStepIndex === 5) {
-      this._googleMapsLoaderService.initFromAutoComplete();
-    }
-
-    if (this.activeStepIndex === 8) {
-      this._googleMapsLoaderService.initToAutoComplete();
-    }
-
     if (this.activeStepIndex === 9) {
-      this.writeFromAddressValuesToForm(this._googleMapsLoaderService.fromAutocomplete);
-      this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
       this.extractDistanceToJobMileage();
       this.extractDistanceBetweenAddressesMileage();
     }
 
     if (this.activeStepIndex === 10) {
       this.populateRoomItems();
-      console.log('Job Session State at index 11:', this.jobSessionState);
     }
 
     this.specialRequestSubmissionSuccess = false;
@@ -415,18 +408,12 @@ export class MovePlannerComponent extends PageComponent {
     //RoomsGroup
     this.jobSessionState.currentJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
 
-    console.log('Current Job.rooms is:', this.jobSessionState.currentJob.rooms);
-
     //ItemsGroup
     this.jobSessionState.currentJob.rooms.forEach(room => {
       const roomFormGroup = this.roomsGroup.get(room.roomName);
-
       if (roomFormGroup) {
         room.items.forEach((count, itemName) => {
-          const itemControl = roomFormGroup.get(itemName);
-          if (itemControl) {
-            itemControl.patchValue(count);
-          }
+          room.items.set(itemName, this.itemsGroup.get(`${room.roomName}${itemName.replaceAll(' ', '')}`)?.value);
         });
       }
     });
@@ -511,7 +498,7 @@ export class MovePlannerComponent extends PageComponent {
     }, { emitEvent: false });
 
     //RoomsGroup
-    console.log('Right before refreshing rooms group value is:', sessionStateObject);
+    console.log('Right before refreshing rooms group value is:', sessionStateObject.currentJob.rooms);
     sessionStateObject.currentJob.rooms.forEach(room => {
       const roomControls = this.roomsGroup.controls;
       if (roomControls.hasOwnProperty(room.roomName)) {
@@ -524,10 +511,10 @@ export class MovePlannerComponent extends PageComponent {
     //ItemsGroup
     sessionStateObject.currentJob.rooms.forEach(room => {
       room.items.forEach((value, name) => {
-        const itemControl = this.itemsGroup.get(name);
-        console.log('ItemControl in refreshMovePlannerState is:', itemControl);
-        if (itemControl && itemControl instanceof FormControl) {
-          itemControl.patchValue(value, { emitEvent: false });
+        const itemControl = `${room.roomName}` + name.replaceAll(' ', '');
+        console.log('Item value in refresheMovePlannerState is:', itemControl, value);
+        if (itemControl) {
+          this.itemsGroup.get(itemControl)?.patchValue(value, { emitEvent: false });
         } else {
           console.log('error patching item values');
         }
@@ -544,9 +531,11 @@ export class MovePlannerComponent extends PageComponent {
       }
     })
 
-    //SpecialtyGroup TODO: NOT WORKING AS INTENDED
-    this.specialtyGroup.patchValue(sessionStateObject.currentJob.special);
+    //SpecialtyGroup
+    this.specialtyGroup.patchValue(sessionStateObject.currentJob.special, { emitEvent: false });
 
+    /*
+    //SpecialRequestGroup TODO: NOT WORKING AS INTENDED
     const specialRequestFormArray = sessionStateObject.currentJob.specialRequests;
 
     const formTextArea = this.specialRequestGroup.get('specialTextArea');
@@ -554,8 +543,9 @@ export class MovePlannerComponent extends PageComponent {
     specialRequestFormArray.forEach(request => {
       formTextArea?.patchValue(request);
     });
+    */
 
-    //TODO: NOT WORKING AS INTENDED
+    //TODO: NOT WORKING AS INTENDED???
     //ActiveStepIndex
     this.activeStepIndex = sessionStateObject.activeStepIndex;
   }
@@ -570,15 +560,21 @@ export class MovePlannerComponent extends PageComponent {
       .filter(([roomName, roomControl]) => roomControl.value)
       .map(([roomName]) => roomName);
 
+    const sessionRoomsArray = this.jobSessionState.currentJob.rooms
+
     // Iterate over the selected rooms
     this.checkedRooms.forEach(roomName => {
       // Retrieve room items based on the roomName
       const itemsMap = this.getRoomItems(roomName);
 
       for (const item of itemsMap.keys()) {
-        this.itemsGroup.addControl(item, new FormControl(0));
+        this.itemsGroup.addControl(`${roomName}${item.replaceAll(' ', '')}`, new FormControl());
       }
     });
+
+    this.jobSessionState.currentJob.rooms = sessionRoomsArray;
+
+    this.refreshMovePlannerState(this.jobSessionState);
   }
 
   /**
@@ -682,8 +678,6 @@ export class MovePlannerComponent extends PageComponent {
       let roomToAdd = new Room(roomName, new Map<string, number>());
       chosenRooms.push(roomToAdd);
     });
-
-    console.log('checked rooms is:', this.checkedRooms);
     return chosenRooms;
   }
 
@@ -702,77 +696,18 @@ export class MovePlannerComponent extends PageComponent {
         //iterate over room's associated items
         room.items.forEach((value, name) => {
           //get user input count for number of items based on FormControl
-          let control = this.itemsGroup.get(name);
-          let itemCount = control ? (control.value as number) : 0;
+          let control = `${room?.roomName}` + name.replaceAll(' ', '');
+          //console.log('Control value in populateFormItems is:', control);
+          let itemCount = control ? (this.itemsGroup.get(control)?.value as number) : 0;
 
           itemsMap.set(name, itemCount);
-
+          //console.log('Items map value in populateFormItems is:', itemsMap);
         });
         formRoom.setItems(itemsMap);
         itemsForRooms.push(formRoom);
       }
     });
     return itemsForRooms;
-  }
-
-  /**
-   * Takes a google maps autocomplete object and writes the associated 'from' address components to the Move Planner form
-   * @param autocomplete Autocomplete object that contains the user's 'moving from' address
-   */
-  writeFromAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    const place = autocomplete.getPlace();
-    console.log('From Place object value:', place);
-    place.address_components?.forEach(component => {
-      switch (component.types[0]) {
-        case 'street_number':
-          this.fromAddressGroup.get('fromAddressStreetNumber')?.setValue(component.short_name);
-          break;
-        case 'route':
-          this.fromAddressGroup.get('fromAddressStreetName')?.setValue(component.short_name);
-          break;
-        case 'locality':
-          this.fromAddressGroup.get('fromCity')?.setValue(component.short_name);
-          break;
-        case 'administrative_area_level_1':
-          this.fromAddressGroup.get('fromState')?.setValue(component.short_name);
-          break;
-        case 'postal_code':
-          this.fromAddressGroup.get('fromZip')?.setValue(component.short_name);
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  /**
-   * Takes a google maps autocomplete object and writes the associated 'to' address components to the Move Planner form
-   * @param autocomplete Autocomplete object that contains the user's 'moving to' address
-   */
-  writeToAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    const place = autocomplete.getPlace();
-    console.log('To Place object value:', place);
-    place.address_components?.forEach(component => {
-      switch (component.types[0]) {
-        case 'street_number':
-          this.toAddressGroup.get('toAddressStreetNumber')?.setValue(component.short_name);
-          break;
-        case 'route':
-          this.toAddressGroup.get('toAddressStreetName')?.setValue(component.short_name);
-          break;
-        case 'locality':
-          this.toAddressGroup.get('toCity')?.setValue(component.short_name);
-          break;
-        case 'administrative_area_level_1':
-          this.toAddressGroup.get('toState')?.setValue(component.short_name);
-          break;
-        case 'postal_code':
-          this.toAddressGroup.get('toZip')?.setValue(component.short_name);
-          break;
-        default:
-          break;
-      }
-    });
   }
 
   /**
@@ -867,8 +802,10 @@ export class MovePlannerComponent extends PageComponent {
       this.newJob.customer = customer ?? new Customer();
 
       this._jobsService.createCustomerEstimate(this.newJob).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           console.log('Customer estimate created successfully', response);
+          this.jobSessionState.estimateAmount.next(response.result.estimatedCost);
+          this.jobSessionState.estimateID.next(response.result.estimateId);
         },
         error: (error) => {
           console.error('Error creating customer estimate', error);
