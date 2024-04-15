@@ -73,7 +73,6 @@ export class GoogleMapsLoaderService {
   async initFromAutoComplete(): Promise<void> {
     try {
       const { Autocomplete } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
-      console.log('Entered initFromAutocomplete');
       this.fromAddress1Field = document.querySelector("#fromStreetAddress") as HTMLInputElement;
       this.fromAddress2Field = document.querySelector("#fromAptNumUnitOrSuite") as HTMLInputElement;
       this.fromPostalField = document.querySelector("#fromPostcode") as HTMLInputElement;
@@ -84,7 +83,6 @@ export class GoogleMapsLoaderService {
         fields: ["address_components", "geometry"],
         types: ["address"],
       });
-      console.log('Initialized fromAutocomplete');
       this.fromAddress1Field.focus();
 
       // complete address fields based on user selection from autocomplete dropdown, call fillInFrom address once change detected
@@ -177,7 +175,6 @@ export class GoogleMapsLoaderService {
   async initToAutoComplete(): Promise<void> {
     try {
       const { Autocomplete } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
-      console.log('Entered initToAutocomplete');
       this.toAddress1Field = document.querySelector("#toStreetAddress") as HTMLInputElement;
       this.toAddress2Field = document.querySelector("#toAptNumUnitOrSuite") as HTMLInputElement;
       this.toPostalField = document.querySelector("#toPostcode") as HTMLInputElement;
@@ -188,7 +185,6 @@ export class GoogleMapsLoaderService {
         fields: ["address_components", "geometry"],
         types: ["address"],
       });
-      console.log('Initialized toAutocomplete');
       this.toAddress1Field.focus();
 
       //Populate address form once an address is selected. fillInToAddress called when place_changed happens
@@ -333,8 +329,6 @@ export class GoogleMapsLoaderService {
 
       // Calculated distance between the geocoded locations
       const distanceMatrixResponse = await this.calculateDistanceBetweenAddresses(fromLatLng, toLatLng) as number;
-
-      console.log('Distance Matrix Response:', distanceMatrixResponse);
 
       return distanceMatrixResponse;
 

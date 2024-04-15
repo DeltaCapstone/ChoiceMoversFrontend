@@ -6,6 +6,8 @@ import { Customer } from '../../../models/customer.model';
 import { CommonModule } from '@angular/common';
 import { CreateEstimateSessionState } from '../../../models/session.model';
 import { CustomerSessionServiceToken } from '../../../app.config';
+import { BehaviorSubject, take } from 'rxjs';
+import { JobsService } from '../../../shared/services/jobs.service';
 
 @Component({
   selector: 'app-customer-summary',
@@ -18,10 +20,37 @@ export class CustomerSummaryComponent {
 
   jobSessionState: CreateEstimateSessionState;
 
-  constructor(private _router: Router, @Inject(CustomerSessionServiceToken) private _customerSession: SessionService<Customer>) { }
+  estimateCost$: BehaviorSubject<number | null>;
+
+  estimateID$: BehaviorSubject<number | null>;
+
+  constructor(private _router: Router, @Inject(CustomerSessionServiceToken) private _customerSession: SessionService<Customer>, private _jobService: JobsService) {
+    this.estimateCost$ = new BehaviorSubject<number | null>(null);
+    this.estimateID$ = new BehaviorSubject<number | null>(null);
+  }
 
   ngOnInit() {
     this.jobSessionState = this._customerSession.movePlannerSessionState;
+
+    this.estimateCost$ = this.jobSessionState.estimateAmount;
+
+    this.estimateID$ = this.jobSessionState.estimateID;
+  }
+
+  createJobFromEstimate() {
+    this.estimateID$.subscribe({
+      next: (id) => {
+        if (id) {
+          this._jobService.createCustomerJob(id).pipe(
+            take(1)
+          ).subscribe()
+        }
+      },
+      error: (error) => {
+        console.error('Error creating job from estimate', error);
+      }
+    });
+    this._router.navigate(['/home'])
   }
 
   navigateBackToMovePlanner() {

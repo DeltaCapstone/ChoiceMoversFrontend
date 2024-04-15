@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ElementRef, Inject } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { PageService } from '../../../../shared/services/page.service';
 import { PageComponent } from '../../../../shared/components/page-component';
@@ -13,8 +13,8 @@ import { Customer } from '../../../../models/customer.model';
 import { ValueTransformerService } from '../../../../shared/services/value-transformer.service';
 import { GoogleMapsLoaderService } from '../../../../shared/services/google-maps-loader.service';
 import { SessionService } from '../../../../shared/services/session.service';
-import { CreateEstimateSessionState, SessionType } from '../../../../models/session.model';
-import { Observable, Subscription } from 'rxjs';
+import { CreateEstimateSessionState } from '../../../../models/session.model';
+import { Observable, Subscription, of } from 'rxjs';
 import { CustomerSessionServiceToken } from '../../../../app.config';
 import { JobsService } from '../../../../shared/services/jobs.service';
 
@@ -57,7 +57,7 @@ export class MovePlannerComponent extends PageComponent {
 
   activeUser$: Observable<Customer | undefined>;
 
-  currentCustomer: Customer = new Customer();
+  currentCustomer: Observable<Customer> = of(new Customer());
 
   currentFormGroup: FormGroup;
 
@@ -117,7 +117,7 @@ export class MovePlannerComponent extends PageComponent {
 
   newJob: CreateJobEstimate = new CreateJobEstimate();
 
-  jobSessionState = this._customerSession.movePlannerSessionState;
+  jobSessionState: CreateEstimateSessionState;
 
   subscriptions: Subscription[] = [];
 
@@ -140,6 +140,8 @@ export class MovePlannerComponent extends PageComponent {
 
     this.activeUser$ = new Observable<Customer | undefined>;
 
+    this.jobSessionState = this._customerSession.movePlannerSessionState;
+
     // Initialize the itemsGroup FormGroup
     this.itemsGroup = this._formBuilder.group({});
   }
@@ -155,31 +157,33 @@ export class MovePlannerComponent extends PageComponent {
 
     this.subscibeAllFormGroupsToValueChanges();
 
-    this.activeUser$ = this._customerSession.getUser();
     console.log('Active user is:', this.activeUser$);
-    const userSubscription = this.activeUser$.subscribe();
-
-    this.subscriptions.push(userSubscription);
-
-    this.activeUser$.subscribe({
+    const userSubscription = this._customerSession.getUser().subscribe({
       next: (customer) => {
         console.log(customer);
         if (customer) {
-          this.currentCustomer = customer;
+          this.jobSessionState.currentCustomer.next(customer);
         } else {
-          this.currentCustomer = new Customer();
+          console.log('hitting else block for customer assignment')
+          this.jobSessionState.currentCustomer.next(new Customer());
         }
       },
       error: (error) => {
         console.error('An error occurred in creating active user:', error);
       }
-    });
+    });;
+
+    this.subscriptions.push(userSubscription);
+
 
   }
 
   ngAfterViewInit() {
+    console.log('this.jobSessionState.currentJob.rooms in ngAfterViewInit before calling this.refreshMovePlannerState', this.jobSessionState.currentJob.rooms);
     this.refreshMovePlannerState(this.jobSessionState);
+    console.log('this.jobSessionState.currentJob.rooms in ngAfterViewInit after calling this.refreshMovePlannerState', this.jobSessionState.currentJob.rooms);
   }
+
   /**
    * Checks that at least one checkbox of the FormGroup that it is assigned to is checked
    * @returns A function that is used for checking the validation of a checkbox group
@@ -242,7 +246,7 @@ export class MovePlannerComponent extends PageComponent {
       fromZip: new FormControl('', Validators.required),
       fromResidenceType: new FormControl(''),
       fromFlights: new FormControl(0),
-      fromAptNumUnitOrSuite: new FormControl('', Validators.required),
+      fromAptNumUnitOrSuite: new FormControl(''),
     });
 
     this.toAddressResType = this._formBuilder.group({
@@ -261,7 +265,7 @@ export class MovePlannerComponent extends PageComponent {
       toZip: new FormControl('', Validators.required),
       toResidenceType: new FormControl(''),
       toFlights: new FormControl(0),
-      toAptNumUnitOrSuite: new FormControl('', Validators.required)
+      toAptNumUnitOrSuite: new FormControl('')
     });
 
     this.roomsGroup = this._formBuilder.group({
@@ -313,20 +317,9 @@ export class MovePlannerComponent extends PageComponent {
 
     this.activeStepIndex = index;
 
-    if (this.activeStepIndex === 5) {
-      this._googleMapsLoaderService.initFromAutoComplete();
-    }
-
-    if (this.activeStepIndex === 8) {
-      this._googleMapsLoaderService.initToAutoComplete();
-    }
-
     if (this.activeStepIndex === 9) {
-      this.writeFromAddressValuesToForm(this._googleMapsLoaderService.fromAutocomplete);
-      this.writeToAddressValuesToForm(this._googleMapsLoaderService.toAutocomplete);
       this.extractDistanceToJobMileage();
       this.extractDistanceBetweenAddressesMileage();
-      this.totalJobDistanceCalculation();
     }
 
     if (this.activeStepIndex === 10) {
@@ -354,6 +347,7 @@ export class MovePlannerComponent extends PageComponent {
       this.toAddressFlights,
       this.toAddressGroup,
       this.roomsGroup,
+      this.itemsGroup,
       this.boxesGroup,
       this.specialtyGroup
     ];
@@ -361,7 +355,7 @@ export class MovePlannerComponent extends PageComponent {
     allFormGroups.forEach(formGroup => {
       this.subscriptions.push(
         formGroup.valueChanges.subscribe(_ => {
-          this._customerSession.saveMovePlannerValues(this.saveMovePlannerState());
+          this.saveMovePlannerState();
         })
       )
     });
@@ -372,9 +366,6 @@ export class MovePlannerComponent extends PageComponent {
    * in the middle of the move planning process
    */
   saveMovePlannerState(): CreateEstimateSessionState {
-    // console.log('Inside saveMovePlannerState Session Value is:', this.jobSessionState);
-    //Customer
-    this.jobSessionState.currentCustomer = this.currentCustomer;
 
     //ServicesGroup
     this.jobSessionState.currentJob.pack = this.servicesGroup.get('packing')?.value;
@@ -382,7 +373,6 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.load = this.servicesGroup.get('load')?.value;
     this.jobSessionState.currentJob.unload = this.servicesGroup.get('unload')?.value;
 
-    console.log('Need truck value:', this.needTruckGroup.get('needTruck')?.value);
     //NeedTruckGroup
     this.jobSessionState.currentJob.needTruck = this.needTruckGroup.get('needTruck')?.value;
 
@@ -418,13 +408,24 @@ export class MovePlannerComponent extends PageComponent {
     //RoomsGroup
     this.jobSessionState.currentJob.rooms = this.populateFormItems(this.populateFormRooms()) ?? [];
 
+    //ItemsGroup
+    this.jobSessionState.currentJob.rooms.forEach(room => {
+      const roomFormGroup = this.roomsGroup.get(room.roomName);
+      if (roomFormGroup) {
+        room.items.forEach((count, itemName) => {
+          room.items.set(itemName, this.itemsGroup.get(`${room.roomName}${itemName.replaceAll(' ', '')}`)?.value);
+        });
+      }
+    });
+
     //BoxesGroup
-    this.jobSessionState.currentJob.boxes = this.boxesGroup.value ?? new Map();
+    this.jobSessionState.currentJob.boxes = new Map<string, number>(Object.entries(this.boxesGroup.value)) ?? new Map<string, number>;
 
     //SpecialtyGroup
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
 
-    //TODO:Need to add special requests group once it is created on the backend
+    //SpecialRequestsGroup
+    this.jobSessionState.currentJob.specialRequests = this.specialRequestGroup.value ?? [];
 
     //ActiveStepIndex
     this.jobSessionState.activeStepIndex = this.activeStepIndex;
@@ -432,16 +433,13 @@ export class MovePlannerComponent extends PageComponent {
     return this.jobSessionState;
   }
 
-  //TODO: THIS FUNCTION NEEDS TO BE CALLED SOMEWHERE TO REFRESH MOVE PLANNER STATE WHEN CUSTOMER RETURNS TO MOVE PLANNER
   /**
    * Refreshes move planner state if the customer navigates away from the move planner in the middle of planning the move
    * @param sessionStateObject The session object that holds the current move planner session values
    */
   refreshMovePlannerState(sessionStateObject: CreateEstimateSessionState): void {
     console.log('In refreshMovePlanner');
-    console.log('Session state object in function is:', this.jobSessionState);
-    //Customer
-    this.currentCustomer = sessionStateObject.currentCustomer;
+    console.log('Session state object in function is:', sessionStateObject);
 
     // ServicesGroup
     this.servicesGroup.patchValue({
@@ -500,19 +498,56 @@ export class MovePlannerComponent extends PageComponent {
     }, { emitEvent: false });
 
     //RoomsGroup
-    this.populateFormItems(this.jobSessionState.currentJob.rooms) !== null ? this.populateFormItems(sessionStateObject.currentJob.rooms) : [];
+    console.log('Right before refreshing rooms group value is:', sessionStateObject.currentJob.rooms);
+    sessionStateObject.currentJob.rooms.forEach(room => {
+      const roomControls = this.roomsGroup.controls;
+      if (roomControls.hasOwnProperty(room.roomName)) {
+        this.roomsGroup.get(room.roomName)?.patchValue(true, { emitEvent: false });
+      } else {
+        console.log('error patching rooms')
+      }
+    });
+
+    //ItemsGroup
+    sessionStateObject.currentJob.rooms.forEach(room => {
+      room.items.forEach((value, name) => {
+        const itemControl = `${room.roomName}` + name.replaceAll(' ', '');
+        console.log('Item value in refresheMovePlannerState is:', itemControl, value);
+        if (itemControl) {
+          this.itemsGroup.get(itemControl)?.patchValue(value, { emitEvent: false });
+        } else {
+          console.log('error patching item values');
+        }
+      });
+    });
 
     //BoxesGroup
-    this.boxesGroup.setValue(sessionStateObject.currentJob.boxes);
+    sessionStateObject.currentJob.boxes.forEach((value, name) => {
+      const boxControl = this.boxesGroup.get(name);
+      if (boxControl && boxControl instanceof FormControl) {
+        boxControl.patchValue(value, { emitEvent: false });
+      } else {
+        console.log('error patching box value');
+      }
+    })
 
     //SpecialtyGroup
-    this.specialtyGroup.setValue(sessionStateObject.currentJob.special);
+    this.specialtyGroup.patchValue(sessionStateObject.currentJob.special, { emitEvent: false });
 
-    //TODO:Need to add special requests group once it is created on the backend
+    /*
+    //SpecialRequestGroup TODO: NOT WORKING AS INTENDED
+    const specialRequestFormArray = sessionStateObject.currentJob.specialRequests;
 
+    const formTextArea = this.specialRequestGroup.get('specialTextArea');
+
+    specialRequestFormArray.forEach(request => {
+      formTextArea?.patchValue(request);
+    });
+    */
+
+    //TODO: NOT WORKING AS INTENDED???
     //ActiveStepIndex
     this.activeStepIndex = sessionStateObject.activeStepIndex;
-
   }
 
   /**
@@ -525,15 +560,21 @@ export class MovePlannerComponent extends PageComponent {
       .filter(([roomName, roomControl]) => roomControl.value)
       .map(([roomName]) => roomName);
 
+    const sessionRoomsArray = this.jobSessionState.currentJob.rooms
+
     // Iterate over the selected rooms
     this.checkedRooms.forEach(roomName => {
       // Retrieve room items based on the roomName
       const itemsMap = this.getRoomItems(roomName);
 
       for (const item of itemsMap.keys()) {
-        this.itemsGroup.addControl(item, new FormControl());
+        this.itemsGroup.addControl(`${roomName}${item.replaceAll(' ', '')}`, new FormControl());
       }
     });
+
+    this.jobSessionState.currentJob.rooms = sessionRoomsArray;
+
+    this.refreshMovePlannerState(this.jobSessionState);
   }
 
   /**
@@ -637,7 +678,6 @@ export class MovePlannerComponent extends PageComponent {
       let roomToAdd = new Room(roomName, new Map<string, number>());
       chosenRooms.push(roomToAdd);
     });
-
     return chosenRooms;
   }
 
@@ -654,13 +694,14 @@ export class MovePlannerComponent extends PageComponent {
         let itemsMap = new Map<string, number>();
 
         //iterate over room's associated items
-        room.items.forEach((value, key) => {
+        room.items.forEach((value, name) => {
           //get user input count for number of items based on FormControl
-          let control = this.itemsGroup.get(key);
-          let itemCount = control ? (control.value as number) : 0;
+          let control = `${room?.roomName}` + name.replaceAll(' ', '');
+          //console.log('Control value in populateFormItems is:', control);
+          let itemCount = control ? (this.itemsGroup.get(control)?.value as number) : 0;
 
-          itemsMap.set(key, itemCount);
-
+          itemsMap.set(name, itemCount);
+          //console.log('Items map value in populateFormItems is:', itemsMap);
         });
         formRoom.setItems(itemsMap);
         itemsForRooms.push(formRoom);
@@ -670,69 +711,9 @@ export class MovePlannerComponent extends PageComponent {
   }
 
   /**
-   * Takes a google maps autocomplete object and writes the associated 'from' address components to the Move Planner form
-   * @param autocomplete Autocomplete object that contains the user's 'moving from' address
-   */
-  writeFromAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    const place = autocomplete.getPlace();
-    console.log('From Place object value:', place);
-    place.address_components?.forEach(component => {
-      switch (component.types[0]) {
-        case 'street_number':
-          this.fromAddressGroup.get('fromAddressStreetNumber')?.setValue(component.short_name);
-          break;
-        case 'route':
-          this.fromAddressGroup.get('fromAddressStreetName')?.setValue(component.short_name);
-          break;
-        case 'locality':
-          this.fromAddressGroup.get('fromCity')?.setValue(component.short_name);
-          break;
-        case 'administrative_area_level_1':
-          this.fromAddressGroup.get('fromState')?.setValue(component.short_name);
-          break;
-        case 'postal_code':
-          this.fromAddressGroup.get('fromZip')?.setValue(component.short_name);
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  /**
-   * Takes a google maps autocomplete object and writes the associated 'to' address components to the Move Planner form
-   * @param autocomplete Autocomplete object that contains the user's 'moving to' address
-   */
-  writeToAddressValuesToForm(autocomplete: google.maps.places.Autocomplete): void {
-    const place = autocomplete.getPlace();
-    console.log('To Place object value:', place);
-    place.address_components?.forEach(component => {
-      switch (component.types[0]) {
-        case 'street_number':
-          this.toAddressGroup.get('toAddressStreetNumber')?.setValue(component.short_name);
-          break;
-        case 'route':
-          this.toAddressGroup.get('toAddressStreetName')?.setValue(component.short_name);
-          break;
-        case 'locality':
-          this.toAddressGroup.get('toCity')?.setValue(component.short_name);
-          break;
-        case 'administrative_area_level_1':
-          this.toAddressGroup.get('toState')?.setValue(component.short_name);
-          break;
-        case 'postal_code':
-          this.toAddressGroup.get('toZip')?.setValue(component.short_name);
-          break;
-        default:
-          break;
-      }
-    });
-  }
-
-  /**
    * Function that extracts the numerical value of the Promise<number> and sets the distanceToJob
    */
-  async extractDistanceToJobMileage(): Promise<number | undefined> {
+  async extractDistanceToJobMileage() {
     try {
       const distance = await this._googleMapsLoaderService.geocodeAndCalculateDistance(
         this.choiceMoversAddress,
@@ -743,17 +724,15 @@ export class MovePlannerComponent extends PageComponent {
       this.newJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
       this.jobSessionState.currentJob.distanceToJob = distance !== undefined ? Math.floor(distance) : 0;
 
-      return distance;
     } catch (error) {
       console.error('Error', error);
-      return undefined;
     }
   }
 
   /**
   * Function that extracts the numerical value of the Promise<number> and sets the distanceToJob
   */
-  async extractDistanceBetweenAddressesMileage(): Promise<number | undefined> {
+  async extractDistanceBetweenAddressesMileage() {
     try {
       const distance = await this._googleMapsLoaderService.geocodeAndCalculateDistance(
         this.concatenateAddresses(this.fromAddressGroup),
@@ -761,32 +740,10 @@ export class MovePlannerComponent extends PageComponent {
       );
       console.log('Distance Between Addresses Mileage value is:', distance)
 
-      return distance;
-
+      this.newJob.distanceMove = distance !== undefined ? Math.floor(distance) : 0;
+      this.jobSessionState.currentJob.distanceMove = distance !== undefined ? Math.floor(distance) : 0;
     } catch (error) {
       console.error('Error', error);
-      return undefined;
-    }
-  }
-
-  /**
-   * Calculates total job distance
-   */
-  async totalJobDistanceCalculation() {
-    try {
-      let totalJobDistance: number | undefined = await this.extractDistanceBetweenAddressesMileage();
-      let distanceToJob: number | undefined = await this.extractDistanceToJobMileage();
-      console.log('Total Job distance after initialization', totalJobDistance);
-
-      totalJobDistance !== undefined && distanceToJob !== undefined ? totalJobDistance += distanceToJob : 0;
-      console.log('Total Job distance first assignment', totalJobDistance);
-
-      totalJobDistance !== undefined ? this.newJob.distanceTotal += Math.floor(totalJobDistance) : 0;
-      console.log('Total Job distance second assignment', totalJobDistance);
-      this.jobSessionState.currentJob.distanceTotal = totalJobDistance !== undefined ? Math.floor(totalJobDistance) : 0;
-
-    } catch (error) {
-      console.error('Error:', error);
     }
   }
 
@@ -794,9 +751,8 @@ export class MovePlannerComponent extends PageComponent {
    * Final form submission. Sets the value of the master object newJob, and sends the newly created estimate to the backend database.
    */
   submitForm(): void {
+    console.log('In submit form, customer value is', this.currentCustomer);
     this.boolToString(this.roomsGroup);
-
-    this.newJob.customer = this.currentCustomer;
 
     this.newJob.loadAddr.street = this.fromAddressGroup.get('fromAddressStreetNumber')?.value + ' ' + this.fromAddressGroup.get('fromAddressStreetName')?.value;
     this.newJob.loadAddr.city = this.fromAddressGroup.get('fromCity')?.value;
@@ -821,6 +777,8 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.special = this.specialtyGroup.value ?? [];
 
+    this.newJob.specialRequests = this.specialRequestGroup.get('specialTextArea')?.value ?? [];
+
     this.newJob.boxes = this.boxesGroup.value ?? new Map();
 
     this.newJob.pack = this.servicesGroup.value.packing;
@@ -834,17 +792,26 @@ export class MovePlannerComponent extends PageComponent {
 
     console.log('New Job object value:', this.newJob);
 
-    console.log('Job session state value:', this.jobSessionState)
+    console.log('Job session state value:', this.jobSessionState);
 
-    this._jobsService.createCustomerEstimate(this.newJob).subscribe({
-      next: (response) => {
-        console.log('Customer estimate created successfully', response);
-      },
-      error: (error) => {
-        console.error('Error creating customer estimate', error);
-      }
-    });
+    this.newJob.rooms.forEach(room => {
+      room.items = Object.fromEntries(room.items) as any;
+    })
 
+    this.jobSessionState.currentCustomer.subscribe(customer => {
+      this.newJob.customer = customer ?? new Customer();
+
+      this._jobsService.createCustomerEstimate(this.newJob).subscribe({
+        next: (response: any) => {
+          console.log('Customer estimate created successfully', response);
+          this.jobSessionState.estimateAmount.next(response.result.estimatedCost);
+          this.jobSessionState.estimateID.next(response.result.estimateId);
+        },
+        error: (error) => {
+          console.error('Error creating customer estimate', error);
+        }
+      });
+    })
     this._router.navigate(['home/customer-summary']);
   }
 

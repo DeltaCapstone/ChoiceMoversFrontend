@@ -78,32 +78,36 @@
         Moving From Address
         <ng-container *ngIf="this.activeStepIndex === 5">
             <div class="absolute inset-x-0 top-full mt-4">
-                <form [formGroup]="fromAddressGroup">
+                <form [formGroup]="fromAddressGroup" autocomplete="on">
                     <label>
                         <span>Moving From Address*</span>
-                        <input id="fromStreetAddress" name="fromStreetAddress" required autocomplete="off"
-                            #fromStreetAddress />
+                        <input id="fromStreetAddress" name="fromStreetAddress" formControlName="fromAddressStreetNumber"
+                            autocomplete="address-line1" #fromStreetAddress />
                     </label>
                     <label>
                         <span>Apartment, unit, suite, or floor #</span>
                         <input id="fromAptNumUnitOrSuite" name="fromAptNumUnitOrSuite"
-                            formControlName="fromAptNumUnitOrSuite" #fromAptNumUnitOrSuite />
+                            formControlName="fromAptNumUnitOrSuite" autocomplete="address-line2"
+                            #fromAptNumUnitOrSuite />
                     </label>
                     <label>
                         <span>City*</span>
-                        <input id="fromLocality" name="fromLocality" #fromLocality />
+                        <input id="fromLocality" name="fromLocality" formControlName="fromCity"
+                            autocomplete="address-level2" #fromLocality />
                     </label>
                     <label>
                         <span>State/Province*</span>
-                        <input id="fromState" name="fromState" #fromState />
+                        <input id="fromState" name="fromState" formControlName="fromState" autocomplete="address-level1"
+                            #fromState />
                     </label>
                     <label for="postal_code">
                         <span>Postal code*</span>
-                        <input id="fromPostcode" name="fromPostcode" required #fromPostcode />
+                        <input id="fromPostcode" name="fromPostcode" formControlName="fromZip"
+                            autocomplete="postal-code" #fromPostcode />
                     </label>
                     <label>
                         <span>Country/Region*</span>
-                        <input id="fromCountry" name="fromCountry" required #fromCountry />
+                        <input id="fromCountry" name="fromCountry" autocomplete="country-name" #fromCountry />
                     </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!fromAddressGroup.valid">
@@ -143,32 +147,35 @@
         Moving To Address
         <ng-container *ngIf="activeStepIndex === 8">
             <div class="absolute inset-x-0 top-full mt-4">
-                <form [formGroup]="toAddressGroup">
+                <form [formGroup]="toAddressGroup" autocomplete="on">
                     <label>
                         <span>Moving To Address*</span>
-                        <input id="toStreetAddress" name="toStreetAddress" required autocomplete="off"
-                            #toStreetAddress />
+                        <input id="toStreetAddress" name="toStreetAddress" formControlName="toAddressStreetNumber"
+                            autocomplete="address-line1" #toStreetAddress />
                     </label>
                     <label>
                         <span>Apartment, unit, suite, or floor #</span>
                         <input id="toAptNumUnitOrSuite" name="toAptNumUnitOrSuite" formControlName="toAptNumUnitOrSuite"
-                            #toAptNumUnitOrSuite />
+                            autocomplete="address-line2" #toAptNumUnitOrSuite />
                     </label>
                     <label>
                         <span>City*</span>
-                        <input id="toLocality" name="toLocality" required #toLocality />
+                        <input id="toLocality" name="toLocality" formControlName="toCity" autocomplete="address-level2"
+                            #toLocality />
                     </label>
                     <label>
                         <span>State/Province*</span>
-                        <input id="toState" name="toState" required #toState />
+                        <input id="toState" name="toState" formControlName="toState" autocomplete="address-level1"
+                            #toState />
                     </label>
                     <label for="postal_code">
                         <span>Postal code*</span>
-                        <input id="toPostcode" name="toPostcode" required #toPostcode />
+                        <input id="toPostcode" name="toPostcode" formControlName="toZip" autocomplete="postal-code"
+                            required #toPostcode />
                     </label>
                     <label>
                         <span>Country/Region*</span>
-                        <input id="toCountry" name="toCountry" required #toCountry />
+                        <input id="toCountry" name="toCountry" autocomplete="country-name" #toCountry />
                     </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!toAddressGroup.valid">
@@ -221,7 +228,7 @@
                                     <!--Populate room items-->
                                     <tui-input-number [min]="0" class="b-form"
                                         *ngFor="let item of room.items | keyvalue"
-                                        formControlName="{{item.key}}">{{item.key}}
+                                        formControlName="{{room.roomName + item.key.replaceAll(' ','')}}">{{item.key}}
                                     </tui-input-number>
                                 </form>
                             </ng-template>

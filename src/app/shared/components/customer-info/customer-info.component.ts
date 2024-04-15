@@ -101,7 +101,6 @@ export class CustomerInfoComponent extends BaseComponent {
       });
     });
     this.subscriptions.push(saveSub);
-    this._router.navigate(['/home']);
   }
 
   back() {

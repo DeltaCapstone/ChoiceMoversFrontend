@@ -15,26 +15,28 @@
     flex-direction: column;
     justify-content: center;
     text-align: left;
-    position: relative; /* Ensure .review provides a positioning context for its children */
+    position: relative;
+    /* Ensure .review provides a positioning context for its children */
   }
-  
+
   .review-author,
   .review-rating,
   .review-text {
     margin-bottom: 0.5rem;
     text-align: left;
   }
- 
+
   .review-author {
     font-weight: bold;
-    margin-bottom: 1rem; /* Space between author name and review text */
- 
+    margin-bottom: 1rem;
+    /* Space between author name and review text */
+
   }
 
   .review-rating {
     position: absolute;
-    top: 1rem; 
-    right: 1.5rem; 
+    top: 1rem;
+    right: 1.5rem;
     display: flex;
     align-items: center;
   }
@@ -58,18 +60,20 @@
     z-index: 1000;
     scale: .75;
   }
-  
+
   app-google-maps-component {
     pointer-events: auto;
   }
 
   .button-container {
     display: flex;
-    align-items: center; /* Vertically center */
-    justify-content: center; /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    justify-content: center;
+    /* Horizontally center */
     transform: scale(0.65);
   }
-  
+
   app-move-button {
     z-index: 1001;
     pointer-events: auto;
