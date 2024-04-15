@@ -52,7 +52,7 @@ export class CustomerHomeComponent extends PageComponent implements OnInit, OnDe
   }
 
   getReviews() {
-    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=KEYGOESHERE';
+    const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
       this.googleReviews$.next(response);
     });

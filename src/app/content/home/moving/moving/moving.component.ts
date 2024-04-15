@@ -20,39 +20,15 @@ import { FeatureService } from '../../../../shared/services/feature.service';
 })
 
 export class MovingComponent extends PageComponent {
-  googleReviews$: BehaviorSubject<GoogleReviewsResponse | null>;
-  subscriptions: Subscription[] = [];
 
   constructor(
     private featureService: FeatureService,
-    private googleMapsLoaderService: GoogleMapsLoaderService, 
     pageService: PageService) {
     super(pageService);
-    this.googleReviews$ = new BehaviorSubject<GoogleReviewsResponse | null>(null);
   }
 
   ngOnInit() {
     this.setTitle("Moving");
-    this.googleReviews$.subscribe(data => console.log(data));
   }
 
-  ngAfterViewInit() {
-    this.getReviews();
-  }
-
-  getReviews() {
-
-    const url = this.featureService.getFeatureValue("mapsApi").placesUrl;
-
-    const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
-      this.googleReviews$.next(response);
-    });
-
-    this.subscriptions.push(googleReviewSubscription);
-
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
 }

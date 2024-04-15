@@ -3,7 +3,7 @@
  */
 export interface IRoom {
     roomName: string;
-    items: Map<string, number>;
+    items: Map<string, number> | Object;
 }
 
 /**

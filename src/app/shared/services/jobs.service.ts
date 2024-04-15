@@ -32,8 +32,8 @@ export class JobsService {
     }
 
     // TODO: needs implemented on the backend
-    createCustomerJob(newJob: Job): Observable<Job> {
-        return this.http.post<Job>(`${this.apiUrl}/customer/job`, newJob);
+    createCustomerJob(newJobID: number) {
+        return this.http.post<Object>(`${this.apiUrl}/customer/estimate/convert`, { estimateId: newJobID });
     }
 
     // TODO: needs implemented on the backend

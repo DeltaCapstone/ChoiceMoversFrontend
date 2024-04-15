@@ -1,4 +1,4 @@
-<nav class="w-full bg-neutral text-primary font-bold">
+<nav class="nav w-full bg-neutral text-primary font-bold">
     <div class="flex items-end">
         <div class="mt-0 ml-0">
             <img src="/assets/logo.png" alt="Logo" class="h-auto max-h-50 max-w-40">
@@ -39,10 +39,10 @@
                 </ng-container>
             </div>
             <div class="w-auto">
-                <ul class="flex bg-secondary w-full py-2 px-8">
+                <ul class="nav2 flex bg-secondary w-full py-2 px-8">
                     <li class="flex-grow items-center cursor-pointer px-8" *ngFor="let item of items">
                         <a [routerLink]="item.route" routerLinkActive="active"
-                            class="w-full active:bg-accent hover:text-neutral sm:text-xs md:text-med lg:text-xl">
+                            class="w-full sm:text-xs md:text-med lg:text-xl">
                             <span>{{ item.title }}</span>
                         </a>
                     </li>
