@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
-import { IJob, Job } from '../../../../models/job.model';
+import { Job } from '../../../../models/job.model';
 import { TuiAccordionModule, TuiCheckboxLabeledModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiInputNumberModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
-import { TuiDataListModule, TuiDialogModule, TuiDialogService, TuiErrorModule, TuiLoaderModule, TuiPrimitiveSpinButtonComponent, TuiPrimitiveTextfieldModule, TuiRootModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
+import { TuiDataListModule, TuiDialogModule, TuiErrorModule, TuiLoaderModule, TuiPrimitiveSpinButtonComponent, TuiPrimitiveTextfieldModule, TuiRootModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
 import { TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
@@ -40,8 +40,8 @@ export class JobInfoComponent extends BaseComponent {
         startTime: new FormControl(TuiDay.currentLocal()),
         endTime: new FormControl(TuiDay.currentLocal()),
         boxes: new FormControl(0),
-        cost: new FormControl(0),
-        manHours: new FormControl(0),
+        jobCost: new FormControl(0),
+        jobManHours: new FormControl(0),
         notes: new FormControl(""),
         loadAddr: new FormControl(""),
         unloadAddr: new FormControl(""),
@@ -79,8 +79,8 @@ export class JobInfoComponent extends BaseComponent {
                 startTime: TuiDay.fromUtcNativeDate(new Date(job.startTime)),
                 endTime: TuiDay.fromUtcNativeDate(new Date(job.endTime)),
                 notes: job.notes,
-                cost: job.cost,
-                manHours: +job.manHours.split("h")[1][0],
+                jobCost: job.jobCost,
+                jobManHours: +job.jobManHours.split("h")[1][0],
                 boxes: job.boxes,
                 loadAddr: this.makeStringFromAddress(job.loadAddr),
                 unloadAddr: this.makeStringFromAddress(job.unloadAddr),
@@ -101,30 +101,17 @@ export class JobInfoComponent extends BaseComponent {
             }
             
             const formValues = this.form.value;
-            const formManHours = formValues.manHours ?
-                `P0T${formValues.manHours}h0m0s` :
+            const formManHours = formValues.jobManHours ?
+                `P0T${formValues.jobManHours}h0m0s` :
                 null;            
 
-            const saveSub = this.job$.pipe(
-                map(job => ({
-                    ...job,
-                    manHours: formManHours ?? job?.manHours ?? "P0T0h0m0s",
-                    boxes: formValues.boxes ?? job?.boxes ?? 0,
-                }))
-            ).subscribe(job => {
-                const updatedJob: IJob = {
-                    estimateId: job.estimateId!,
-                    jobId: job.jobId!,
-                    manHours: job.manHours!,
-                    rate: job.rate!,
-                    cost: job.cost!,
-                    finalized: job.finalized!,
-                    actualManHours: job.actualManHours!,
-                    finalCost: job.finalCost!,
-                    amountPaid: job.amountPaid!,
-                    notes: job.notes!
-                };
-                this.jobsService.updateCustomerJob(updatedJob).subscribe();
+            const saveSub = this.job$.pipe().subscribe(job => {
+                if (!job)
+                    return;
+                job.jobManHours = formManHours ?? job?.jobManHours ?? "P0T0h0m0s";
+                job.jobCost = formValues.boxes ?? job?.jobCost ?? 0;
+                job.boxes = formValues.boxes ?? job?.boxes ?? 0;
+                this.jobsService.updateCustomerJob(job).subscribe();
             });
             this.subscriptions.push(saveSub);
         });

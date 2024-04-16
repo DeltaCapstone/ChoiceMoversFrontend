@@ -35,9 +35,8 @@ export class JobsService {
         return this.http.post<Object>(`${this.apiUrl}/customer/estimate/convert`, { estimateId: newJobID });
     }
 
-    updateCustomerJob(updatedJob: IJob): Observable<IJob> {
-        console.log(updatedJob);
-        return this.http.post<IJob>(`${this.apiUrl}/manager/job/update`, updatedJob);
+    updateCustomerJob(updatedJob: Job): Observable<Job> {
+        return this.http.post<Job>(`${this.apiUrl}/manager/job/update`, updatedJob);
     }
 
 

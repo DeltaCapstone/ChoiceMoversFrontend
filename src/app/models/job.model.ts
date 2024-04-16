@@ -9,9 +9,9 @@ import { Room } from "./room.model";
 export interface IJob {
     estimateId: number;
     jobId: string;
-    manHours: string;
-    rate: number;
-    cost: number;
+    jobManHours: string;
+    jobRate: number;
+    jobCost: number;
     finalized: boolean;
     actualManHours: string;
     finalCost: number;
@@ -147,9 +147,9 @@ export class Estimate implements IEstimate {
  */
 export class Job extends Estimate implements IJob, IEstimate {
     jobId: string;
-    manHours: string;
-    rate: number;
-    cost: number;
+    jobManHours: string;
+    jobRate: number;
+    jobCost: number;
     finalized: boolean;
     actualManHours: string;
     finalCost: number;
@@ -161,9 +161,9 @@ export class Job extends Estimate implements IJob, IEstimate {
         finalCost: number = 0, amountPaid: number = 0, assignedEmployees: AssignedEmployee[] = [], notes: string = "") {
         super();
         this.jobId = jobId;
-        this.manHours = manHours;
-        this.rate = rate;
-        this.cost = cost;
+        this.jobManHours = manHours;
+        this.jobRate = rate;
+        this.jobCost = cost;
         this.finalized = finalized;
         this.actualManHours = actualManHours;
         this.finalCost = finalCost;
