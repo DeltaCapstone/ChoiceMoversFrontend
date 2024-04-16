@@ -2,7 +2,7 @@
     <ng-container *tuiLet="isManager$ | async as isManager">
         <ng-container *ngIf="workers$ | async as employees">
             <div class="flex items-center mb-4">
-                <tui-tag status="custom" class="h-min"
+                <tui-tag status="custom" class="bg-[var(--tui-link)] h-min"
                     [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
                 <tui-tag class="h-min ml-2" *ngIf="displayOverride$ | async" value="Boot available"></tui-tag>
                 <ng-container *ngIf="isManager">

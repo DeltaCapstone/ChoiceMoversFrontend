@@ -50,13 +50,15 @@
                                 </div>
                                 <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
-                                        <tui-input-number tuiTextfieldSize="m" formControlName="jobCost">
+                                        <tui-input-number [readOnly]="job.finalized" tuiTextfieldSize="m"
+                                            formControlName="jobCost">
                                             Cost
                                         </tui-input-number>
                                         <tui-error formControlName="jobCost"></tui-error>
                                     </div>
                                     <div class="tui-form__multi-field">
-                                        <tui-input-number tuiTextfieldSize="m" formControlName="jobManHours">
+                                        <tui-input-number [readOnly]="job.finalized" tuiTextfieldSize="m"
+                                            formControlName="jobManHours">
                                             Man Hours
                                         </tui-input-number>
                                         <tui-error formControlName="jobManHours"></tui-error>
@@ -70,8 +72,8 @@
                                 </div>
                                 <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
-                                        <tui-textarea [expandable]="true" [rows]="10" tuiTextfieldSize="m"
-                                            formControlName="notes">
+                                        <tui-textarea [readOnly]="job.finalized" [expandable]="true" [rows]="10"
+                                            tuiTextfieldSize="m" formControlName="notes">
                                             Notes
                                         </tui-textarea>
                                     </div>
@@ -88,7 +90,7 @@
                         </div>
 
                         <div class="tui-form__buttons">
-                            <button *ngIf="isEditing" (click)="save()" tuiButton type="submit"
+                            <button *ngIf="isEditing" (click)="save(job)" tuiButton type="submit"
                                 class="gradient-button bg-secondary rounded-md text-lg tui-form__button">
                                 Save
                             </button>
@@ -130,7 +132,7 @@
 
         <ng-template let-observer [tuiDialogOptions]="{label: 'Rooms and items', size: 'm'}"
             [(tuiDialog)]="itemsDialogOpen">
-            <tui-accordion class="container" [rounded]="false">
+            <tui-accordion [closeOthers]=false class="container" [rounded]="false">
                 <!--Iterate over selected rooms-->
                 <!--Accordion item for each room-->
                 <tui-accordion-item *ngFor="let room of job.rooms" borders="top-bottom" [showArrow]="true">
