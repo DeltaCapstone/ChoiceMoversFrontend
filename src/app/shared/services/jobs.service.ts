@@ -36,6 +36,7 @@ export class JobsService {
     }
 
     updateCustomerJob(updatedJob: Job): Observable<Job> {
+        this.cacheUpsert([updatedJob]);
         return this.http.post<Job>(`${this.apiUrl}/manager/job/update`, updatedJob);
     }
 

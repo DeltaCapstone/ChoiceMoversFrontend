@@ -109,8 +109,8 @@ export class JobInfoComponent extends BaseComponent {
                 if (!job)
                     return;
                 job.jobManHours = formManHours ?? job?.jobManHours ?? "P0T0h0m0s";
-                job.jobCost = formValues.boxes ?? job?.jobCost ?? 0;
-                job.boxes = formValues.boxes ?? job?.boxes ?? 0;
+                job.jobCost = formValues.jobCost ?? job?.jobCost ?? 0;
+                console.log(job);
                 this.jobsService.updateCustomerJob(job).subscribe();
             });
             this.subscriptions.push(saveSub);
