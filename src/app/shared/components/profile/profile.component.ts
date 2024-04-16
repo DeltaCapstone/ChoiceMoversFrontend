@@ -8,7 +8,6 @@ import { Employee, EmployeeProfileUpdateRequest, EmployeeType } from '../../../m
 import { Observable, Subscription, map, finalize } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
-import { SessionType } from '../../../models/session.model';
 import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
@@ -74,7 +73,8 @@ export class ProfileComponent extends BaseComponent {
                     lastName: formValues.lastName ?? user?.lastName ?? "",
                     userName: formValues.userName ?? user?.userName ?? "",
                     phonePrimary: formValues.phonePrimary ?? user?.phonePrimary ?? "",
-                    phoneOther: [],
+                    phoneOther1: "",
+                    phoneOther2: "",
                     employeeType: (formValues.employeeType ?? user?.employeeType ?? "") as EmployeeType,
                 } as EmployeeProfileUpdateRequest))
             ).subscribe(newUser => {

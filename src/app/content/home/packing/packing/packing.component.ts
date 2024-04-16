@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { TuiSvgModule } from '@taiga-ui/core';
-import { MoveButtonComponent } from '../../../../shared/components/move-button/move-button.component';
+import { MoveButtonPlannerComponent } from '../../../../shared/components/move-button-planner/move-button-planner.component';
 
 @Component({
   selector: 'app-packing',
   standalone: true,
-  imports: [TuiSvgModule, MoveButtonComponent],
+  imports: [TuiSvgModule, MoveButtonPlannerComponent],
   templateUrl: './packing.component.html',
   styleUrl: './packing.component.css'
 })
