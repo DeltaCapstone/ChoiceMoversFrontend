@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { TuiSvgModule } from '@taiga-ui/core';
-import { MoveButtonComponent } from '../../../../shared/components/move-button/move-button.component';
+import { MoveButtonPlannerComponent } from '../../../../shared/components/move-button-planner/move-button-planner.component';
 
 @Component({
   selector: 'app-storage',
   standalone: true,
-  imports: [TuiSvgModule, MoveButtonComponent], 
+  imports: [TuiSvgModule, MoveButtonPlannerComponent], 
   templateUrl: './storage.component.html',
   styleUrl: './storage.component.css'
 })

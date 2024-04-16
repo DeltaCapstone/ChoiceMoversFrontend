@@ -24,14 +24,14 @@
 
                     <div class="tui-form__buttons flex justify-between">
                         <button (click)="login()" type="submit"
-                            class="bg-secondary p-3 rounded-md text-lg">
+                            class="gradient-button bg-secondary p-3 rounded-md text-lg">
                             Login
                         </button>
-                        <div class="signup-text">
+                        <div *ngIf="session.getType() == 'customer'" class=" signup-text">
                             <span class="font-bold mr-1">Don't have an account?</span>
                             <a (click)="navigateToCustomerSignup()"
-                               class="text-blue-500 hover:text-blue-700 font-bold cursor-pointer">
-                               Sign up
+                                class="text-blue-500 hover:text-blue-700 font-bold cursor-pointer">
+                                Sign up
                             </a>
                         </div>
                     </div>

@@ -4,12 +4,11 @@ import { TuiAvatarModule, TuiDataListWrapperModule, TuiFieldErrorPipeModule, Tui
 import { FormControl, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { TuiDataListModule, TuiErrorModule, TuiSvgModule } from '@taiga-ui/core';
-import { EmployeeCreateRequest, Employee, EmployeeType, EmployeeTypePriorityRequest } from '../../../models/employee';
-import { ActivatedRoute } from '@angular/router';
+import { Employee, EmployeeType, EmployeeTypePriorityRequest } from '../../../models/employee';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, map, of } from 'rxjs';
 import { EmployeesService } from '../../services/employees.service';
 import { SessionService } from '../../services/session.service';
-import { SessionType } from '../../../models/session.model';
 import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
@@ -76,6 +75,7 @@ export class EmployeeInfoComponent extends BaseComponent {
 
     constructor(private location: Location,
         private route: ActivatedRoute,
+        private router: Router,
         @Inject(EmployeeSessionServiceToken) private session: SessionService<Employee>,
         private employeesService: EmployeesService) {
         super();
@@ -101,19 +101,16 @@ export class EmployeeInfoComponent extends BaseComponent {
                     employeePriority: formValues.employeePriority ?? user?.employeePriority ?? 3,
                 }))
             ).subscribe(newUser => {
-                // TODO: needs changed for email procedure
                 if (this.isNew) { // CREATE NEW EMPLOYEE
-                    const createEmployeeRequest: EmployeeCreateRequest = {
-                        ...newUser,
-                        phoneOther: [],
-                        employeePriority: 3,
-                        passwordPlain: "test1234"
-                    };
-
-                    this.employeesService.createEmployee(createEmployeeRequest).subscribe({
-                        next: (response) => {
-                            console.log('User created successfully', response);
-                            this.back();
+                    this.employeesService.createEmployee(newUser.email, newUser.employeePriority, newUser.employeeType).subscribe({
+                        next: (response: any) => {
+                            console.log('User create email sent', response);
+                            let splitUrl: Array<string> = response.url.split("/");
+                            splitUrl.shift();
+                            const token = splitUrl.pop();
+                            const route = splitUrl.join("/");
+                            this.router.navigate([route, token])
+                            // this.back();
                         },
                         error: (error) => {
                             console.error('Error creating user', error);

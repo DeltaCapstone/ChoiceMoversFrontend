@@ -4,12 +4,12 @@ import { Calendar, CalendarOptions, EventClickArg, EventInput } from '@fullcalen
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { PageComponent } from '../../../shared/components/page-component';
 import { PageService } from '../../../shared/services/page.service';
-import { Observable, map, take } from 'rxjs';
+import { Observable, combineLatest, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { JobsService } from '../../../shared/services/jobs.service';
 import { Router } from '@angular/router';
 import { SessionService } from '../../../shared/services/session.service';
-import { Employee } from '../../../models/employee';
+import { Employee, EmployeeType } from '../../../models/employee';
 import { EmployeeSessionServiceToken } from '../../../app.config';
 
 @Component({
@@ -24,8 +24,11 @@ export class ScheduleComponent extends PageComponent {
     calendarOptions: CalendarOptions;
 
     getJobEvents(start: string, end: string): Observable<EventInput[]> {
-        return this.jobsService.getEmployeeJobs(start, end).pipe(
-            map(jobs => jobs.map(job => {
+        return combineLatest([this.jobsService.getEmployeeJobs(start, end), this.session.getUser()]).pipe(
+            map(([jobs, user]) => jobs
+                .filter(job => user?.employeeType == EmployeeType.Manager || 
+                    (user?.employeeType as EmployeeType != EmployeeType.Manager && job.finalized))
+                .map(job => {
                 const eventInput: EventInput = {
                     title: job.customer.email,
                     start: job.startTime,

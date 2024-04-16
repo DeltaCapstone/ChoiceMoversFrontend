@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@
 import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
-import { Job } from '../../../../models/job.model';
-import { TuiCheckboxModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
-import { TuiDataListModule, TuiErrorModule, TuiLoaderModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
+import { IJob, Job } from '../../../../models/job.model';
+import { TuiAccordionModule, TuiCheckboxLabeledModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiInputNumberModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
+import { TuiDataListModule, TuiDialogModule, TuiDialogService, TuiErrorModule, TuiLoaderModule, TuiPrimitiveSpinButtonComponent, TuiPrimitiveTextfieldModule, TuiRootModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
-import { TuiChipModule, TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
+import { TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
 import { JobsService } from '../../../services/jobs.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap, MapDirectionsRenderer, MapDirectionsService, MapInfoWindow } from '@angular/google-maps';
@@ -19,10 +19,10 @@ import { Employee } from '../../../../models/employee';
 @Component({
     selector: 'app-job-info',
     standalone: true,
-    imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule, TuiTextareaModule,
-        TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule, TuiCheckboxModule, TuiChipModule, FormsModule,
-        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule,
-        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule],
+    imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule, TuiTextareaModule, 
+        TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule, TuiCheckboxLabeledModule, FormsModule, 
+        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule, TuiDialogModule, TuiRootModule,
+        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule, TuiInputNumberModule, TuiAccordionModule, TuiPrimitiveTextfieldModule],
     templateUrl: './job-info.component.html',
     styleUrl: './job-info.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,14 +31,24 @@ export class JobInfoComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
     directionsResults$: Observable<google.maps.DirectionsResult | undefined>;
     subscriptions: Subscription[] = [];
- 
+    isEditing = false;
+
+    itemsDialogOpen = false;
+
     form = new FormGroup({
         jobId: new FormControl(""),
         startTime: new FormControl(TuiDay.currentLocal()),
         endTime: new FormControl(TuiDay.currentLocal()),
+        boxes: new FormControl(0),
+        cost: new FormControl(0),
+        manHours: new FormControl(0),
         notes: new FormControl(""),
         loadAddr: new FormControl(""),
-        unloadAddr: new FormControl("")
+        unloadAddr: new FormControl(""),
+        needTruck: new FormControl(false),
+        load: new FormControl(false),
+        unload: new FormControl(false),
+        unpack: new FormControl(false),
     });
     checked: Array<Array<String | boolean>> = [];
     status = "Pending";
@@ -55,16 +65,13 @@ export class JobInfoComponent extends BaseComponent {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
 
+        const formSub = this.form.valueChanges.subscribe(_ => {
+            this.isEditing = true;
+        });
+        this.subscriptions.push(formSub);
+
         const jobSub = this.job$.subscribe(job => {
             if (!job) return;
-            this.checked = [
-                ["Truck", !!job.needTruck, "needsTruck"],
-                ["Load", !!job.load, "load"],
-                ["Unload", !!job.unload, "unload"],
-                ["Pack", !!job.pack, "pack"],
-                ["Unpack", !!job.unpack, "clean"],
-            ];
-
             this.status = job?.finalized ? "Finalized" : "Pending";
 
             this.form.patchValue({
@@ -72,13 +79,61 @@ export class JobInfoComponent extends BaseComponent {
                 startTime: TuiDay.fromUtcNativeDate(new Date(job.startTime)),
                 endTime: TuiDay.fromUtcNativeDate(new Date(job.endTime)),
                 notes: job.notes,
+                cost: job.cost,
+                manHours: +job.manHours.split("h")[1][0],
+                boxes: job.boxes,
                 loadAddr: this.makeStringFromAddress(job.loadAddr),
-                unloadAddr: this.makeStringFromAddress(job.unloadAddr)
-            });
+                unloadAddr: this.makeStringFromAddress(job.unloadAddr),
+                needTruck: job.needTruck,
+                load: job.load,
+                unload: job.unload,
+                unpack: job.unpack,
+            }, { emitEvent: false });
         });
         this.subscriptions.push(jobSub);
     }
 
+    save(){
+        this.isEditing = false;
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+            }
+            
+            const formValues = this.form.value;
+            const formManHours = formValues.manHours ?
+                `P0T${formValues.manHours}h0m0s` :
+                null;            
+
+            const saveSub = this.job$.pipe(
+                map(job => ({
+                    ...job,
+                    manHours: formManHours ?? job?.manHours ?? "P0T0h0m0s",
+                    boxes: formValues.boxes ?? job?.boxes ?? 0,
+                }))
+            ).subscribe(job => {
+                const updatedJob: IJob = {
+                    estimateId: job.estimateId!,
+                    jobId: job.jobId!,
+                    manHours: job.manHours!,
+                    rate: job.rate!,
+                    cost: job.cost!,
+                    finalized: job.finalized!,
+                    actualManHours: job.actualManHours!,
+                    finalCost: job.finalCost!,
+                    amountPaid: job.amountPaid!,
+                    notes: job.notes!
+                };
+                this.jobsService.updateCustomerJob(updatedJob).subscribe();
+            });
+            this.subscriptions.push(saveSub);
+        });
+    }
+
+    toggleItemsDialog(){
+        this.itemsDialogOpen = !this.itemsDialogOpen;
+    }
+    
     async ngAfterViewInit() {
         await this.initPlaceAutocomplete();
         this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(
