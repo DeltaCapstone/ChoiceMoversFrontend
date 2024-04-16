@@ -40,6 +40,10 @@ export class JobsService {
         return this.http.post<IJob>(`${this.apiUrl}/manager/job/update`, updatedJob);
     }
 
+    getCustomerJobs(userName: string): Observable<Job[]> {
+        return this.http.get<Job[]>(`${this.apiUrl}/customer/job?username=${userName}`)
+    }
+
 
     // -----------------------
     // EMPLOYEE REQUESTS

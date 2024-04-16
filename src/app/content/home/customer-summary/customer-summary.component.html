@@ -2,12 +2,12 @@
     <div class="w-64">
         <div class="bg-secondary rounded-md p-2 text-lg font-bold mb-2">Job Summary</div>
         <div class="flex flex-col w-64 mt-2 mb-2 rounded-md text-lg">
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Estimated Move Cost</label>
-            <div>{{estimateCost$ | async}}</div>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Estimated Move Cost</label>
+            <div>${{this.estimateCost$ | async}}</div>
             <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Services</label>
             <ul>
                 <li>
-                    Pack
+                    <strong>Pack:</strong>
                     <ul>
                         <li>
                             {{this.jobSessionState.currentJob.pack}}
@@ -15,7 +15,7 @@
                     </ul>
                 </li>
                 <li>
-                    Unpack
+                    <strong>Unpack:</strong>
                     <ul>
                         <li>
                             {{this.jobSessionState.currentJob.unpack}}
@@ -23,7 +23,7 @@
                     </ul>
                 </li>
                 <li>
-                    Load
+                    <strong>Load:</strong>
                     <ul>
                         <li>
                             {{this.jobSessionState.currentJob.load}}
@@ -31,7 +31,7 @@
                     </ul>
                 </li>
                 <li>
-                    Unload
+                    <strong>Unload:</strong>
                     <ul>
                         <li>
                             {{this.jobSessionState.currentJob.unload}}
@@ -39,22 +39,24 @@
                     </ul>
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Need A Truck</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Need A Truck</label>
             <ul>
                 <li>
                     {{this.jobSessionState.currentJob.needTruck}}
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Move Date and Time</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Move Date and Time</label>
             <ul>
                 <li>
                     {{this.jobSessionState.currentJob.startTime}}
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Moving From Address</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Moving From Address</label>
             <ul>
                 <li>
-                    {{this.jobSessionState.currentJob.loadAddr.street}}
+                    {{this.jobSessionState.currentJob.loadAddr.street}} <ng-container
+                        *ngIf="this.jobSessionState.currentJob.loadAddr.aptNum !== '' ">Apt
+                        {{this.jobSessionState.currentJob.loadAddr.aptNum}}</ng-container>
                 </li>
                 <li>
                     {{this.jobSessionState.currentJob.loadAddr.city}},
@@ -64,10 +66,12 @@
                     {{this.jobSessionState.currentJob.loadAddr.aptNum}}
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Moving To Address</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Moving To Address</label>
             <ul>
                 <li>
-                    {{this.jobSessionState.currentJob.unloadAddr.street}}
+                    {{this.jobSessionState.currentJob.unloadAddr.street}} <ng-container
+                        *ngIf="this.jobSessionState.currentJob.unloadAddr.aptNum !== '' ">Apt
+                        {{this.jobSessionState.currentJob.unloadAddr.aptNum}}</ng-container>
                 </li>
                 <li>
                     {{this.jobSessionState.currentJob.unloadAddr.city}},
@@ -75,32 +79,36 @@
                     {{this.jobSessionState.currentJob.unloadAddr.zip}}
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Rooms and Items</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Rooms and Items</label>
             <div *ngFor="let room of this.jobSessionState.currentJob.rooms">
-                <p>{{room.roomName}}</p>
+                <strong>{{room.roomName}}:</strong>
                 <ul>
-                    <div *ngFor="let roomItems of this.jobSessionState.currentJob.rooms">
-                        <div *ngFor="let items of roomItems.items | keyvalue">
-                            <li *ngIf="items.value !== 0">
+                    <ng-container *ngFor="let items of room.items | keyvalue">
+                        <ng-container *ngIf="items.value !== null">
+                            <li>
                                 {{items.key}}: {{items.value}}
                             </li>
-                        </div>
-                    </div>
+                        </ng-container>
+                    </ng-container>
                 </ul>
             </div>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Boxes Needed</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Boxes Needed</label>
             <ul>
                 <li *ngFor="let box of this.jobSessionState.currentJob.boxes | keyvalue">
                     {{box.key}}:{{box.value}}
                 </li>
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Specialty Items</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Specialty Items</label>
             <ul>
+
                 <li *ngFor="let special of this.jobSessionState.currentJob.special | keyvalue">
-                    {{special.key}}: {{special.value}}
+                    <ng-container *ngIf="special.value !==0">
+                        {{special.key}}: {{special.value}}
+                    </ng-container>
                 </li>
+
             </ul>
-            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Special Requests</label>
+            <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Special Requests</label>
             <ul>
                 <li *ngFor="let request of this.jobSessionState.currentJob.specialRequests | keyvalue">
                     {{request.value}}
