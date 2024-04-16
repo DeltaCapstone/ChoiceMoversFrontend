@@ -101,15 +101,12 @@ export class JobInfoComponent extends BaseComponent {
             }
             
             const formValues = this.form.value;
-            const formManHours = formValues.jobManHours ?
-                `P0T${formValues.jobManHours}h0m0s` :
-                null;            
-
-            const saveSub = this.job$.pipe().subscribe(job => {
+            const saveSub = this.job$.pipe(take(1)).subscribe(job => {
                 if (!job)
                     return;
-                job.jobManHours = formManHours ?? job?.jobManHours ?? "P0T0h0m0s";
-                job.jobCost = formValues.jobCost ?? job?.jobCost ?? 0;
+
+                job.jobManHours = formValues?.jobCost ?? job?.jobManHours ?? 0;
+                job.jobCost = formValues?.jobCost ?? job?.jobCost ?? 0;
                 console.log(job);
                 this.jobsService.updateCustomerJob(job).subscribe();
             });
