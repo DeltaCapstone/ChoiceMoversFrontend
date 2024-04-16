@@ -3,7 +3,7 @@
         <div class="bg-secondary rounded-md p-2 text-lg font-bold mb-2">Job Summary</div>
         <div class="flex flex-col w-64 mt-2 mb-2 rounded-md text-lg">
             <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Estimated Move Cost</label>
-            <div>${{this.estimateCost$ | async}}</div>
+            <div>${{ roundedEstimate$ | async}}</div>
             <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Services</label>
             <ul>
                 <li>
@@ -110,8 +110,8 @@
             </ul>
             <label class="bg-secondary rounded-md mb-2 mt-2 pl-2 font-bold">Special Requests</label>
             <ul>
-                <li *ngFor="let request of this.jobSessionState.currentJob.specialRequests | keyvalue">
-                    {{request.value}}
+                <li>
+                    {{this.jobSessionState.currentJob.customerNotes}}
                 </li>
             </ul>
         </div>

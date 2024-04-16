@@ -71,7 +71,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     distanceToJob: number;
     distanceMove: number;
 
-    specialRequests: string[];
+    customerNotes: string;
 
     estimatedCost: number;
 
@@ -97,7 +97,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         distanceToJob: number = 0,
         distanceMove: number = 0,
 
-        specialRequests: string[] = [],
+        customerNotes: string = '',
 
         estimatedCost: number = 0
     ) {
@@ -122,7 +122,7 @@ export class CreateJobEstimate implements ICreateJobEstimate {
         this.distanceToJob = distanceToJob;
         this.distanceMove = distanceMove;
 
-        this.specialRequests = specialRequests;
+        this.customerNotes = customerNotes;
 
         this.estimatedCost = estimatedCost;
     }

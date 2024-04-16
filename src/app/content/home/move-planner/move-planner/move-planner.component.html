@@ -105,10 +105,6 @@
                         <input id="fromPostcode" name="fromPostcode" formControlName="fromZip"
                             autocomplete="postal-code" #fromPostcode />
                     </label>
-                    <label>
-                        <span>Country/Region*</span>
-                        <input id="fromCountry" name="fromCountry" autocomplete="country-name" #fromCountry />
-                    </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!fromAddressGroup.valid">
                     * inidicates required fields
@@ -171,11 +167,7 @@
                     <label for="postal_code">
                         <span>Postal code*</span>
                         <input id="toPostcode" name="toPostcode" formControlName="toZip" autocomplete="postal-code"
-                            required #toPostcode />
-                    </label>
-                    <label>
-                        <span>Country/Region*</span>
-                        <input id="toCountry" name="toCountry" autocomplete="country-name" #toCountry />
+                            #toPostcode />
                     </label>
                 </form>
                 <div class="bg-secondary text-neutral text-center rounded-md mt-2" *ngIf="!toAddressGroup.valid">
@@ -271,8 +263,9 @@
         <ng-container *ngIf="activeStepIndex === 13">
             <div class="absolute inset-x-0 top-full mt-4 w-64">
                 <form [formGroup]="specialRequestGroup">
-                    <textarea name="specialTextArea" formGroupName="specialTextArea" #specialTextArea cols="30"
-                        rows="10" class="fixed-size">  Enter any special requests here</textarea>
+                    <textarea name="specialTextArea" placeholder="Enter any special requests here"
+                        formControlName="specialTextArea" #specialTextArea cols="30" rows="10"
+                        class="fixed-size"></textarea>
                     <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3"
                         (click)="addSpecialRequest(specialTextArea.value)">
                         Add Special Request
@@ -291,7 +284,7 @@
                 </ng-template>
                 <button tuiButton type="button" class="tui-space_right-3 tui-space_bottom-3" [icon]="icon"
                     (click)="submitForm()"
-                    [disabled]="!moveDateGroup.valid || !servicesGroup.valid || !roomsGroup.valid ">
+                    [disabled]="!moveDateGroup.valid || !servicesGroup.valid || !roomsGroup.valid || !fromAddressGroup.valid || !toAddressGroup.valid">
                     Submit Move Form
                 </button>
                 <div class="bg-secondary text-neutral rounded-md"
