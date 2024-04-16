@@ -93,7 +93,7 @@ export class JobInfoComponent extends BaseComponent {
         this.subscriptions.push(jobSub);
     }
 
-    save(){
+    save(job: Job){        
         this.isEditing = false;
         this.session.isUserAuthorized().subscribe(isAuthorized => {
             if (!isAuthorized){
@@ -101,16 +101,12 @@ export class JobInfoComponent extends BaseComponent {
             }
             
             const formValues = this.form.value;
-            const saveSub = this.job$.pipe(take(1)).subscribe(job => {
-                if (!job)
-                    return;
-
-                job.jobManHours = formValues?.jobManHours ?? job?.jobManHours ?? 0;
-                job.jobCost = formValues?.jobCost ?? job?.jobCost ?? 0;
-                console.log(job);
-                this.jobsService.updateCustomerJob(job).subscribe();
-            });
-            this.subscriptions.push(saveSub);
+            job.jobManHours = formValues?.jobManHours ?? job?.jobManHours ?? 0;
+            job.jobCost = formValues?.jobCost ?? job?.jobCost ?? 0;
+            job.notes = formValues?.notes ?? job?.notes ?? 0;
+            console.log("SENDING JOB");
+            console.log(job);
+            this.jobsService.updateCustomerJob(job).subscribe();
         });
     }
 
