@@ -48,11 +48,39 @@
                     </li>
                 </ul>
                 <label class="bg-secondary rounded-md mb-2 mt-2 pl-2">Jobs</label>
-                <ul>
-                    <li>
-                        No Current Jobs
-                    </li>
-                </ul>
+                <div *ngIf="this.customerJobs$ | async as jobs">
+                    <div *ngFor="let job of this.customerJobs$ | async">
+                        <ul>
+                            <li class="bg-secondary rounded-md">
+                                <strong>Job#:</strong> {{job.jobId}}
+                            </li>
+                            <li>
+                                <strong>Primary Contact:</strong>
+                                {{job.customer.firstName}} {{job.customer.lastName}}
+                            </li>
+                            <li>
+                                <strong>Total Final Cost:</strong>
+                                {{job.finalCost}}
+                            </li>
+                            <li>
+                                <strong>Total Amount Paid:</strong>
+                                {{job.amountPaid}}
+                            </li>
+                            <li>
+                                <strong>Loading Address:</strong>
+                                <br />
+                                {{job.loadAddr.street}}
+                                {{job.loadAddr.city}}, {{job.loadAddr.state}} {{job.loadAddr.zip}}
+                            </li>
+                            <li>
+                                <strong>Unloading Address:</strong>
+                                <br />
+                                {{job.unloadAddr.street}}
+                                {{job.unloadAddr.city}}, {{job.unloadAddr.state}} {{job.unloadAddr.zip}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -18,7 +18,6 @@ import { Observable, Subscription, of } from 'rxjs';
 import { CustomerSessionServiceToken } from '../../../../app.config';
 import { JobsService } from '../../../../shared/services/jobs.service';
 
-
 @Component({
   selector: 'app-move-planner',
   standalone: true,
@@ -327,7 +326,6 @@ export class MovePlannerComponent extends PageComponent {
     }
 
     this.specialRequestSubmissionSuccess = false;
-    this.saveMovePlannerState();
 
   }
 
@@ -534,18 +532,11 @@ export class MovePlannerComponent extends PageComponent {
     //SpecialtyGroup
     this.specialtyGroup.patchValue(sessionStateObject.currentJob.special, { emitEvent: false });
 
-    /*
+
     //SpecialRequestGroup TODO: NOT WORKING AS INTENDED
-    const specialRequestFormArray = sessionStateObject.currentJob.specialRequests;
+    //this.specialRequestGroup.get('specialTextArea')?.push(sessionStateObject.currentJob.specialRequests, { emitEvent: false });
 
-    const formTextArea = this.specialRequestGroup.get('specialTextArea');
 
-    specialRequestFormArray.forEach(request => {
-      formTextArea?.patchValue(request);
-    });
-    */
-
-    //TODO: NOT WORKING AS INTENDED???
     //ActiveStepIndex
     this.activeStepIndex = sessionStateObject.activeStepIndex;
   }

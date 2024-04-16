@@ -41,6 +41,10 @@ export class JobsService {
         return this.http.put<Job>(`${this.apiUrl}/customer/job/${updatedJob.jobId}`, updatedJob);
     }
 
+    getCustomerJobs(userName: string): Observable<Job[]> {
+        return this.http.get<Job[]>(`${this.apiUrl}/customer/job?username=${userName}`)
+    }
+
 
     // -----------------------
     // EMPLOYEE REQUESTS

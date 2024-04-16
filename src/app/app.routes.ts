@@ -28,6 +28,7 @@ import { CustomerSummaryComponent } from './content/home/customer-summary/custom
 import { CustomerInfoComponent } from './shared/components/customer-info/customer-info.component';
 import { movePlannerGuard } from './shared/guards/move-planner.guard';
 import { CustomerProfileComponent } from './content/home/customer-profile/customer-profile.component';
+import { JobCompletionComponent } from './content/home/job-completion/job-completion.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home/customer-home', pathMatch: 'full' },
@@ -46,6 +47,7 @@ export const routes: Routes = [
             { path: 'customer-summary', component: CustomerSummaryComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
             { path: 'customer-signup', component: CustomerInfoComponent },
             { path: 'customer-profile', component: CustomerProfileComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
+            { path: 'job-completion', component: JobCompletionComponent, canActivate: [() => inject(movePlannerGuard).canActivate()] },
         ]
     },
     {
