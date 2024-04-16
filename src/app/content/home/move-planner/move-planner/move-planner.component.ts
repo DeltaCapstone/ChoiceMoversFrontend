@@ -239,7 +239,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.fromAddressGroup = this._formBuilder.group({
       fromAddressStreetNumber: new FormControl('', Validators.required),
-      fromAddressStreetName: new FormControl('', Validators.required),
+      fromAddressStreetName: new FormControl(' ', Validators.required),
       fromCity: new FormControl('', Validators.required),
       fromState: new FormControl('', Validators.required),
       fromZip: new FormControl('', Validators.required),
@@ -258,7 +258,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.toAddressGroup = this._formBuilder.group({
       toAddressStreetNumber: new FormControl('', Validators.required),
-      toAddressStreetName: new FormControl('', Validators.required),
+      toAddressStreetName: new FormControl(' ', Validators.required),
       toCity: new FormControl('', Validators.required),
       toState: new FormControl('', Validators.required),
       toZip: new FormControl('', Validators.required),
@@ -304,7 +304,7 @@ export class MovePlannerComponent extends PageComponent {
     });
 
     this.specialRequestGroup = this._formBuilder.group({
-      specialTextArea: new FormArray([])
+      specialTextArea: new FormControl('')
     });
   }
 
@@ -423,7 +423,7 @@ export class MovePlannerComponent extends PageComponent {
     this.jobSessionState.currentJob.special = this.specialtyGroup.value ?? [];
 
     //SpecialRequestsGroup
-    this.jobSessionState.currentJob.specialRequests = this.specialRequestGroup.value ?? [];
+    this.jobSessionState.currentJob.customerNotes = this.specialRequestGroup.value.specialTextArea ?? '';
 
     //ActiveStepIndex
     this.jobSessionState.activeStepIndex = this.activeStepIndex;
@@ -534,8 +534,12 @@ export class MovePlannerComponent extends PageComponent {
 
 
     //SpecialRequestGroup TODO: NOT WORKING AS INTENDED
-    //this.specialRequestGroup.get('specialTextArea')?.push(sessionStateObject.currentJob.specialRequests, { emitEvent: false });
-
+    console.log('Special request group value:', this.specialRequestGroup.get('specialTextArea')?.value);
+    this.specialRequestGroup.patchValue({
+      'specialTextArea': sessionStateObject.currentJob.customerNotes !== null ? sessionStateObject.currentJob.customerNotes : ''
+    }
+      , { emitEvent: false });
+    console.log('Special request group value:', this.specialRequestGroup.get('specialTextArea')?.value);
 
     //ActiveStepIndex
     this.activeStepIndex = sessionStateObject.activeStepIndex;
@@ -632,9 +636,7 @@ export class MovePlannerComponent extends PageComponent {
    */
   addSpecialRequest(requests: string): void {
 
-    const specialRequest = this.specialRequestGroup.get('specialTextArea') as FormArray
-
-    specialRequest.push(this._formBuilder.control(requests));
+    this.specialRequestGroup.get('specialTextArea')?.patchValue(requests, { emitEvent: false });
 
     this.specialRequestSubmissionSuccess = true;
   }
@@ -768,7 +770,7 @@ export class MovePlannerComponent extends PageComponent {
 
     this.newJob.special = this.specialtyGroup.value ?? [];
 
-    this.newJob.specialRequests = this.specialRequestGroup.get('specialTextArea')?.value ?? [];
+    this.newJob.customerNotes = this.specialRequestGroup.get('specialTextArea')?.value ?? '';
 
     this.newJob.boxes = this.boxesGroup.value ?? new Map();
 

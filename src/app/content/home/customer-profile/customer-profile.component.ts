@@ -35,6 +35,8 @@ export class CustomerProfileComponent extends PageComponent {
       if (customer) {
         const username = customer.userName;
         this.customerJobs$ = this._jobsService.getCustomerJobs(username);
+      } else {
+        console.error('Error grabbing customer jobs');
       }
     })
 

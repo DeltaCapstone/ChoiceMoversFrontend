@@ -6,7 +6,7 @@ import { Customer } from '../../../models/customer.model';
 import { CommonModule } from '@angular/common';
 import { CreateEstimateSessionState } from '../../../models/session.model';
 import { CustomerSessionServiceToken } from '../../../app.config';
-import { BehaviorSubject, Observable, Subscription, filter, map, take } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, filter, map, pipe, take } from 'rxjs';
 import { JobsService } from '../../../shared/services/jobs.service';
 
 @Component({
@@ -24,11 +24,14 @@ export class CustomerSummaryComponent {
 
   estimateID$: BehaviorSubject<number | null>;
 
+  roundedEstimate$: BehaviorSubject<number | null>;
+
   subscriptions: Subscription[];
 
   constructor(private _router: Router, @Inject(CustomerSessionServiceToken) private _customerSession: SessionService<Customer>, private _jobService: JobsService) {
     this.estimateCost$ = new BehaviorSubject<number | null>(null);
     this.estimateID$ = new BehaviorSubject<number | null>(null);
+    this.roundedEstimate$ = new BehaviorSubject<number | null>(null);
   }
 
   ngOnInit() {
@@ -40,6 +43,16 @@ export class CustomerSummaryComponent {
 
     this.subscriptions = [];
 
+  }
+
+  ngAfterViewInit() {
+
+    this.subscriptions.push(this.estimateCost$.pipe(
+      map(estimateCost => estimateCost !== null ? (Math.round(estimateCost * 100) / 100) : null)
+    ).subscribe(roundedValue => {
+      this.roundedEstimate$.next(roundedValue);
+    })
+    );
   }
 
   createJobFromEstimate() {
