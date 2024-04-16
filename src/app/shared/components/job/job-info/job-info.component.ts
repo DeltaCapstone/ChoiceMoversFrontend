@@ -3,8 +3,8 @@ import { BaseComponent } from '../../base-component';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription, map, of, switchMap, take, tap } from 'rxjs';
 import { IJob, Job } from '../../../../models/job.model';
-import { TuiCheckboxLabeledModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiInputNumberModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
-import { TuiDataListModule, TuiErrorModule, TuiLoaderModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
+import { TuiAccordionModule, TuiCheckboxLabeledModule, TuiFieldErrorPipeModule, TuiInputDateModule, TuiInputModule, TuiInputNumberModule, TuiTabsModule, TuiTagModule, TuiTextareaModule } from '@taiga-ui/kit';
+import { TuiDataListModule, TuiDialogModule, TuiDialogService, TuiErrorModule, TuiLoaderModule, TuiPrimitiveSpinButtonComponent, TuiPrimitiveTextfieldModule, TuiRootModule, TuiSvgModule, TuiTextfieldControllerModule } from '@taiga-ui/core';
 import { CommonModule } from '@angular/common';
 import { TuiDay, TuiRepeatTimesModule } from '@taiga-ui/cdk';
 import { TuiHeaderModule, TuiTitleModule } from '@taiga-ui/experimental';
@@ -21,8 +21,8 @@ import { Employee } from '../../../../models/employee';
     standalone: true,
     imports: [ReactiveFormsModule, TuiInputModule, CommonModule, TuiInputDateModule, TuiTagModule, TuiTextareaModule, 
         TuiErrorModule, TuiFieldErrorPipeModule, TuiTabsModule, TuiSvgModule, TuiCheckboxLabeledModule, FormsModule, 
-        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule,
-        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule, TuiInputNumberModule],
+        TuiRepeatTimesModule, TuiHeaderModule, TuiTitleModule, TuiTextfieldControllerModule, TuiDialogModule, TuiRootModule,
+        GoogleMap, MapDirectionsRenderer, MapInfoWindow, TuiDataListModule, TuiLoaderModule, TuiInputNumberModule, TuiAccordionModule, TuiPrimitiveTextfieldModule],
     templateUrl: './job-info.component.html',
     styleUrl: './job-info.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,8 +31,10 @@ export class JobInfoComponent extends BaseComponent {
     job$: Observable<Job | undefined>;
     directionsResults$: Observable<google.maps.DirectionsResult | undefined>;
     subscriptions: Subscription[] = [];
-    isEditing = true;
- 
+    isEditing = false;
+
+    itemsDialogOpen = false;
+
     form = new FormGroup({
         jobId: new FormControl(""),
         startTime: new FormControl(TuiDay.currentLocal()),
@@ -49,7 +51,7 @@ export class JobInfoComponent extends BaseComponent {
         unpack: new FormControl(false),
     });
     checked: Array<Array<String | boolean>> = [];
-    status = "pending";
+    status = "Pending";
     // map state
     mapOptions: google.maps.MapOptions = {    
         center: {lat: 41.066078186035156, lng: -81.46630096435547},
@@ -62,6 +64,11 @@ export class JobInfoComponent extends BaseComponent {
     ngOnInit() {
         const jobId = this.route.parent?.snapshot?.paramMap?.get("jobId") ?? "";
         this.job$ = this.jobsService.getJob(jobId);
+
+        const formSub = this.form.valueChanges.subscribe(_ => {
+            this.isEditing = true;
+        });
+        this.subscriptions.push(formSub);
 
         const jobSub = this.job$.subscribe(job => {
             if (!job) return;
@@ -81,12 +88,13 @@ export class JobInfoComponent extends BaseComponent {
                 load: job.load,
                 unload: job.unload,
                 unpack: job.unpack,
-            });
+            }, { emitEvent: false });
         });
         this.subscriptions.push(jobSub);
     }
 
     save(){
+        this.isEditing = false;
         this.session.isUserAuthorized().subscribe(isAuthorized => {
             if (!isAuthorized){
                 this.session.redirectToLogin();
@@ -122,6 +130,10 @@ export class JobInfoComponent extends BaseComponent {
         });
     }
 
+    toggleItemsDialog(){
+        this.itemsDialogOpen = !this.itemsDialogOpen;
+    }
+    
     async ngAfterViewInit() {
         await this.initPlaceAutocomplete();
         this.directionsResults$ = this.session.scheduleSessionState.jobSessionState.directionsResults$.pipe(

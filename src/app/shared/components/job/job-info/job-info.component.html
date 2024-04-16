@@ -11,9 +11,9 @@
             <form [formGroup]="form" class="ml-6 mt-6">
                 <div class="flex flex-wrap gap-2">
                     <tui-checkbox-labeled formControlName="needTruck" [readOnly]=true>Truck</tui-checkbox-labeled>
-                    <tui-checkbox-labeled formControlName="load" [readOnly]=true>load</tui-checkbox-labeled>
-                    <tui-checkbox-labeled formControlName="unload" [readOnly]=true>unload</tui-checkbox-labeled>
-                    <tui-checkbox-labeled formControlName="unpack" [readOnly]=true>unpack</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="load" [readOnly]=true>Load</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="unload" [readOnly]=true>Unload</tui-checkbox-labeled>
+                    <tui-checkbox-labeled formControlName="unpack" [readOnly]=true>Unpack</tui-checkbox-labeled>
                 </div>
             </form>
 
@@ -22,7 +22,7 @@
                     <form [formGroup]="form">
                         <div class="tui-row tui-row_sme">
                             <div class="tui-col_8 w-full m-auto mt-8">
-                                <div class="tui-form__row tui-form__row_multi-fields">
+                                <!-- <div class="tui-form__row tui-form__row_multi-fields">
                                     <div class="tui-form__multi-field">
                                         <tui-input-date tuiTextfieldSize="m" formControlName="startTime"
                                             [readOnly]=true>
@@ -39,19 +39,28 @@
                                         <tui-error formControlName="endTime"
                                             [error]="[] | tuiFieldError | async"></tui-error>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="tui-form__row">
-                                    <tui-input-number tuiTextfieldSize="m" formControlName="manHours">
-                                        Man Hours
-                                    </tui-input-number>
-                                    <tui-error formControlName="manHours"></tui-error>
+                                    <tui-input-date tuiTextfieldSize="m" formControlName="startTime" [readOnly]=true>
+                                        Date
+                                    </tui-input-date>
+                                    <tui-error formControlName="startTime"
+                                        [error]="[] | tuiFieldError | async"></tui-error>
                                 </div>
-                                <div class="tui-form__row">
-                                    <tui-input-number tuiTextfieldSize="m" formControlName="cost">
-                                        Cost
-                                    </tui-input-number>
-                                    <tui-error formControlName="cost"></tui-error>
+                                <div class="tui-form__row tui-form__row_multi-fields">
+                                    <div class="tui-form__multi-field">
+                                        <tui-input-number tuiTextfieldSize="m" formControlName="cost">
+                                            Cost
+                                        </tui-input-number>
+                                        <tui-error formControlName="cost"></tui-error>
+                                    </div>
+                                    <div class="tui-form__multi-field">
+                                        <tui-input-number tuiTextfieldSize="m" formControlName="manHours">
+                                            Man Hours
+                                        </tui-input-number>
+                                        <tui-error formControlName="manHours"></tui-error>
+                                    </div>
                                 </div>
                                 <div class="tui-form__row">
                                     <tui-input-number [step]=1 tuiTextfieldSize="m" formControlName="boxes">
@@ -66,7 +75,8 @@
                                             Notes
                                         </tui-textarea>
                                     </div>
-                                    <div class="flex flex-col items-center justify-center tui-form__multi-field">
+                                    <div (click)="toggleItemsDialog()"
+                                        class="hover:bg-[black] hover:bg-opacity-15 rounded cursor-pointer flex flex-col items-center justify-center tui-form__multi-field">
                                         <div class="text-2xl w-3/4 flex justify-between items-center py-0.5">
                                             <span>Rooms</span>
                                             <span class="opacity-45">{{ job.rooms.length }}</span>
@@ -117,5 +127,27 @@
                 </google-map>
             </div>
         </tui-loader>
+
+        <ng-template let-observer [tuiDialogOptions]="{label: 'Rooms and items', size: 'm'}"
+            [(tuiDialog)]="itemsDialogOpen">
+            <tui-accordion class="container" [rounded]="false">
+                <!--Iterate over selected rooms-->
+                <!--Accordion item for each room-->
+                <tui-accordion-item *ngFor="let room of job.rooms" borders="top-bottom" [showArrow]="true">
+                    <!--Accordion Item Label-->
+                    <div class="operation-header">
+                        <div class="operation-title">{{room.roomName}}</div>
+                    </div>
+                    <ng-template tuiAccordionItemContent>
+                        <!--Populate room items-->
+                        <tui-primitive-textfield [readOnly]=true class="mb-2" [value]="item.value + ''"
+                            *ngFor="let item of room.items | keyvalue">
+                            {{item.key}}
+                            <input tuiTextfield />
+                        </tui-primitive-textfield>
+                    </ng-template>
+                </tui-accordion-item>
+            </tui-accordion>
+        </ng-template>
     </div>
 </div>
