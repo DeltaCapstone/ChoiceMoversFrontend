@@ -44,6 +44,9 @@ export class CustomerInfoComponent extends BaseComponent {
     });
   }
 
+  /**
+   * Called on component initialization. Subscribes to the current user via userName and patches formControl values based on information fetched from userName. Subscribes to emitted values.
+   */
   ngOnInit() {
     const userName: string | null = this._route.snapshot.paramMap.get('userName');
     //if user exists, get this customer and set the form values
@@ -68,6 +71,9 @@ export class CustomerInfoComponent extends BaseComponent {
     }
   }
 
+  /**
+   * Saves a customer's sign up information to the database via assigning values from formControls to a constant, and subscribes to emitted values.
+   */
   save() {
     const customerSignUpFormValues = this.customerSignUpGroup.value;
     const saveSub = this.user$.pipe(
@@ -103,10 +109,16 @@ export class CustomerInfoComponent extends BaseComponent {
     this.subscriptions.push(saveSub);
   }
 
+  /**
+   * Navigates back to the previous page
+   */
   back() {
     this._location.back();
   }
 
+  /**
+   * Called on component destruction. Unsubscribes to all subscriptions.
+   */
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }

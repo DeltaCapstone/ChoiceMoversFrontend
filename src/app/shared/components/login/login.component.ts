@@ -50,6 +50,9 @@ export class LoginComponent extends BaseComponent {
         passwordPlain: new FormControl("", [Validators.required]),
     });
 
+    /**
+     * Called on component initialization. Uses the SessionType to determine which login route to provide.
+     */
     ngOnInit() {
         const sessionType = this._route.snapshot.paramMap.get("type") as SessionType ?? "";
         if (sessionType === SessionType.Customer) {
@@ -60,6 +63,10 @@ export class LoginComponent extends BaseComponent {
         }
     }
 
+    /**
+     * Login function that provides login functionality to the website. Validates user credentials and attempts login depending on SessionType
+     * @returns An AbstractControl if the form field is invalid; nothing otherwise
+     */
     login() {
         // validate
         const firstInvalidControl = Object.keys(this.form.controls).find(field => {
@@ -90,16 +97,26 @@ export class LoginComponent extends BaseComponent {
         });
     }
 
+    /**
+     * Getter for computedCredentialsError
+     * @returns An observable of type TuiValidationError if an credentials are invalid; null otherwise
+     */
     get computedCredentialsError(): Observable<TuiValidationError | null> {
         return this.invalidCredentials.asObservable().pipe(
             map(invalidCredentials => invalidCredentials ? this.credentialsError : null)
         );
     }
 
+    /**
+     * Called on component destruction. Unsubscribes from all subscriptions.
+     */
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
 
+    /**
+     * Function that navigates to the customer-signup component if the sign up button is clicked
+     */
     navigateToCustomerSignup() {
         this.router.navigate(['/home/customer-signup']);
     }

@@ -34,6 +34,9 @@ export class CustomerSummaryComponent {
     this.roundedEstimate$ = new BehaviorSubject<number | null>(null);
   }
 
+  /**
+   * Called on component initialization. Assigns initial values of component properties.
+   */
   ngOnInit() {
     this.jobSessionState = this._customerSession.movePlannerSessionState;
 
@@ -45,6 +48,9 @@ export class CustomerSummaryComponent {
 
   }
 
+  /**
+   * Called after component initialization. Subscribes to estimateCost$ BehaviorSubject to get value, and uses pipe and map to round that value, setting roundedValue$ Behavior Subject value.
+   */
   ngAfterViewInit() {
 
     this.subscriptions.push(this.estimateCost$.pipe(
@@ -55,6 +61,9 @@ export class CustomerSummaryComponent {
     );
   }
 
+  /**
+   * Calls the Jobs service which is used to call the createCustomerJob API route. Creates a customer job from an estimate given the estimate ID.
+   */
   createJobFromEstimate() {
     const estimateSubscription = this.estimateID$.subscribe({
       next: (id) => {
@@ -74,10 +83,16 @@ export class CustomerSummaryComponent {
     this._router.navigate(['/home/job-completion']);
   }
 
+  /**
+   * Uses Router module to navigate back to the move-planner component
+   */
   navigateBackToMovePlanner() {
     this._router.navigate(['/home/move-planner']);
   }
 
+  /**
+   * Called on component destruction. Unsubscribes from each subscription to avoid memory leaks
+   */
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }

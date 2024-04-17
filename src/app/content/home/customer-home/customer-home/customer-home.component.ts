@@ -31,6 +31,9 @@ export class CustomerHomeComponent extends PageComponent implements OnInit, OnDe
     this.googleReviews$ = new BehaviorSubject<GoogleReviewsResponse | null>(null);
   }
 
+  /**
+   * Called on component initialization. Sets title, subscribes to GoogleReviews response data, pushes subscriptions to Subscription array
+   */
   ngOnInit() {
     this.setTitle("Moving");
     this.subscriptions.push(this.googleReviews$.subscribe(data => console.log(data)));
@@ -47,10 +50,16 @@ export class CustomerHomeComponent extends PageComponent implements OnInit, OnDe
     this.subscriptions.push(this.reviewRotationSubscription);
   }
 
+  /**
+   * Called after component view initializes. Calls the getReviews function which fetches Google Reviews via an API call to Google Places API
+   */
   ngAfterViewInit() {
     this.getReviews();
   }
 
+  /**
+   * Calls the google places API to retreive the 5 most recent reviews for Choice Movers Google Business Profile
+   */
   getReviews() {
     const url = 'https://places.googleapis.com/v1/places/ChIJR0zbo4V49mIRynTpBCdPbC4?fields=reviews,displayName&key=API_KEY_HERE';
     const googleReviewSubscription = this.googleMapsLoaderService.getGoogleReviews(url).subscribe(response => {
@@ -59,6 +68,9 @@ export class CustomerHomeComponent extends PageComponent implements OnInit, OnDe
     this.subscriptions.push(googleReviewSubscription);
   }
 
+  /**
+   * Called on component destruction. Unsubscribes to all subscriptions to avoid memory leaks.
+   */
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     if (this.reviewRotationSubscription) {

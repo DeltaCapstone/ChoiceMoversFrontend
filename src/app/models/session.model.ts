@@ -5,10 +5,16 @@ import { JobsService } from "../shared/services/jobs.service";
 import { CreateJobEstimate } from "./create-job-estimate.model";
 import { Customer } from "./customer.model";
 
+/**
+ * Interface that describes the SessionState type
+ */
 export interface ISessionState {
     clear(): void;
 }
 
+/**
+ * Interface that describes the JobSessionState type
+ */
 export interface IJobSessionState {
     jobId: string;
     employeeToBoot$: ReplaySubject<AssignedEmployee | null>;
@@ -18,6 +24,9 @@ export interface IJobSessionState {
     directionsResults$: ReplaySubject<google.maps.DirectionsResult | undefined>;
 }
 
+/**
+ * Interface that describes the CreateEstimateSessionState type
+ */
 export interface ICreateEstimateSessionState {
     currentJob: CreateJobEstimate;
     currentCustomer: BehaviorSubject<Customer | null>;
@@ -26,6 +35,9 @@ export interface ICreateEstimateSessionState {
     estimateID: BehaviorSubject<number | null>;
 }
 
+/**
+ * Class that defines a CreateEstimateSessionState object and its properties and methods
+ */
 export class CreateEstimateSessionState implements ICreateEstimateSessionState, ISessionState {
     currentJob = new CreateJobEstimate();
     currentCustomer = new BehaviorSubject<Customer | null>(null);
@@ -42,6 +54,9 @@ export class CreateEstimateSessionState implements ICreateEstimateSessionState, 
     }
 }
 
+/**
+ * Interface that describes the ScheduleSessionState type
+ */
 export interface IScheduleSessionState {
     jobSessionState: JobSessionState | null;
     jobsStartDate: string;
@@ -49,6 +64,9 @@ export interface IScheduleSessionState {
     tabIndex: number;
 }
 
+/**
+ * Class that defines a JobSessionStateObject and its properties and methods
+ */
 export class JobSessionState implements IJobSessionState, ISessionState {
     jobsService: JobsService;
     jobId = "";
@@ -78,6 +96,9 @@ export class JobSessionState implements IJobSessionState, ISessionState {
     }
 }
 
+/**
+ * Class that defines a ScheduleSessionStateObject and its properties and methods
+ */
 export class ScheduleSessionState implements IScheduleSessionState, ISessionState {
     jobsStartDate = "";
     jobsEndDate = "";
@@ -92,17 +113,26 @@ export class ScheduleSessionState implements IScheduleSessionState, ISessionStat
     }
 }
 
+/**
+ * Enum class that describes a SessionType
+ */
 export enum SessionType {
     Employee = "employee",
     Customer = "customer",
 }
 
+/**
+ * Interface that describes the SessionServiceConfig generic type
+ */
 export interface ISessionServiceConfig<T> {
     type: SessionType;
     getUser: () => Observable<T | undefined>;
     loginRoute: string;
 }
 
+/**
+ * Class that defines a SessionServiceConfig generic object and its properties and methods
+ */
 export class SessionServiceConfig<T> implements ISessionServiceConfig<T> {
     type: SessionType;
     getUser: () => Observable<T | undefined>;

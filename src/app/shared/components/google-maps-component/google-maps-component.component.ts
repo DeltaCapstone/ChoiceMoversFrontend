@@ -21,6 +21,9 @@ export class GoogleMapsComponentComponent extends PageComponent {
     this.setTitle("Moving");
   }
 
+  /**
+   * Calls the initMap() function via the GoogleMapsLoaderService
+   */
   ngAfterViewInit(): void {
     this.googleMapsLoaderService.initMap();
   }
