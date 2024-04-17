@@ -54,7 +54,7 @@ export class JobWorkersComponent extends BaseComponent {
             map(user => user?.employeeType == EmployeeType.Manager)
         );
 
-        const columns = ["email", "name", "employeeType", "managerAssigned"];
+        const columns = ["name", "email", "employeeType", "managerAssigned"];
         const managerSub = this.isManager$.subscribe(isManager => {
             const newColumns = isManager ? [...columns, "unassign"] : columns;
             this.columns$.next(newColumns);

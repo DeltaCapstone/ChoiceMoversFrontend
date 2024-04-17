@@ -2,8 +2,7 @@
     <ng-container *tuiLet="isManager$ | async as isManager">
         <ng-container *ngIf="workers$ | async as employees">
             <div class="flex items-center mb-4">
-                <tui-tag status="custom" class="bg-[var(--tui-link)] h-min"
-                    [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
+                <tui-tag class="h-min" [value]="employees.length + '/' + maxWorkers + ' slots filled'"></tui-tag>
                 <tui-tag class="h-min ml-2" *ngIf="displayOverride$ | async" value="Boot available"></tui-tag>
                 <ng-container *ngIf="isManager">
                     <div *tuiLet="isFull$ | async as isFull" (click)="!isFull && toggleAssignDialog()"
@@ -16,11 +15,11 @@
             <table class="w-full" tuiTable [columns]="(columns$ | async) ?? []">
                 <thead>
                     <tr tuiThGroup>
-                        <th *tuiHead="'email'" tuiTh>
-                            E-mail
-                        </th>
                         <th *tuiHead="'name'" tuiTh>
                             Name
+                        </th>
+                        <th *tuiHead="'email'" tuiTh>
+                            E-mail
                         </th>
                         <th *tuiHead="'employeeType'" tuiTh>
                             Employee Type

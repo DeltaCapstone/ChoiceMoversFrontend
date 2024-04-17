@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { BaseComponent } from '../base-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TUI_VALIDATION_ERRORS, TuiFieldErrorPipeModule, TuiInputModule, TuiInputPasswordModule, TuiInputPhoneModule } from '@taiga-ui/kit';
 import { TuiErrorModule } from '@taiga-ui/core';
@@ -51,7 +51,7 @@ export class EmployeeSignupComponent extends BaseComponent {
     }
   }
   
-  constructor(private route: ActivatedRoute, private employeesService: EmployeesService) {
+  constructor(private route: ActivatedRoute, private employeesService: EmployeesService, private router: Router) {
     super();
   }
 
@@ -84,6 +84,7 @@ export class EmployeeSignupComponent extends BaseComponent {
     this.employeesService.signUp(employeeCreateRequest, this.token).subscribe({
       next: (response: any) => {
           console.log('User created', response);
+          this.router.navigate(["dashboard"]);
       },
       error: (error) => {
           console.error('Error creating user', error);

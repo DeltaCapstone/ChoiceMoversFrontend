@@ -24,7 +24,7 @@ export class EmployeesService {
     }
 
     createEmployee(email: string, priority: number, type: EmployeeType) {
-        return this.http.post(`${this.apiUrl}/manager/employee?email=${email}&priority=${priority}&type=${type}`, {});
+        return this.http.post(`${this.apiUrl}/manager/employee?email=${email}&priority=${priority}&type=${type}`, {})    
     }
 
     getProfile(): Observable<Employee | undefined> {
