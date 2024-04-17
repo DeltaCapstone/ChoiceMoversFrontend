@@ -6,7 +6,7 @@
       class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 opacity-20 rounded-2xl"
       style="opacity: 0.2; width: 50%; height: auto;" />
 
-    <!-- Centered content including header, icons, and paragraph -->
+    <!-- Centered content -->
     <div class="relative flex flex-col justify-between h-full z-10">
       <div class="flex justify-between items-end p-10 order-[1]">
         <div class="button-container w-full flex justify-center">
@@ -45,7 +45,6 @@
                   <div class="review-rating">
                     <span *ngFor="let starIndex of createRange(review.rating)" class="star-icon">★</span>
                   </div>
-                  <!-- Add more fields as needed -->
                 </div>
               </div>
             </ng-container>
