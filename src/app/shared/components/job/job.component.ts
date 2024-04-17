@@ -71,8 +71,16 @@ export class JobComponent extends BaseComponent {
         });
 	}
 
-    finalize() {
-        
+    finalize(job: Job) {        
+        this.session.isUserAuthorized().subscribe(isAuthorized => {
+            if (!isAuthorized){
+                this.session.redirectToLogin();
+            }
+            
+            job.finalized = true;
+            console.log(job);
+            this.jobsService.updateCustomerJob(job).subscribe();
+        });
     }
 
     selfAssign() {

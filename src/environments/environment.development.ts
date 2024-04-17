@@ -4,7 +4,7 @@
 import pkg from '../../package.json';
 
 
-const mapsApiKey = "AIzaSyC3tj5ebRVtAxJG4A4seUV02a5fIuZmG9s";
+const mapsApiKey = "API_KEY_HERE";
 
 export const environment = {
     enableSystemMessages: false,

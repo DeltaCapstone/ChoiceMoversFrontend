@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, combineLatest, map, startWith, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, combineLatest, map, switchMap, take, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BaseComponent } from '../../base-component';
 import { TuiTableModule } from '@taiga-ui/addon-table';
@@ -8,7 +8,6 @@ import { TuiLetModule } from '@taiga-ui/cdk';
 import { AssignedEmployee, Employee, EmployeeType } from '../../../../models/employee';
 import { SessionService } from '../../../services/session.service';
 import { JobsService } from '../../../services/jobs.service';
-import { SessionType } from '../../../../models/session.model';
 import { EmployeesService } from '../../../services/employees.service';
 import { TUI_PROMPT, TuiDataListWrapperModule, TuiPromptModule, TuiSelectModule, TuiTagModule } from '@taiga-ui/kit';
 import { TuiIconModule } from '@taiga-ui/experimental';

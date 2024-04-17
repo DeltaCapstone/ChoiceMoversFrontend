@@ -45,14 +45,16 @@ export class JobsService {
         return this.http.post<Object>(`${this.apiUrl}/customer/estimate/convert`, { estimateId: newJobID });
     }
 
+
     /**
      * Updates a customer job based on an updated Job object. Calls the updateCustomerJob API post route
      * @param updatedJob 
      * @returns Observable of type Job with updated job information
      */
-    updateCustomerJob(updatedJob: IJob): Observable<IJob> {
-        console.log(updatedJob);
-        return this.http.post<IJob>(`${this.apiUrl}/manager/job/update`, updatedJob);
+    updateCustomerJob(updatedJob: Job): Observable<Job> {
+        this.cacheUpsert([updatedJob]);
+        return this.http.post<Job>(`${this.apiUrl}/manager/job/update`, updatedJob);
+
     }
 
     /**

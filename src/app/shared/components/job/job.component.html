@@ -49,11 +49,13 @@
         </ng-container>
     </ng-container>
 
-    <div *ngIf="!(job$ | async)?.finalized" class="flex flex-col">
-        <button type="submit"
-            class="gradient-button bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold">
-            Finalize </button>
-    </div>
+    <ng-container *tuiLet="job$ | async as job">
+        <div *ngIf="!job?.finalized" class="flex flex-col">
+            <button (click)="finalize(job!)" type="submit"
+                class="gradient-button bg-secondary p-3 rounded-md text-lg tui-form__button text-[white] font-bold">
+                Finalize </button>
+        </div>
+    </ng-container>
 </div>
 
 <router-outlet></router-outlet>
