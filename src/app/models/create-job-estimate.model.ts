@@ -128,6 +128,9 @@ export class CreateJobEstimate implements ICreateJobEstimate {
     }
 }
 
+/**
+ * Class that defines a CreateJob object and its properties and methods
+ */
 export class CreateJob extends CreateJobEstimate implements ICreateJob {
     manHours: number;
     rate: number;

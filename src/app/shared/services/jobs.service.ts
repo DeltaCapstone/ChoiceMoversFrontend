@@ -27,19 +27,41 @@ export class JobsService {
     // CUSTOMER REQUESTS
     // -----------------------
 
+    /**
+     * Creates an estimate based on information provided by the customer via the CreateJobEstimate object. Uses the createCustomerEstimate API post route.
+     * @param newJob A CreateJobEstimate object with provided by the customer to be used to create and estimate
+     * @returns Observable of type CreateJobEstimate
+     */
     createCustomerEstimate(newJob: CreateJobEstimate): Observable<CreateJobEstimate> {
         return this.http.post<CreateJobEstimate>(`${this.apiUrl}/customer/estimate`, newJob);
     }
 
+    /**
+     * Creates a finalized job from a customer estimate via an estimate ID using the createCustomerJob API post route.
+     * @param newJobID the estimate ID to be used to create the new job
+     * @returns An http response of type Object containing job response information
+     */
     createCustomerJob(newJobID: number) {
         return this.http.post<Object>(`${this.apiUrl}/customer/estimate/convert`, { estimateId: newJobID });
     }
 
+
+    /**
+     * Updates a customer job based on an updated Job object. Calls the updateCustomerJob API post route
+     * @param updatedJob 
+     * @returns Observable of type Job with updated job information
+     */
     updateCustomerJob(updatedJob: Job): Observable<Job> {
         this.cacheUpsert([updatedJob]);
         return this.http.post<Job>(`${this.apiUrl}/manager/job/update`, updatedJob);
+
     }
 
+    /**
+     * Gets customer job information via a customer username. Calls the getCustomerJobs API get route
+     * @param userName A valid username 
+     * @returns Observable of type Job with current created customer job information
+     */
     getCustomerJobs(userName: string): Observable<Job[]> {
         return this.http.get<Job[]>(`${this.apiUrl}/customer/job?username=${userName}`)
     }

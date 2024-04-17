@@ -55,6 +55,9 @@ export interface IEstimate {
     estimateCost: number;
 }
 
+/**
+ * Class that defines an Estimate object and its properties and methods.
+ */
 export class Estimate implements IEstimate {
     estimateId: number;
     customer: Customer;

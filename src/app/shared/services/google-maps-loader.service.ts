@@ -22,6 +22,9 @@ export class GoogleMapsLoaderService {
   //--Maps and Reviews Section----------------------------------------------
   map: google.maps.Map;
 
+  /**
+   * Function that initializes a Google Map instance wherever it is used in the web application by making an asynchronous call to the Google Maps library via the dynamic library loader in the index.html file
+   */
   async initMap(): Promise<void> {
     // Choice Movers Location
     const position = { lat: 41.066078186035156, lng: -81.46630096435547 };

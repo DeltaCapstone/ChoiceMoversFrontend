@@ -145,6 +145,9 @@ export class MovePlannerComponent extends PageComponent {
     this.itemsGroup = this._formBuilder.group({});
   }
 
+  /**
+   * Called on component initialization. Calls initialization functions, subscribes to the current user, and adds that subscription to the Subscription array.
+   */
   ngOnInit(): void {
     this.setTitle("Move Planner");
 
@@ -177,6 +180,9 @@ export class MovePlannerComponent extends PageComponent {
 
   }
 
+  /**
+   * Called after component initialization. Calls the refreshMovePlannerState() function.
+   */
   ngAfterViewInit() {
     console.log('this.jobSessionState.currentJob.rooms in ngAfterViewInit before calling this.refreshMovePlannerState', this.jobSessionState.currentJob.rooms);
     this.refreshMovePlannerState(this.jobSessionState);
@@ -808,6 +814,9 @@ export class MovePlannerComponent extends PageComponent {
     this._router.navigate(['home/customer-summary']);
   }
 
+  /**
+   * Called on component destruction. Unsubscribes from all subscriptions.
+   */
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
